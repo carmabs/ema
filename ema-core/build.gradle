@@ -9,6 +9,7 @@ compileKotlin {
 }
 
 dependencies {
+    implementation("com.squareup:kotlinpoet-ksp:1.10.2")
     api emaCore.kotlin
     api emaCore.coroutines
 }

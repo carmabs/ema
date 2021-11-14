@@ -42,6 +42,7 @@ android {
 
 dependencies {
 
+    implementation("com.squareup:kotlinpoet-ksp:1.10.2")
     //Java Time API for SDK version < 26
     coreLibraryDesugaring emaAndroid.desugaring
 
