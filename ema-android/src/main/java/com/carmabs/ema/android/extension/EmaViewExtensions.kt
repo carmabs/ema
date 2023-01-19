@@ -163,7 +163,7 @@ fun ImageView.setImageWithOvershot(
 fun checkVisibility(visibility: Boolean, gone: Boolean = true): Int {
     return when {
         visibility -> View.VISIBLE
-        !visibility && gone -> View.GONE
+        gone -> View.GONE
         else -> View.INVISIBLE
     }
 }
