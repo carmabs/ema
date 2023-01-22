@@ -1,7 +1,5 @@
 package com.carmabs.ema.core.viewmodel
 
-import com.carmabs.ema.core.concurrency.ConcurrencyManager
-import com.carmabs.ema.core.concurrency.DefaultConcurrencyManager
 import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaUseCaseResult
@@ -10,20 +8,34 @@ import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 /**
  * View model to handle view states.
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
+abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: CoroutineScope = MainScope()) {
+
+
+    /**
+     * The scope where coroutines will be launched by default.
+     */
+    protected var scope: CoroutineScope = defaultScope
+    private set
+
+    internal fun setScope(scope:CoroutineScope){
+        this.scope = scope
+    }
+
 
     private val pendingEvents = mutableListOf<() -> Unit>()
 
@@ -63,11 +75,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
     )
 
     /**
-     * Manager to handle the threads where the background tasks are going to be launched
-     */
-    var concurrencyManager: ConcurrencyManager = DefaultConcurrencyManager()
-
-    /**
      * The state of the view.
      */
     internal lateinit var state: EmaState<S>
@@ -105,7 +112,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
      */
     fun onStart(initializer: EmaInitializer? = null, startedFinishListener: (() -> Unit)? = null) {
         if (!this::state.isInitialized) {
-            concurrencyManager.launch {
+            scope.launch {
                 normalContentData = onCreateState(initializer)
                 state = EmaState.Normal(normalContentData)
                 hasBeenInitialized = true
@@ -259,10 +266,10 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
      * - job returns the job where the action function has been executed
      */
     protected fun <T> executeUseCase(
-        fullException: Boolean = false,
+        dispatcher: CoroutineContext = this.scope.coroutineContext,
         action: suspend CoroutineScope.() -> T
     ): EmaUseCaseResult<T> {
-        return EmaUseCaseResult(concurrencyManager, fullException, action)
+        return EmaUseCaseResult(scope, dispatcher, action)
     }
 
     /**
@@ -274,13 +281,11 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
      * @return the job that can handle the lifecycle of the background task
      */
     protected fun runSuspend(
-        dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
-        fullException: Boolean = false,
+        dispatcher: CoroutineContext = scope.coroutineContext,
         block: suspend CoroutineScope.() -> Unit
     ): Job {
-        return concurrencyManager.launch(
-            dispatcher = dispatcher,
-            fullException = fullException,
+        return scope.launch(
+            dispatcher,
             block = block
         )
     }
@@ -422,7 +427,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
     internal fun onCleared() {
         emaResultHandler.notifyResults(getId())
         emaResultHandler.removeResultListener(getId())
-        concurrencyManager.cancelPendingTasks()
+        scope.cancel()
         useAfterStateIsCreated {
             onDestroy()
         }

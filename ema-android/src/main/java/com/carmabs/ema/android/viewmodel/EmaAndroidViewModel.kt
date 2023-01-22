@@ -2,6 +2,7 @@ package com.carmabs.ema.android.viewmodel
 
 import androidx.annotation.CallSuper
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaMethod
@@ -18,6 +19,9 @@ import kotlin.reflect.jvm.javaMethod
 abstract class EmaAndroidViewModel(val emaViewModel:EmaViewModel<*,*>) :
     ViewModel() {
 
+    init {
+        Class.forName(emaViewModel.javaClass.name).kotlin.functions.find { it.name == "setScope" }?.javaMethod?.invoke(emaViewModel,viewModelScope)
+    }
     @CallSuper
     override fun onCleared() {
         Class.forName(emaViewModel.javaClass.name).kotlin.functions.find { it.name == "onCleared" }?.javaMethod?.invoke(emaViewModel)
