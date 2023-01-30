@@ -2,9 +2,7 @@ package com.carmabs.ema.core.model
 
 import com.carmabs.ema.core.delegate.emaSyncDelegate
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext

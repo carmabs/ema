@@ -1,5 +1,6 @@
 package com.carmabs.ema.core.viewmodel
 
+import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaUseCaseResult
@@ -10,7 +11,6 @@ import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,7 +23,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: CoroutineScope = MainScope()) {
+abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: CoroutineScope = EmaMainScope()) {
 
 
     /**
