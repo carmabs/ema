@@ -102,9 +102,6 @@ abstract class EmaActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     protected var isFirstOverlayedExecution: Boolean = true
         private set
 
-    protected var isFirstErrorExecution: Boolean = true
-        private set
-
     private var viewJob: MutableList<Job>? = null
 
     /**
@@ -126,11 +123,6 @@ abstract class EmaActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
      * Trigger to start viewmodel only when startViewModel is launched
      */
     override val startTrigger: EmaViewModelTrigger? = null
-
-    /**
-     * Automatically updates previousState
-     */
-    override val updatePreviousStateAutomatically: Boolean = true
 
     /**
      * The incoming initializer in activity instantiation. This is set up when other fragment/activity
@@ -170,7 +162,7 @@ abstract class EmaActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     /**
      * Previous state for comparing state properties update
      */
-    override var previousState: S? = null
+    final override var previousEmaState: EmaState<S>? = null
 
 
     /**
@@ -267,11 +259,6 @@ abstract class EmaActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
         scope.close()
     }
 
-    final override fun onEmaStateErrorOverlayed(error: Throwable) {
-        binding.onStateErrorOverlayed(error)
-        isFirstErrorExecution = false
-    }
-
     @CallSuper
     override fun finish() {
         super.finish()
@@ -286,6 +273,10 @@ abstract class EmaActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     }
 
     //Override it to make it final to avoid deprecated implementation
+    @Suppress("DEPRECATION")
+    @Deprecated("Overrides deprecated member in 'androidx.core.app.ComponentActivity'. Deprecated in Java",
+        ReplaceWith("super.onBackPressed()", "androidx.appcompat.app.AppCompatActivity")
+    )
     final override fun onBackPressed() {
         super.onBackPressed()
     }
@@ -294,7 +285,6 @@ abstract class EmaActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
 
     abstract fun B.onStateNormal(data: S)
     protected open fun B.onStateOverlayed(data: EmaExtraData) {}
-    protected open fun B.onStateErrorOverlayed(throwable: Throwable) {}
     protected open fun B.onSingleEvent(data: EmaExtraData) {}
 
     protected data class EmaPopActivityTransitionAnimations(

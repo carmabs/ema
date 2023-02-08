@@ -314,10 +314,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      */
     private fun updateData(newState: S): EmaState<S> {
         return when (state) {
-            is EmaState.Error -> {
-                val errorState = state as EmaState.Error
-                EmaState.Error(newState, errorState.error)
-            }
             is EmaState.Normal -> {
                 EmaState.Normal(newState)
             }
@@ -376,15 +372,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
             EmaState.Overlayed(normalContentData, dataOverlayed = it)
         } ?: EmaState.Overlayed(normalContentData)
         updateView(overlayedData)
-    }
-
-    /**
-     * Used for trigger an updateErrorState event on the view
-     * Use the EmaState -> Error
-     * @param error with the exception object
-     */
-    protected open fun updateToErrorOverlayedState(error: Throwable) {
-        updateView(EmaState.Error(normalContentData, error))
     }
 
     /**

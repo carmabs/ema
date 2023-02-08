@@ -64,9 +64,6 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     protected var isFirstOverlayedExecution: Boolean = true
         private set
 
-    protected var isFirstErrorExecution: Boolean = true
-        private set
-
     /**
      * The view model of the fragment
      */
@@ -76,11 +73,6 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
      * Trigger to start viewmodel only when startViewModel is launched
      */
     override val startTrigger: EmaViewModelTrigger? = null
-
-    /**
-     * Automatically updates previousState
-     */
-    override val updatePreviousStateAutomatically: Boolean = true
 
     /**
      * The incoming initializer in fragment instantiation. This is set up when other fragment/activity
@@ -99,7 +91,7 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     /**
      * Previous state for comparing state properties update
      */
-    override var previousState: S? = null
+    final override var previousEmaState: EmaState<S>? = null
 
 
     /**
@@ -139,7 +131,7 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     }
 
     /**
-     * Get the incoming initializer from another fragment/activity by the key [inputStateKey] provided
+     * Get the incoming initializer from another fragment/activity
      */
     private fun getInitializerArgument(): EmaInitializer? {
         return arguments?.let {
@@ -168,8 +160,7 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     ): View? {
         isFirstNormalExecution = true
         isFirstOverlayedExecution = true
-        isFirstErrorExecution = true
-        previousState = null
+        previousEmaState = null
         _binding = createViewBinding(inflater, container)
         return binding.root
     }
@@ -268,7 +259,7 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
 
     @CallSuper
     override fun onDestroyView() {
-        previousState = null
+        previousEmaState = null
         _binding = null
         super.onDestroyView()
     }
@@ -289,11 +280,6 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
         isFirstOverlayedExecution = false
     }
 
-    final override fun onEmaStateErrorOverlayed(error: Throwable) {
-        binding.onStateErrorOverlayed(error)
-        isFirstErrorExecution = false
-    }
-
     final override fun onSingleEvent(data: EmaExtraData) {
         binding.onSingleEvent(data)
     }
@@ -301,9 +287,7 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     final override fun onBack(): Boolean {
         val hasMoreFragments = kotlin.runCatching {
             findNavController().popBackStack()
-        }.getOrNull()?.let {
-            it
-        } ?: let {
+        }.getOrNull() ?: let {
             val hasMoreFragments = parentFragmentManager.backStackEntryCount > INT_ZERO
             if (hasMoreFragments)
                 parentFragmentManager.popBackStack()
@@ -317,7 +301,6 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
 
     abstract fun B.onStateNormal(data: S)
     protected open fun B.onStateOverlayed(data: EmaExtraData) {}
-    protected open fun B.onStateErrorOverlayed(throwable: Throwable) {}
     protected open fun B.onSingleEvent(data: EmaExtraData) {}
 
 }

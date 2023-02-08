@@ -35,7 +35,7 @@ rootProject.ext {
     fragmentVersion = "1.5.4"
 
     emaVersioning = [
-            minSdk     : 21,
+            minSdk     : 23,
             compileSdk : 33,
             targetSdk  : 33,
             versionCode: 14,
