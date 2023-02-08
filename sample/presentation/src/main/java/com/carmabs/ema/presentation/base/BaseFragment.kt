@@ -2,7 +2,6 @@ package com.carmabs.ema.presentation.base
 
 import androidx.viewbinding.ViewBinding
 import com.carmabs.ema.android.ui.EmaFragment
-import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.core.navigator.EmaNavigationState
 import com.carmabs.ema.core.state.EmaBaseState
 import com.carmabs.ema.core.state.EmaExtraData
@@ -23,20 +22,20 @@ abstract class BaseFragment<B : ViewBinding, S : EmaBaseState, VM : EmaViewModel
 
     override fun injectFragmentModule(kodein: DI.MainBuilder): DI.Module? = fragmentInjection(this)
 
-    override fun B.onStateNormal(data: S) {
+    final override fun B.onStateNormal(data: S) {
         onNormal(data)
     }
 
-    override fun B.onStateOverlayed(data: EmaExtraData) {
+    final override fun B.onStateOverlayed(data: EmaExtraData) {
         onOverlayed(data)
     }
 
-    override fun B.onSingleEvent(data: EmaExtraData) {
+    final override fun B.onSingleEvent(data: EmaExtraData) {
         onSingle(data)
     }
 
     override fun B.onStateError(error: Throwable) {
-        onError(error)
+        onOverlayedError(error)
     }
 
     abstract fun B.onNormal(data: S)
@@ -45,6 +44,6 @@ abstract class BaseFragment<B : ViewBinding, S : EmaBaseState, VM : EmaViewModel
 
     protected open fun B.onSingle(data: EmaExtraData) {}
 
-    protected open fun B.onError(error: Throwable) {}
+    protected open fun B.onOverlayedError(error: Throwable) {}
 
 }

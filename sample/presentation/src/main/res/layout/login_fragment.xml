@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/tvLoginWelcome"
+        style="@style/TextHugeTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_huge_medium"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="@dimen/space_huge_medium"
+        android:gravity="center"
+        android:text="@string/home_hello"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"/>
+
+    <TextView
+        android:id="@+id/tvLoginWelcomeText"
+        style="@style/TextMedium"
+        android:textSize="@dimen/letter_medium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_big_medium"
+        android:text="@string/home_identify"
+        app:layout_constraintEnd_toEndOf="@+id/tvLoginWelcome"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/tvLoginWelcome"
+        app:layout_constraintTop_toBottomOf="@+id/tvLoginWelcome" />
+
+    <include
+        android:id="@+id/layoutLoginUser"
+        style="@style/EditTextUser"
+        layout="@layout/layout_user"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/tvLoginWelcomeText"
+        app:layout_constraintEnd_toEndOf="@+id/tvLoginWelcomeText"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/tvLoginWelcomeText"/>
+
+    <TextView
+        android:id="@+id/tvLoginErrorUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/home_check_credentials"
+        android:textColor="@color/colorAccent"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/layoutLoginUser"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/layoutLoginUser"
+        app:layout_constraintTop_toBottomOf="@+id/layoutLoginUser" />
+
+    <include
+        android:id="@+id/layoutLoginPassword"
+        style="@style/EditTextPasswordHome"
+        layout="@layout/layout_password"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/layoutLoginUser"
+        app:layout_constraintStart_toStartOf="@+id/layoutLoginUser"
+        app:layout_constraintTop_toBottomOf="@+id/tvLoginErrorUser" />
+
+    <TextView
+        android:id="@+id/tvLoginErrorPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/home_check_credentials"
+        android:textColor="@color/colorAccent"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/layoutLoginPassword"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/layoutLoginPassword"
+        app:layout_constraintTop_toBottomOf="@+id/layoutLoginPassword" />
+
+    <LinearLayout
+        android:id="@+id/llLoginRememberUser"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_big_medium"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="@+id/layoutLoginPassword"
+        app:layout_constraintStart_toStartOf="@+id/layoutLoginPassword"
+        app:layout_constraintTop_toBottomOf="@+id/tvLoginErrorPassword">
+
+        <Switch
+            android:id="@+id/swLoginRememberPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0"
+            android:trackTint="@color/colorAccent"
+            android:thumbTint="@color/white"
+            android:checked="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/space_tiny"
+            android:text="@string/home_remember_user"
+            android:textSize="@dimen/letter_small_medium"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/bLoginSign"
+            style="@style/ButtonRed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/home_access" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
