@@ -1,23 +1,33 @@
 package com.carmabs.ema.presentation.ui.splash
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.widget.Toolbar
+import com.carmabs.ema.android.navigation.EmaActivityNavControllerHost
 import com.carmabs.ema.android.ui.EmaToolbarActivity
-import com.google.android.material.appbar.AppBarLayout
-import com.carmabs.ema.android.di.injectDirect
+import com.carmabs.ema.android.viewmodel.EmaAndroidEmptyViewModel
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
+import com.carmabs.ema.core.navigator.EmaEmptyDestination
 import com.carmabs.ema.core.navigator.EmaNavigator
+import com.carmabs.ema.core.state.EmaEmptyState
+import com.carmabs.ema.core.viewmodel.EmaEmptyViewModel
 import com.carmabs.ema.sample.ema.R
 import com.carmabs.ema.sample.ema.databinding.SplashActivityBinding
+import com.google.android.material.appbar.AppBarLayout
 
 
 class SplashActivity :
-    EmaToolbarActivity<SplashActivityBinding,SplashState, SplashViewModel, SplashDestination>() {
+    EmaToolbarActivity<SplashActivityBinding,EmaEmptyState, EmaEmptyViewModel, EmaEmptyDestination>() {
 
     override fun createViewBinding(inflater: LayoutInflater): SplashActivityBinding {
         return SplashActivityBinding.inflate(inflater)
     }
-    
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+    }
+
     override fun SplashActivityBinding.provideToolbar(): Toolbar {
        return tbSplash
     }
@@ -27,16 +37,16 @@ class SplashActivity :
     }
 
     override fun provideAndroidViewModel(): EmaAndroidViewModel {
-        return SplashAndroidViewModel(injectDirect())
+        return EmaAndroidEmptyViewModel()
     }
 
-    override fun SplashActivityBinding.onStateNormal(data: SplashState){
+    override fun SplashActivityBinding.onStateNormal(data: EmaEmptyState){
     
     }
 
-    override val navigator: EmaNavigator<SplashDestination> = SplashNavigator(
+    override val navigator: EmaNavigator<EmaEmptyDestination> = EmaActivityNavControllerHost(
        this,
        R.id.navHostFragment,
-       R.navigation.splash_graph
+       R.navigation.main_graph
    )
 }

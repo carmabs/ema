@@ -3,6 +3,7 @@ package com.carmabs.ema.presentation.ui.login
 import com.carmabs.domain.manager.ResourceManager
 import com.carmabs.domain.model.LoginRequest
 import com.carmabs.domain.usecase.LoginUseCase
+import com.carmabs.ema.core.constants.STRING_EMPTY
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.state.EmaExtraData
@@ -16,8 +17,14 @@ class LoginViewModel(
 
     companion object {
         const val EVENT_MESSAGE = 1000
+        const val OVERLAYED_EMPTY = 1001
+        const val OVERLAYED_ERROR = 1002
+        const val OVERALAYED_LOADING = 1003
     }
 
+    override suspend fun onCreateState(initializer: EmaInitializer?): LoginState {
+        return LoginState()
+    }
 
     override fun onResultListenerSetup() {
         //When two or more resultReceived WITH THE SAME CODE are active, for example in this case,
@@ -40,30 +47,29 @@ class LoginViewModel(
     private fun doLogin() {
         executeUseCase {
             updateToOverlayedState()
-            val user = loginUseCase.execute(LoginRequest(it.userName, it.userPassword))
+            val user =
+                loginUseCase.execute(LoginRequest(stateData.userName, stateData.userPassword))
             updateToNormalState()
             notifySingleEvent(EmaExtraData(EVENT_MESSAGE, resourceManager.getCongratulations()))
-            navigate(
-                LoginDestination.Home(
-                    HomeState(
-                        name = user.name,
-                        surname = user.surname
-                    )
-                )
-            )
+            /* navigate(
+                 LoginDestination.Home(
+                     HomeState(
+                         name = user.name,
+                         surname = user.surname
+                     )
+                 )
+             )*/
         }.onError {
-            navigate(LoginDestination.Error)
+            //navigate(LoginDestination.Error)
         }
     }
 
     fun onActionLogin() {
-        getDataState().also {
             when {
-                it.userName.isEmpty() -> updateToErrorState(UserEmptyException())
-                it.userPassword.isEmpty() -> updateToErrorState(UserEmptyException())
+                stateData.userName.isEmpty() -> updateToOverlayedState(EmaExtraData(OVERLAYED_EMPTY))
+                stateData.userPassword.isEmpty() -> updateToOverlayedState(EmaExtraData(OVERLAYED_EMPTY))
                 else -> doLogin()
             }
-        }
     }
 
     fun onActionShowPassword() {

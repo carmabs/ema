@@ -34,8 +34,8 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion "1.0.5"
-        kotlinCompilerVersion '1.5.31'
+        kotlinCompilerExtensionVersion "1.4.0"
+        kotlinCompilerVersion '1.8.0'
     }
 
     kotlinOptions {
@@ -64,4 +64,5 @@ dependencies {
     implementation project(path: ':common')
     implementation emaLibraries.emaAndroidCompose
     implementation emaLibraries.emaAndroid
+    implementation 'androidx.compose.material3:material3'
 }

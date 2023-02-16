@@ -3,6 +3,7 @@ rootProject.ext {
     //Libraries
 
     navigationVersion = "2.6.0-alpha04"
+    navigationComposeVersion = "2.5.3"
 
     lifecycleExtensionsVersion = "2.2.0"
 
@@ -24,7 +25,7 @@ rootProject.ext {
 
     espressoVersion = "3.4.0"
 
-    kotlinVersion = '1.7.21'
+    kotlinVersion = '1.8.0'
 
     kotlinCompilerExtensionVersion = '1.0.5'
 
@@ -35,14 +36,14 @@ rootProject.ext {
     fragmentVersion = "1.5.4"
 
     emaVersioning = [
-            minSdk     : 23,
-            compileSdk : 33,
-            targetSdk  : 33,
-            versionCode: 14,
-            versionName: "4.2.3",
-            groupId    : 'com.github.carmabs',
-            artifactCoreId : 'ema-core',
-            artifactAndroidId : 'ema-android'
+            minSdk           : 23,
+            compileSdk       : 33,
+            targetSdk        : 33,
+            versionCode      : 14,
+            versionName      : "4.2.3",
+            groupId          : 'com.github.carmabs',
+            artifactCoreId   : 'ema-core',
+            artifactAndroidId: 'ema-android'
     ]
 
     emaCoreDependencies = [
@@ -72,6 +73,21 @@ rootProject.ext {
             lifecycle           : "androidx.lifecycle:lifecycle-extensions:" + project.lifecycleExtensionsVersion,
             lifecycleKtExtension: "androidx.lifecycle:lifecycle-runtime-ktx:" + project.lifecycleKtExtensionVersion,
             desugaring          : "com.android.tools:desugar_jdk_libs:$desugaringVersion"
+    ]
+
+    emaComposeDependencies = [
+            bom           : 'androidx.compose:compose-bom:+',
+            ui            : "androidx.compose.ui:ui",
+            tooling       : "androidx.compose.ui:ui-tooling",
+            toolingPreview: "androidx.compose.ui:ui-tooling-preview",
+            activity      : "androidx.activity:activity-compose",
+            viewmodel     : "androidx.lifecycle:lifecycle-viewmodel-compose",
+            navigation    : "androidx.navigation:navigation-compose:$navigationComposeVersion",
+    ]
+
+    emaComposeTestingDependencies = [
+            junit4  : "androidx.compose.ui:ui-test-junit4",
+            manifest: "androidx.compose.ui:ui-test-manifest"
     ]
 
 }

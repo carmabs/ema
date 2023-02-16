@@ -1,5 +1,8 @@
 package com.carmabs.app
 
+import com.carmabs.app.di.dataModule
+import com.carmabs.app.di.uiModule
+import com.carmabs.app.di.useCaseModule
 import com.carmabs.ema.android.base.EmaApplication
 import org.koin.core.module.Module
 
@@ -16,6 +19,6 @@ import org.koin.core.module.Module
 class EmaSampleApplication : EmaApplication() {
 
     override fun injectAppModules(): List<Module> {
-        return listOf(appDataInjection())
+        return listOf(dataModule, uiModule, useCaseModule)
     }
 }

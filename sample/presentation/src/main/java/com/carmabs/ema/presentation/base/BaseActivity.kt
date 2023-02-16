@@ -1,11 +1,11 @@
 package com.carmabs.ema.presentation.base
 
+import androidx.viewbinding.ViewBinding
 import com.carmabs.ema.android.ui.EmaActivity
-import com.carmabs.ema.core.navigator.EmaNavigationState
-import com.carmabs.ema.core.state.EmaBaseState
+import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.state.EmaDataState
+import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import com.carmabs.ema.presentation.injection.activityInjection
-
 
 /**
  * Base Activity. OverrideTheme -> True, the theme is overriden by AppTheme
@@ -15,11 +15,22 @@ import com.carmabs.ema.presentation.injection.activityInjection
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
-abstract class BaseActivity<S : EmaBaseState, VM : EmaViewModel<S, D>, D : EmaNavigationState> : EmaActivity<S,VM,D>() {
+abstract class BaseActivity<B:ViewBinding,S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> : EmaActivity<B,S,VM,D>(){
+    final override fun B.onStateNormal(data: S) {
+        onNormal(data)
+    }
 
-    override fun injectActivityModule(kodein: DI.MainBuilder): DI.Module? = activityInjection(this)
+    final override fun B.onStateOverlayed(data: EmaExtraData) {
+        onOverlayed(data)
+    }
 
-    //True if you want to set the Application theme to activity, otherwise it will take EmaTheme.
-    //False by default -> EmaTheme
-    override val overrideTheme: Boolean = true
+    final override fun B.onSingleEvent(data: EmaExtraData) {
+        onSingle(data)
+    }
+
+    abstract fun B.onNormal(data: S)
+
+    protected open fun B.onOverlayed(data: EmaExtraData) {}
+
+    protected open fun B.onSingle(data: EmaExtraData) {}
 }

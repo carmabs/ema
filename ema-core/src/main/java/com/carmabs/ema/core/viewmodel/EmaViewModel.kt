@@ -30,9 +30,9 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * The scope where coroutines will be launched by default.
      */
     protected var scope: CoroutineScope = defaultScope
-    private set
+        private set
 
-    internal fun setScope(scope:CoroutineScope){
+    internal fun setScope(scope: CoroutineScope) {
         this.scope = scope
     }
 
@@ -94,7 +94,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * Determine if the viewmodel has initialized its state
      */
 
-    var hasBeenInitialized: Boolean = false
+    protected var hasBeenInitialized: Boolean = false
         private set
 
     /**
@@ -108,7 +108,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * Methods called the first time ViewModel is created
      * @param initializer
      * @param startedFinishListener: (() -> Unit) listener when starting has been finished
-     * @return true if it's the first time is started
      */
     fun onStart(initializer: EmaInitializer? = null, startedFinishListener: (() -> Unit)? = null) {
         if (!this::state.isInitialized) {
@@ -139,7 +138,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
     /**
      * Called when view is created by first time, it means, it is added to the stack
      */
-    abstract suspend fun onCreateState(initializer: EmaInitializer? = null): S
+    protected abstract suspend fun onCreateState(initializer: EmaInitializer? = null): S
 
     protected open suspend fun onCreated() = Unit
 
@@ -207,7 +206,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
     /**
      * Get current state of view
      */
-    fun getCurrentState(): EmaState<S> = state
+    protected fun getCurrentState(): EmaState<S> = state
 
     /**
      * Get navigation state as LiveData to avoid state setting from the view
@@ -357,9 +356,13 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * Get the current view state
      * @return the current viewState or null if it has not been initialized
      */
-    fun getDataState(): S {
+    @Deprecated("Use stateData instead. This method will be deleted in future.")
+    protected fun getDataState(): S {
         return normalContentData
     }
+
+    val stateData: S
+        get() = normalContentData
 
 
     /**

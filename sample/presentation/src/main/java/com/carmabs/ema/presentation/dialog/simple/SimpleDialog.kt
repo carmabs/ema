@@ -3,10 +3,10 @@ package com.carmabs.ema.presentation.dialog.simple
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.carmabs.ema.R
-import com.carmabs.ema.android.ui.dialog.EmaBaseDialog
-import com.carmabs.ema.databinding.DialogSimpleBinding
+import com.carmabs.ema.android.ui.dialog.EmaDialog
 import com.carmabs.ema.core.constants.STRING_EMPTY
+import com.carmabs.ema.sample.ema.R
+import com.carmabs.ema.sample.ema.databinding.DialogSimpleBinding
 
 
 /**
@@ -15,7 +15,7 @@ import com.carmabs.ema.core.constants.STRING_EMPTY
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-class SimpleDialog : EmaBaseDialog<DialogSimpleBinding,SimpleDialogData>() {
+class SimpleDialog : EmaDialog<DialogSimpleBinding,SimpleDialogData>() {
 
     override fun createViewBinding(
         inflater: LayoutInflater,
@@ -32,12 +32,12 @@ class SimpleDialog : EmaBaseDialog<DialogSimpleBinding,SimpleDialogData>() {
                 bDialogSimpleYes.setOnClickListener { listener.onConfirmClicked() }
             }
 
-            tvDialogSimpleTitle!!.text = title
+            tvDialogSimpleTitle.text = title
 
             if (showCross)
                 ivDialogSimpleCross.visibility = if (showCross) View.VISIBLE else View.GONE
 
-            tvDialogSimpleMessage!!.text = message
+            tvDialogSimpleMessage.text = message
 
             bDialogSimpleYes.text = resources.getString(R.string.dialog_accept)
 

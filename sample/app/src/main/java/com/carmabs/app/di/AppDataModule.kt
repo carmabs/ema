@@ -1,8 +1,9 @@
-package com.carmabs.app
+package com.carmabs.app.di
 
 
 import com.carmabs.data.manager.AndroidResourceManager
 import com.carmabs.data.repository.MockRepository
+import com.carmabs.domain.manager.ResourceManager
 import com.carmabs.domain.repository.Repository
 import com.carmabs.domain.usecase.LoginUseCase
 import org.koin.dsl.module
@@ -17,13 +18,15 @@ import org.koin.dsl.module
  * Created by: Carlos Mateo Benito on 20/1/19.
  */
 
-fun appDataInjection() = module {
+val dataModule = module {
 
    single<Repository> {
       MockRepository()
    }
 
-   single { LoginUseCase(get()) }
+   single<ResourceManager> {
+      AndroidResourceManager(get())
+   }
 
    single { AndroidResourceManager(get()) }
 }

@@ -1,21 +1,17 @@
 package com.carmabs.ema.presentation.ui.splash
 
-import android.app.Activity
-import androidx.annotation.IdRes
-import androidx.annotation.NavigationRes
-import com.carmabs.ema.android.navigation.EmaActivityNavControllerNavigator
+import androidx.fragment.app.Fragment
+import com.carmabs.ema.android.navigation.EmaFragmentNavControllerNavigator
+import com.carmabs.ema.sample.ema.R
 
 class SplashNavigator(
-    activity: Activity,
-    @IdRes navHostId: Int,
-    @NavigationRes graphId: Int
-) : EmaActivityNavControllerNavigator<SplashDestination>(
-    activity = activity,
-    navHostId = navHostId,
-    graphId = graphId
-) {
+    fragment: Fragment
+) : EmaFragmentNavControllerNavigator<SplashDestination>(fragment) {
 
-    override fun navigate(navigationTarget: SplashDestination){
-    
+    override fun navigate(navigationTarget: SplashDestination) {
+        when(navigationTarget){
+            SplashDestination.Login -> navController.navigate(R.id.action_splashFragment_to_loginFragment)
+        }
+        
     }
 }

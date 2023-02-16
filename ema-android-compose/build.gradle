@@ -37,19 +37,20 @@ android {
     }
 
 
-    composeOptions {
-        kotlinCompilerExtensionVersion "1.3.2"
-    }
-
-    buildFeatures {
-        compose true
-        viewBinding true
-    }
+    with(composeConfig)
     namespace 'com.carmabs.ema.android.compose'
 }
 
 dependencies {
     implementation project(path: ':ema-android')
+
+    api platform(emaComposeDependencies.bom)
+    api emaComposeDependencies.ui
+    api emaComposeDependencies.tooling
+    api emaComposeDependencies.toolingPreview
+    api emaComposeDependencies.activity
+    api emaComposeDependencies.viewmodel
+    api emaComposeDependencies.navigation
 
     //Java Time API for SDK version < 26
     coreLibraryDesugaring emaAndroidDependencies.desugaring

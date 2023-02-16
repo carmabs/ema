@@ -1,9 +1,12 @@
 package com.carmabs.ema.presentation.ui.login
 
+import com.carmabs.ema.core.constants.STRING_EMPTY
 import com.carmabs.ema.core.state.EmaDataState
 
 data class LoginState(
-    val userName: String,
-    val userPassword:String,
+    val userName: String = STRING_EMPTY,
+    val userPassword:String = STRING_EMPTY,
+    val showPassword:Boolean = false,
+    val rememberUser :Boolean = false
 ):EmaDataState
 
