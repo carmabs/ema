@@ -1,21 +1,20 @@
 package com.carmabs.ema.presentation.ui.profile
 
-import android.app.Activity
-import androidx.annotation.IdRes
-import androidx.annotation.NavigationRes
-import com.carmabs.ema.android.navigation.EmaActivityNavControllerNavigator
+import androidx.activity.ComponentActivity
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import com.carmabs.ema.android.compose.navigation.EmaComposableNavigator
 
 class ProfileNavigator(
-    activity: Activity,
-    @IdRes navHostId: Int,
-    @NavigationRes graphId: Int
-) : EmaActivityNavControllerNavigator<ProfileDestination>(
+    activity: ComponentActivity,
+    navController: NavController,
+    navBackStackEntry: NavBackStackEntry
+) : EmaComposableNavigator<ProfileDestination>(
     activity = activity,
-    navHostId = navHostId,
-    graphId = graphId
+    navController = navController,
+    navBackStackEntry = navBackStackEntry
 ) {
-
     override fun navigate(navigationTarget: ProfileDestination){
-    
+
     }
 }

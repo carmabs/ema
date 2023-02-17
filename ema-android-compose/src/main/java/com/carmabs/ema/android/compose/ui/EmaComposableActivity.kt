@@ -1,15 +1,10 @@
 package com.carmabs.ema.android.compose.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.ComposeView
 import com.carmabs.ema.android.base.EmaCoreActivity
-import com.carmabs.ema.android.base.EmaCoreFragment
 import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData

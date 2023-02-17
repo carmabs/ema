@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.carmabs.ema.android.compose.action.EmaComposableScreenActions
+import com.carmabs.ema.android.compose.action.EmaComposableScreenActionsEmpty
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
 import com.carmabs.ema.core.initializer.EmaInitializer
@@ -15,14 +17,13 @@ import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 
 @Composable
-fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> EmaComposableScreen(
+fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination,A: EmaComposableScreenActions> EmaComposableScreen(
     defaultState:S,
     androidViewModel: EmaAndroidViewModel,
     initializer: EmaInitializer? = null,
     navigator: EmaNavigator<D>? = null,
-    onStateOverlayed: @Composable ((vm: VM, extra: EmaExtraData) -> Unit)? = null,
-    onSingleEvent: @Composable ((vm: VM, extra: EmaExtraData) -> Unit)? = null,
-    onStateNormal: @Composable ((vm: VM, state: S) -> Unit)
+    screenActions:A,
+    screenView: EmaComposableScreenView<S, VM, D,A>
 ) {
     val vm = viewModel(androidViewModel::class.java, factory = EmaViewModelFactory(androidViewModel)).emaViewModel as VM
 
@@ -35,11 +36,11 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> EmaComposabl
 
     when (state) {
         is EmaState.Normal -> {
-            onStateNormal.invoke(vm, state.data)
+            screenView.onStateNormal(state.data,screenActions)
         }
         is EmaState.Overlayed -> {
-            onStateNormal.invoke(vm, state.data)
-            onStateOverlayed?.invoke(vm, state.dataOverlayed)
+            screenView.onStateNormal(state.data,screenActions)
+            screenView.onStateOverlayed(state.dataOverlayed,screenActions)
         }
     }
 
@@ -55,5 +56,5 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> EmaComposabl
     }
 
     val event = vm.getSingleObservableState().collectAsState(initial = EmaExtraData())
-    onSingleEvent?.invoke(vm, event.value)
+    screenView.onSingleEvent(event.value,screenActions)
 }
