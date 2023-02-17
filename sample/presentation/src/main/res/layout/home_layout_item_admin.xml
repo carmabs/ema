@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/grayLight"
-    android:layout_margin="@dimen/space_medium"
+
     android:padding="@dimen/space_big">
 
     <ImageView
-        android:id="@+id/ivItemRight"
+        android:id="@+id/ivHomeItemAdmin"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:scaleType="centerCrop"
@@ -18,15 +18,15 @@
         app:srcCompat="@drawable/ic_group" />
 
     <TextView
-        android:id="@+id/tvItemRight"
+        android:id="@+id/tvHomeItemAdmin"
         android:layout_width="0dp"
         android:gravity="start"
         android:textStyle="bold"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/space_big"
-        app:layout_constraintBottom_toBottomOf="@id/ivItemRight"
-        app:layout_constraintEnd_toStartOf="@id/ivItemRight"
+        app:layout_constraintBottom_toBottomOf="@id/ivHomeItemAdmin"
+        app:layout_constraintEnd_toStartOf="@id/ivHomeItemAdmin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/ivItemRight"
+        app:layout_constraintTop_toTopOf="@id/ivHomeItemAdmin"
         tools:text="Group: 7 people" />
 </androidx.constraintlayout.widget.ConstraintLayout>

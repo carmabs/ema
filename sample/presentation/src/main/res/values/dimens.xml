@@ -9,13 +9,13 @@
     <dimen name="space_big_medium">15dp</dimen>
     <dimen name="space_big">20dp</dimen>
     <dimen name="space_huge_medium">26dp</dimen>
-    <dimen name="space_big_huge">40dp</dimen>
+    <dimen name="space_big_huge">50dp</dimen>
     <dimen name="space_very_big">35dp</dimen>
 
     <!--Spaces-->
     <dimen name="icon_size_toolbar">30dp</dimen>
     <dimen name="icon_size_big">48dp</dimen>
-    <dimen name="icon_size_mini">11dp</dimen>
+    <dimen name="icon_size_mini">15dp</dimen>
     <dimen name="icon_size_little">18dp</dimen>
     <dimen name="icon_size_medium">24dp</dimen>
     <dimen name="icon_size_medium_big">32dp</dimen>
@@ -27,8 +27,8 @@
     <dimen name="letter_very_big">33sp</dimen>
     <dimen name="letter_big">18sp</dimen>
     <dimen name="letter_big_huge">22sp</dimen>
-    <dimen name="letter_small_medium">12sp</dimen>
-    <dimen name="letter_medium">14sp</dimen>
+    <dimen name="letter_small_medium">14sp</dimen>
+    <dimen name="letter_medium">16sp</dimen>
 
     <!--Other-->
     <dimen name="separator">1dp</dimen>

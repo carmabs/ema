@@ -27,6 +27,8 @@ rootProject.ext {
 
     kotlinVersion = '1.8.0'
 
+    viewmodelVersion = "2.5.1"
+
     kotlinCompilerExtensionVersion = '1.0.5'
 
     koinVersion = "3.3.0"
@@ -36,7 +38,7 @@ rootProject.ext {
     fragmentVersion = "1.5.4"
 
     emaVersioning = [
-            minSdk           : 23,
+            minSdk           : 24,
             compileSdk       : 33,
             targetSdk        : 33,
             versionCode      : 14,
@@ -77,6 +79,7 @@ rootProject.ext {
 
     emaComposeDependencies = [
             bom           : 'androidx.compose:compose-bom:+',
+            koin          : "io.insert-koin:koin-androidx-compose:$koinVersion",
             ui            : "androidx.compose.ui:ui",
             tooling       : "androidx.compose.ui:ui-tooling",
             toolingPreview: "androidx.compose.ui:ui-tooling-preview",

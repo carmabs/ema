@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/grayLight"
-    android:layout_margin="@dimen/space_medium"
+
     android:padding="@dimen/space_big">
 
     <ImageView
-        android:id="@+id/ivItemLeft"
+        android:id="@+id/ivHomeItemUser"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:scaleType="centerCrop"
@@ -18,14 +18,14 @@
         app:srcCompat="@drawable/ic_user" />
 
     <TextView
-        android:id="@+id/tvItemLeft"
+        android:id="@+id/tvHomeItemUser"
         android:layout_width="0dp"
         android:textStyle="bold"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_big"
-        app:layout_constraintBottom_toBottomOf="@id/ivItemLeft"
+        app:layout_constraintBottom_toBottomOf="@id/ivHomeItemUser"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/ivItemLeft"
-        app:layout_constraintTop_toTopOf="@id/ivItemLeft"
+        app:layout_constraintStart_toEndOf="@id/ivHomeItemUser"
+        app:layout_constraintTop_toTopOf="@id/ivHomeItemUser"
         tools:text="Admin: Carmabs" />
 </androidx.constraintlayout.widget.ConstraintLayout>

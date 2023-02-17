@@ -4,12 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/space_medium"
     android:background="@color/grayLight"
     android:padding="@dimen/space_big">
 
     <ImageView
-        android:id="@+id/ivItemBackUser"
+        android:id="@+id/ivHomeItemUser"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:scaleType="centerCrop"
@@ -18,25 +17,27 @@
         app:srcCompat="@drawable/ic_user" />
 
     <TextView
-        android:id="@+id/tvItemUserSurname"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvHomeItemUserSurname"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        tools:text="EMA development"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/tvItemUserName"
-        app:layout_constraintTop_toBottomOf="@+id/tvItemUserName" />
+        app:layout_constraintEnd_toEndOf="@+id/tvHomeItemUserName"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/tvHomeItemUserName"
+        app:layout_constraintTop_toBottomOf="@+id/tvHomeItemUserName"
+        tools:text="EMA development" />
 
     <TextView
-        android:id="@+id/tvItemUserName"
+        android:id="@+id/tvHomeItemUserName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_big"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/tvItemUserSurname"
+        app:layout_constraintBottom_toTopOf="@+id/tvHomeItemUserSurname"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/ivItemBackUser"
+        app:layout_constraintStart_toEndOf="@id/ivHomeItemUser"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Carmabs" />
 </androidx.constraintlayout.widget.ConstraintLayout>

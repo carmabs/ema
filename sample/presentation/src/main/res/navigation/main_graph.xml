@@ -17,6 +17,14 @@
         android:id="@+id/loginFragment"
         android:name="com.carmabs.ema.presentation.ui.login.LoginFragment"
         android:label="LoginFragment"
-        tools:layout="@layout/login_fragment"/>
+        tools:layout="@layout/login_fragment">
+        <action
+            android:id="@+id/action_loginFragment_to_profileActivity"
+            app:destination="@id/profileActivity" />
+    </fragment>
+    <activity
+        android:id="@+id/profileActivity"
+        android:name="com.carmabs.ema.presentation.ui.profile.ProfileActivity"
+        android:label="ProfileActivity" />
 
 </navigation>

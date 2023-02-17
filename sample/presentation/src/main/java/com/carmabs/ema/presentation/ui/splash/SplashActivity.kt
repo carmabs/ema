@@ -25,6 +25,7 @@ class SplashActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        hideToolbar()
 
     }
 

@@ -49,6 +49,7 @@ dependencies {
     api emaComposeDependencies.tooling
     api emaComposeDependencies.toolingPreview
     api emaComposeDependencies.activity
+    api emaComposeDependencies.koin
     api emaComposeDependencies.viewmodel
     api emaComposeDependencies.navigation
 

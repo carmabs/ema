@@ -9,6 +9,7 @@ import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.carmabs.ema.presentation.base.BaseViewModel
+import com.carmabs.ema.presentation.ui.home.HomeInitializer
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
@@ -51,16 +52,16 @@ class LoginViewModel(
                 loginUseCase.execute(LoginRequest(stateData.userName, stateData.userPassword))
             updateToNormalState()
             notifySingleEvent(EmaExtraData(EVENT_MESSAGE, resourceManager.getCongratulations()))
-            /* navigate(
+             navigate(
                  LoginDestination.Home(
-                     HomeState(
+                     HomeInitializer.Default(
                          name = user.name,
                          surname = user.surname
                      )
                  )
-             )*/
+             )
         }.onError {
-            //navigate(LoginDestination.Error)
+            updateToOverlayedState(EmaExtraData(type = OVERLAYED_ERROR))
         }
     }
 
