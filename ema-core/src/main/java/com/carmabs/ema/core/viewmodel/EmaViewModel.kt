@@ -114,6 +114,9 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
         if (!this::state.isInitialized) {
             scope.launch {
                 normalContentData = onCreateState(initializer)
+                if(!normalContentData.checkIsValidStateDataClass()){
+                    throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
+                }
                 state = EmaState.Normal(normalContentData)
                 hasBeenInitialized = true
                 pendingEvents.forEach {
