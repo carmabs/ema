@@ -11,8 +11,8 @@ class SplashViewModel: EmaViewModel<EmaEmptyState,SplashDestination>(){
         return EmaEmptyState()
     }
 
-    override suspend fun onCreated() {
-        super.onCreated()
+    override suspend fun onStateCreated() {
+        super.onStateCreated()
         delay(5000)
         navigate(SplashDestination.Login)
     }

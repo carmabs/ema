@@ -122,7 +122,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
                 onResultListenerSetup()
                 if (updateOnInitialization)
                     observableState.tryEmit(state)
-                onCreated()
+                onStateCreated()
                 pendingEvents.clear()
                 onViewStarted()
                 startedFinishListener?.invoke()
@@ -141,7 +141,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      */
     protected abstract suspend fun onCreateState(initializer: EmaInitializer? = null): S
 
-    protected open suspend fun onCreated() = Unit
+    protected open suspend fun onStateCreated() = Unit
 
     /**
      * Called when view is shown in foreground
@@ -320,7 +320,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
 
             is EmaState.Overlapped -> {
                 val alternativeState = state as EmaState.Overlapped
-                EmaState.Overlapped(newState, alternativeState.dataOverlayed)
+                EmaState.Overlapped(newState, alternativeState.dataOverlapped)
             }
         }
     }
@@ -373,7 +373,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      */
     protected open fun updateToOverlappedState(data: EmaExtraData? = null) {
         val overlappedData: EmaState.Overlapped<S> = data?.let {
-            EmaState.Overlapped(normalContentData, dataOverlayed = it)
+            EmaState.Overlapped(normalContentData, dataOverlapped = it)
         } ?: EmaState.Overlapped(normalContentData)
         updateView(overlappedData)
     }

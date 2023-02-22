@@ -1,8 +1,10 @@
 package com.carmabs.ema.presentation.ui.profile.onboarding
 
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationInitializer
+import kotlinx.coroutines.delay
 
 class ProfileOnBoardingViewModel: EmaViewModel<ProfileOnBoardingState, ProfileOnBoardingDestination>(), ProfileOnBoardingScreenActions {
 	
@@ -15,6 +17,17 @@ class ProfileOnBoardingViewModel: EmaViewModel<ProfileOnBoardingState, ProfileOn
         }
     }
 
+    override suspend fun onStateCreated() {
+        super.onStateCreated()
+        executeUseCase {
+            repeat(3){
+                delay(2000)
+                notifySingleEvent(EmaExtraData(data = "Sample event $it"))
+            }
+        }
+
+    }
+
     override fun onActionAdminClicked() {
         navigate(ProfileOnBoardingDestination.ProfileCreation(ProfileCreationInitializer.Admin))
     }
@@ -22,5 +35,6 @@ class ProfileOnBoardingViewModel: EmaViewModel<ProfileOnBoardingState, ProfileOn
     override fun onActionUserClicked() {
         navigate(ProfileOnBoardingDestination.ProfileCreation(ProfileCreationInitializer.User))
     }
+
 
 }

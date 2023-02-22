@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -31,7 +32,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaCompo
 ) {
     vm.onBackHardwarePressedListener?.also {
         BackHandler(true) {
-            if(it.invoke())
+            if (it.invoke())
                 navigator.navigateBack()
         }
     }
@@ -77,15 +78,15 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaCompo
         .collectAsState(initial = EmaState.Normal(defaultState)).value
 
     LaunchedEffect(key1 = Unit) {
-            vm.getNavigationState().collect { destination ->
-                destination?.also { dest ->
-                    if (!dest.isNavigated)
-                        navigator.navigate(dest)
-                    Class.forName(dest.javaClass.name).kotlin.functions.find { it.name == "setNavigated" }?.javaMethod?.invoke(
-                        dest
-                    )
-                } ?: navigator.navigateBack()
-            }
+        vm.getNavigationState().collect { destination ->
+            destination?.also { dest ->
+                if (!dest.isNavigated)
+                    navigator.navigate(dest)
+                Class.forName(dest.javaClass.name).kotlin.functions.find { it.name == "setNavigated" }?.javaMethod?.invoke(
+                    dest
+                )
+            } ?: navigator.navigateBack()
+        }
     }
 
     when (state) {
@@ -94,11 +95,14 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaCompo
         }
         is EmaState.Overlapped -> {
             screenContent.onStateNormal(state.data, actions)
-            screenContent.onStateOverlayed(state.dataOverlayed, actions)
+            screenContent.onStateOverlayed(state.dataOverlapped, actions)
         }
     }
 
 
     val event = vm.getSingleObservableState().collectAsState(initial = EmaExtraData())
-    screenContent.onSingleEvent(event.value, actions)
+    val context = LocalContext.current
+    LaunchedEffect(key1 = event.value) {
+        screenContent.onSingleEvent(context,event.value, actions)
+    }
 }

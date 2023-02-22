@@ -1,5 +1,7 @@
 package com.carmabs.ema.presentation.ui.profile.onboarding
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carmabs.domain.model.User
 import com.carmabs.ema.android.compose.ui.EmaComposableScreenContent
+import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.presentation.ui.compose.AppButton
 import com.carmabs.ema.sample.ema.R
 
@@ -105,5 +108,14 @@ class ProfileOnBoardingScreenContent :
                 override fun onActionAdminClicked() = Unit
                 override fun onActionUserClicked() = Unit
             })
+    }
+
+
+
+
+    override suspend fun onSingleEvent(localContext: Context, extraData: EmaExtraData, actions: ProfileOnBoardingScreenActions) {
+        (extraData.data as? String)?.let {
+            Toast.makeText(localContext,it,Toast.LENGTH_SHORT).show()
+        }
     }
 }

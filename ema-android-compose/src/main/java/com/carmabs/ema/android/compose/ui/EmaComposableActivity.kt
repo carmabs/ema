@@ -40,7 +40,7 @@ abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, D>, 
                     }
                     is EmaState.Overlapped<S> -> {
                         onStateNormal(data = emaState.data)
-                        onStateOverlayed(data = emaState.dataOverlayed)
+                        onStateOverlayed(data = emaState.dataOverlapped)
                         isFirstOverlayedExecution = false
                     }
 
