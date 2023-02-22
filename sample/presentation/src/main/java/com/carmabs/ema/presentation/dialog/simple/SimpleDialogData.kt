@@ -1,7 +1,7 @@
 package com.carmabs.ema.presentation.dialog.simple
 
-import android.graphics.drawable.Drawable
 import com.carmabs.ema.core.dialog.EmaDialogData
+import com.carmabs.ema.core.model.EmaText
 
 
 /**
@@ -14,13 +14,13 @@ import com.carmabs.ema.core.dialog.EmaDialogData
  */
 
 data class SimpleDialogData(
-    val title: String,
-    val message: String,
+    val title: EmaText,
+    val message: EmaText,
     val showCross: Boolean = true,
     val showCancel:Boolean = false,
-    val imageId: Int? = null,
+    val image: Int? = null,
     override val proportionWidth: Float? = 7.5f / 10f,
     override val proportionHeight: Float? = null,
-      override val isModal: Boolean = true
+    override val isModal: Boolean = true
 ) : EmaDialogData
       

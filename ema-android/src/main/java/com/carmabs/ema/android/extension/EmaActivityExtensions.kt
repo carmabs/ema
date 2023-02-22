@@ -1,6 +1,9 @@
 package com.carmabs.ema.android.extension
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
@@ -52,4 +55,13 @@ fun ComponentActivity.addOnBackPressedListener(listener: () -> Boolean) {
         )
     }
 
+}
+
+fun Context.findActivity(): Activity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("This class is not contained in an activity")
 }

@@ -3,8 +3,9 @@ package com.carmabs.ema.presentation.dialog.simple
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.carmabs.ema.android.extension.string
 import com.carmabs.ema.android.ui.dialog.EmaDialog
-import com.carmabs.ema.core.constants.STRING_EMPTY
+import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.sample.ema.R
 import com.carmabs.ema.sample.ema.databinding.DialogSimpleBinding
 
@@ -32,17 +33,17 @@ class SimpleDialog : EmaDialog<DialogSimpleBinding,SimpleDialogData>() {
                 bDialogSimpleYes.setOnClickListener { listener.onConfirmClicked() }
             }
 
-            tvDialogSimpleTitle.text = title
+            tvDialogSimpleTitle.text = title.string(requireContext())
 
             if (showCross)
                 ivDialogSimpleCross.visibility = if (showCross) View.VISIBLE else View.GONE
 
-            tvDialogSimpleMessage.text = message
+            tvDialogSimpleMessage.text = message.string(requireContext())
 
             bDialogSimpleYes.text = resources.getString(R.string.dialog_accept)
 
             ivDialogSimple.visibility =
-                imageId?.let {
+                image?.let {
                     ivDialogSimple.setImageResource(it)
                     View.VISIBLE
                 } ?: View.GONE
@@ -58,7 +59,7 @@ class SimpleDialog : EmaDialog<DialogSimpleBinding,SimpleDialogData>() {
     }
 
     override fun createInitialState(): SimpleDialogData = SimpleDialogData(
-        STRING_EMPTY,
-        STRING_EMPTY
+        EmaText.empty(),
+        EmaText.empty()
     )
 }

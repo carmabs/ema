@@ -43,6 +43,7 @@ android {
 
 dependencies {
     implementation project(path: ':ema-android')
+    implementation emaAndroidDependencies.reflection
 
     api platform(emaComposeDependencies.bom)
     api emaComposeDependencies.ui

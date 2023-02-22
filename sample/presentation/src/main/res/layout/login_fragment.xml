@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/home_check_credentials"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorSecondary"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/layoutLoginUser"
         app:layout_constraintHorizontal_bias="0.0"
@@ -74,7 +74,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/home_check_credentials"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorSecondary"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/layoutLoginPassword"
         app:layout_constraintHorizontal_bias="0.0"
@@ -91,29 +91,10 @@
         app:layout_constraintStart_toStartOf="@+id/layoutLoginPassword"
         app:layout_constraintTop_toBottomOf="@+id/tvLoginErrorPassword">
 
-        <Switch
-            android:id="@+id/swLoginRememberPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0"
-            android:trackTint="@color/colorAccent"
-            android:thumbTint="@color/white"
-            android:checked="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.2"
-            android:layout_gravity="center"
-            android:layout_marginStart="@dimen/space_tiny"
-            android:text="@string/home_remember_user"
-            android:textSize="@dimen/letter_small_medium"
-            android:textStyle="bold" />
 
         <Button
             android:id="@+id/bLoginSign"
-            style="@style/ButtonRed"
+            style="@style/ButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

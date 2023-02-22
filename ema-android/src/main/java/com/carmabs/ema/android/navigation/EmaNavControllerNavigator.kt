@@ -10,6 +10,7 @@ import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.fragment.FragmentNavigator
+import com.carmabs.ema.android.extension.setInitializer
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.navigator.EmaNavigator
@@ -38,9 +39,7 @@ interface EmaNavControllerNavigator<D : EmaDestination> : EmaNavigator<D> {
     fun setInitializer(
         initializer: EmaInitializer
     ): Bundle =
-        Bundle().apply {
-            putSerializable(EmaInitializer.KEY, initializer)
-        }
+        Bundle().setInitializer(initializer)
 
     /**
      * Navigate with android architecture components within action ID

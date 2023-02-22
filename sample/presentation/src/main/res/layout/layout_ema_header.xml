@@ -11,17 +11,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="8dp"
         android:gravity="center"
+        android:text="@string/ema_header_title"
         android:textSize="@dimen/letter_big_huge"
         android:textStyle="bold"
-        android:text="@string/ema_header_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="spread"/>
+        app:layout_constraintVertical_chainStyle="spread" />
 
     <TextView
         android:id="@+id/tvUserSurname"

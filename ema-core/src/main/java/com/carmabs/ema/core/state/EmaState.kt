@@ -19,5 +19,5 @@ sealed class EmaState<T> private constructor(val data: T) : EmaDataState {
      * State that represents an overlayed state of a view.
      * @constructor T is the state model of the view, data represents the current state of the view, dataOverlated represents extra data to handle the overlayed state
      */
-    class Overlayed<T>(data: T, val dataOverlayed: EmaExtraData = EmaExtraData()) : EmaState<T>(data)
+    class Overlapped<T>(data: T, val dataOverlayed: EmaExtraData = EmaExtraData()) : EmaState<T>(data)
 }

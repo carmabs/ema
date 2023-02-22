@@ -69,7 +69,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
         previousEmaState?.let { previousState ->
             if (previousState.javaClass.name != state.javaClass.name) {
                 when (state) {
-                    is EmaState.Overlayed -> {
+                    is EmaState.Overlapped -> {
                         onEmaStateTransition(
                             EmaStateTransition.NormalToOverlayed(
                                 previousState.data,
@@ -80,7 +80,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
                     is EmaState.Normal -> {
                         onEmaStateTransition(
                             EmaStateTransition.OverlayedToNormal(
-                                (previousState as EmaState.Overlayed<S>).dataOverlayed,
+                                (previousState as EmaState.Overlapped<S>).dataOverlayed,
                                 state.data
                             )
                         )
@@ -91,8 +91,8 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
 
         onEmaStateNormal(state.data)
         when (state) {
-            is EmaState.Overlayed -> {
-                onEmaStateOverlayed(state.dataOverlayed)
+            is EmaState.Overlapped -> {
+                onEmaStateOverlapped(state.dataOverlayed)
             }
             else -> {
                 //DO NOTHING
@@ -203,16 +203,16 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
     fun onEmaStateNormal(data: S)
 
     /**
-     * Called when view model trigger a updateOverlayedState event
-     * @param data with information about updateOverlayedState
+     * Called when view model trigger a updateOverlappedState event
+     * @param extra with information about updateOverlappedState
      */
-    fun onEmaStateOverlayed(data: EmaExtraData)
+    fun onEmaStateOverlapped(extra: EmaExtraData)
 
     /**
      * Called when view model trigger an only once notified event.Not called when the view is first time attached to the view model
-     * @param data with information about updateAlternativeState
+     * @param extra with information about updateAlternativeState
      */
-    fun onSingleEvent(data: EmaExtraData)
+    fun onSingleEvent(extra: EmaExtraData)
 
     /**
      * Called when view model trigger a navigation event
@@ -307,6 +307,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
     fun onPauseView(viewModel: VM) {
         viewModel.onPauseView()
     }
+
 
     fun onUnbindView(viewJob: MutableList<Job>?, viewModel: VM) {
         viewJob?.forEach {

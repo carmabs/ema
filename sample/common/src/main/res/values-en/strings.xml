@@ -7,11 +7,11 @@
     <string name="home_hello">Hello</string>
     <string name="home_invalid_credentials_title">INVALID CREDENTIALS</string>
     <string name="home_invalid_credentials_message">Your credentials are not valid, please, try again</string>
-    <string name="home_loading_title">Loading…</string>
+    <string name="dialog_loading_title">Loading…</string>
     <string name="home_check_credentials">Please, check your data</string>
     <string name="home_loading_title_message">Getting user data</string>
     <string name="home_user">User:</string>
-    <string name="home_congratulations">Congratulations</string>
+    <string name="home_welcome">Welcome %s</string>
     <string name="home_password">Password:</string>
     <string name="home_identify">Identify to access app services</string>
     <string name="home_toolbar_title">EMA HOME</string>
@@ -65,5 +65,27 @@
     <string name="ema_header_subtitle">MVVM Architecture, powered by Carmabs</string>
     <string name="ema_back_data_sample">EMA Back Data Sample</string>
     <string name="ema_recycler_adapter_sample">EMA Recycler Adapter Sample</string>
+    <string name="home_admin_title">Administrator panel of %s %s</string>
+    <string name="home_user_title">Friends</string>
+
+    <string name="profile_admin">Admin user: %s</string>
+    <string name="general_error_title">Error</string>
+    <string name="login_error_fail">Se ha producido un error en el login</string>
+    <string name="dialog_loading_message">Espere un momento...</string>
+    <string name="profile_creation_user_admin_title">Usuario ADMIN</string>
+    <string name="profile_creation_user_basic_title">Usuario BASIC</string>
+    <string name="profile_creation_user_message">¿Quiere crear este usuario?</string>
+    <string name="profile_creation_create_user">Crear usuario</string>
+    <string name="home_create">Crear usuario</string>
+    <string name="profile_creation_create_title">Formulario %s</string>
+    <string name="profile_creation_create_name">Nombre</string>
+    <string name="profile_creation_create_surname">Apellido</string>
+    <string name="profile_panel">Panel de administración</string>
+    <string name="profile_type_user_title">¿Que tipo de usuario quieres crear?</string>
+    <string name="profile_user_basic">Basic</string>
+    <string name="profile_user_admin">Admin</string>
+    <string name="login_last_user_added">Ultimo usuario añadido: %S</string>
+    <string name="login_error_password_empty">La contraseña no puede estar vacía</string>
+    <string name="login_error_user_empty">El usuario no puede estar vacío</string>
 
 </resources>

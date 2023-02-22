@@ -5,8 +5,6 @@ import com.carmabs.ema.core.state.EmaDataState
 
 data class LoginState(
     val userName: String = STRING_EMPTY,
-    val userPassword:String = STRING_EMPTY,
-    val showPassword:Boolean = false,
-    val rememberUser :Boolean = false
+    val userPassword:String = STRING_EMPTY
 ):EmaDataState
 

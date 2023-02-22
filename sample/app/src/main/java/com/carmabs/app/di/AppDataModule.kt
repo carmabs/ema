@@ -25,8 +25,7 @@ val dataModule = module {
    }
 
    single<ResourceManager> {
-      AndroidResourceManager(get())
+      AndroidResourceManager()
    }
 
-   single { AndroidResourceManager(get()) }
 }

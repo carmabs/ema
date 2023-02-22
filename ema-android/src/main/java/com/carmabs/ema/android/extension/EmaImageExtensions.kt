@@ -2,10 +2,10 @@ package com.carmabs.ema.android.extension
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
-import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.model.EmaImage
-import com.carmabs.ema.core.model.EmaText
 
 /**
  * Created by Carlos Mateo Benito on 17/04/21.
@@ -30,5 +30,12 @@ suspend fun EmaImage.bitmap(context: Context, overrideWeight:Int?=null,overrideH
     return when(this){
         is EmaImage.ByteArray -> bytes.toBitmap(fWidth,fHeight,fTint)
         is EmaImage.Id -> id.getBitmapFromResource(context,fWidth,fHeight,fTint)
+    }
+}
+
+suspend fun EmaImage.drawable(context: Context):Drawable{
+    return when(this){
+        is EmaImage.ByteArray -> BitmapDrawable(context.resources,bytes.toBitmap(width,height,colorTint))
+        is EmaImage.Id -> id.getDrawable(context)
     }
 }

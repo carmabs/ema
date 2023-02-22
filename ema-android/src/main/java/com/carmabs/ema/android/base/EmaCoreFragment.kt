@@ -10,10 +10,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.viewbinding.ViewBinding
 import com.carmabs.ema.android.delegates.emaViewModelDelegate
 import com.carmabs.ema.android.extension.addOnBackPressedListener
-import com.carmabs.ema.android.extension.getSerializableCompat
+import com.carmabs.ema.android.extension.getInitializer
 import com.carmabs.ema.android.ui.EmaAndroidView
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
@@ -22,7 +21,6 @@ import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.navigator.EmaNavigator
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.view.EmaViewModelTrigger
 import com.carmabs.ema.core.viewmodel.EmaViewModel
@@ -66,7 +64,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
      * The incoming initializer in fragment instantiation. This is set up when other fragment/activity
      * launches a fragment with arguments provided by Bundle
      */
-    override val initializer: EmaInitializer? by lazy { getInitializerArgument() }
+    override val initializer: EmaInitializer? by lazy { getInitializer() }
 
     /**
      * The list which handles the extra view models attached, to unbind the observers
@@ -107,23 +105,6 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
         extraViewModelList.clear()
     }
 
-
-    fun setInitializer(initializer: EmaInitializer) {
-        arguments = Bundle().apply { putSerializable(EmaInitializer.KEY, initializer) }
-    }
-
-    /**
-     * Get the incoming initializer from another fragment/activity
-     */
-    private fun getInitializerArgument(): EmaInitializer? {
-        return arguments?.let {
-            if (it.containsKey(EmaInitializer.KEY)) {
-                it.getSerializableCompat(EmaInitializer.KEY)
-            } else
-                null
-        }
-    }
-
     /**
      * Get the scope of the fragment depending the viewModelScopeSelected
      */
@@ -159,11 +140,13 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
      */
     override fun onStart() {
         super.onStart()
+        onStartView(vm)
+        //Call after. It will set the last value of normalContentData, and avoid to delivered the last value of flow if it has not be updated due to
+        //updateToDataState
         viewJob = onBindView(
             getScope(),
             vm
         )
-        onStartView(vm)
     }
 
     /**
@@ -180,8 +163,8 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
      */
     @CallSuper
     override fun onPause() {
-        onPauseView(vm)
         super.onPause()
+        onPauseView(vm)
     }
 
     /**

@@ -29,8 +29,8 @@ abstract class BaseComposableFragment<S : EmaDataState, VM : EmaViewModel<S, D>,
         onOverlayed(data = data)
     }
 
-    final override fun onSingleEvent(data: EmaExtraData) {
-        onSingle(data)
+    final override fun onSingleEvent(extra: EmaExtraData) {
+        onSingle(extra)
     }
 
 

@@ -3,6 +3,7 @@ package com.carmabs.ema.presentation.dialog.loading
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.carmabs.ema.android.ui.dialog.EmaDialog
+import com.carmabs.ema.presentation.dialog.error.ErrorDialogData
 import com.carmabs.ema.sample.ema.databinding.DialogLoadingBinding
 
 /**
@@ -11,7 +12,7 @@ import com.carmabs.ema.sample.ema.databinding.DialogLoadingBinding
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-class LoadingDialog : EmaDialog<DialogLoadingBinding,LoadingDialogData>() {
+class LoadingDialog : EmaDialog<DialogLoadingBinding, LoadingDialogData>() {
 
     override fun createViewBinding(
         inflater: LayoutInflater,

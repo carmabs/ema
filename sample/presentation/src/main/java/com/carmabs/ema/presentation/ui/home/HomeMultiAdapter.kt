@@ -21,12 +21,13 @@ class HomeMultiAdapter : EmaMultiRecyclerAdapter<User>() {
        when(Role.values()[viewType]){
            Role.ADMIN -> {
                (this as HomeLayoutItemAdminBinding).apply {
+                   tvHomeItemAdmin.text = "${item.name}  ${item.surname}"
 
                }
            }
-           Role.USER -> {
+           Role.BASIC -> {
                (this as HomeLayoutItemUserBinding).apply {
-
+                   tvHomeItemUser.text = "${item.name}  ${item.surname}"
                }
            }
        }
@@ -34,8 +35,8 @@ class HomeMultiAdapter : EmaMultiRecyclerAdapter<User>() {
 
     override fun createMultiViewHolder(view: ViewGroup, viewType: Int): EmaAdapterMultiViewHolder {
        val viewBinding =  when(Role.values()[viewType]){
-            Role.ADMIN -> HomeLayoutItemAdminBinding.inflate(LayoutInflater.from(view.context))
-            Role.USER -> HomeLayoutItemUserBinding.inflate(LayoutInflater.from(view.context))
+            Role.ADMIN -> HomeLayoutItemAdminBinding.inflate(LayoutInflater.from(view.context),view,false)
+            Role.BASIC -> HomeLayoutItemUserBinding.inflate(LayoutInflater.from(view.context),view,false)
         }
 
         return EmaAdapterMultiViewHolder(viewBinding,viewType)

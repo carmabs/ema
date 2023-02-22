@@ -20,12 +20,27 @@
     <TextView
         android:id="@+id/tvHomeItemUser"
         android:layout_width="0dp"
-        android:textStyle="bold"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_big"
-        app:layout_constraintBottom_toBottomOf="@id/ivHomeItemUser"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tvHomeItemUserSurname"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@id/ivHomeItemUser"
-        app:layout_constraintTop_toTopOf="@id/ivHomeItemUser"
-        tools:text="Admin: Carmabs" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Carmabs" />
+
+    <TextView
+        android:id="@+id/tvHomeItemUserSurname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_big"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/ivHomeItemUser"
+        app:layout_constraintTop_toBottomOf="@+id/tvHomeItemUser"
+        app:layout_constraintVertical_bias="0.5"
+        tools:text="Company" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,4 +15,5 @@ import com.carmabs.domain.model.User
 interface Repository {
 
     suspend fun login(loginRequest: LoginRequest): User
+    suspend fun getFriendsList(): List<User>
 }

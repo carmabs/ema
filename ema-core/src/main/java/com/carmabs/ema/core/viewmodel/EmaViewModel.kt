@@ -2,6 +2,7 @@ package com.carmabs.ema.core.viewmodel
 
 import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.constants.INT_ONE
+import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaUseCaseResult
 import com.carmabs.ema.core.model.emaFlowSingleEvent
@@ -145,7 +146,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
     /**
      * Called when view is shown in foreground
      */
-    internal fun onResumeView() {
+    fun onResumeView() {
         useAfterStateIsCreated {
             onViewResumed()
         }
@@ -155,13 +156,13 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
     /**
      * Called when view is hidden in background
      */
-    internal fun onPauseView() {
+    fun onPauseView() {
         useAfterStateIsCreated {
             onViewPaused()
         }
     }
 
-    internal fun onStopView() {
+    fun onStopView() {
         useAfterStateIsCreated {
             onViewStopped()
         }
@@ -317,9 +318,9 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
                 EmaState.Normal(newState)
             }
 
-            is EmaState.Overlayed -> {
-                val alternativeState = state as EmaState.Overlayed
-                EmaState.Overlayed(newState, alternativeState.dataOverlayed)
+            is EmaState.Overlapped -> {
+                val alternativeState = state as EmaState.Overlapped
+                EmaState.Overlapped(newState, alternativeState.dataOverlayed)
             }
         }
     }
@@ -370,21 +371,21 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * Use the EmaState -> Alternative
      * @param data with updateOverlayedState information
      */
-    protected open fun updateToOverlayedState(data: EmaExtraData? = null) {
-        val overlayedData: EmaState.Overlayed<S> = data?.let {
-            EmaState.Overlayed(normalContentData, dataOverlayed = it)
-        } ?: EmaState.Overlayed(normalContentData)
-        updateView(overlayedData)
+    protected open fun updateToOverlappedState(data: EmaExtraData? = null) {
+        val overlappedData: EmaState.Overlapped<S> = data?.let {
+            EmaState.Overlapped(normalContentData, dataOverlayed = it)
+        } ?: EmaState.Overlapped(normalContentData)
+        updateView(overlappedData)
     }
 
     /**
      * Set a result for previous view when the current one is destroyed
      */
-    protected fun addResult(code: Int, data: Any?) {
+    protected fun addResult(data: Any?, codeId: String = this::class.resultId()) {
         useAfterStateIsCreated {
             emaResultHandler.addResult(
                 EmaResultModel(
-                    code = code,
+                    code = codeId,
                     ownerId = getId(),
                     data = data
                 )
@@ -396,13 +397,13 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * Set the listener for back data when the result view is destroyed
      */
     protected fun addOnResultListener(
-        code: Int,
+        codeId: String,
         receiver: (Any?) -> Unit
     ) {
         useAfterStateIsCreated {
             emaResultHandler.addResultReceiver(
                 EmaReceiverModel(
-                    resultCode = code,
+                    resultCode = codeId,
                     ownerId = getId(),
                     function = receiver
                 )

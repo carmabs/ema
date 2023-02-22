@@ -1,5 +1,7 @@
 package com.carmabs.domain.model
 
+import com.carmabs.ema.core.constants.STRING_EMPTY
+
 /**
  *  *<p>
  * Copyright (c) 2020, Carmabs. All rights reserved.
@@ -10,6 +12,6 @@ package com.carmabs.domain.model
  */
 
 data class User(
-    val name: String,
-    val surname: String,
-    val role: Role = Role.USER)
+    val name: String = STRING_EMPTY,
+    val surname: String = STRING_EMPTY,
+    val role: Role = Role.BASIC):java.io.Serializable

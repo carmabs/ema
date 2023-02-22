@@ -10,7 +10,9 @@ interface EmaDialogProvider {
 
     fun show(dialogData: EmaDialogData?=null)
     fun hide()
+
     var dialogListener: EmaDialogListener?
+
     val isVisible:Boolean
 
 

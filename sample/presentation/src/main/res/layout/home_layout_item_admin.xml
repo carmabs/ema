@@ -13,9 +13,10 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_group" />
+        app:srcCompat="@drawable/ic_admin" />
 
     <TextView
         android:id="@+id/tvHomeItemAdmin"

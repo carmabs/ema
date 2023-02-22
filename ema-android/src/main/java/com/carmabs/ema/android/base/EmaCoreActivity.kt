@@ -1,8 +1,6 @@
 package com.carmabs.ema.android.base
 
-import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.annotation.AnimRes
 import androidx.annotation.CallSuper
 import androidx.appcompat.app.AppCompatActivity
@@ -11,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.carmabs.ema.android.delegates.emaViewModelDelegate
 import com.carmabs.ema.android.extension.addOnBackPressedListener
-import com.carmabs.ema.android.extension.getSerializableCompat
+import com.carmabs.ema.android.extension.getInitializer
 import com.carmabs.ema.android.navigation.EmaActivityNavControllerNavigator
 import com.carmabs.ema.android.navigation.EmaNavControllerNavigator
 import com.carmabs.ema.android.ui.EmaAndroidView
@@ -115,7 +113,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
      * The incoming initializer in activity instantiation. This is set up when other fragment/activity
      * launches an activity with arguments provided by Bundle
      */
-    override val initializer: EmaInitializer? by lazy { getInitializerIntent() }
+    override val initializer: EmaInitializer? by lazy { getInitializer() }
 
 
     /**
@@ -191,19 +189,6 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
         return viewModel
     }
 
-    /**
-     * Get the incoming state from another activity by the key [initializer] provided
-     */
-    private fun getInitializerIntent(): EmaInitializer? {
-        return intent?.let {
-            it.extras?.getSerializableCompat(EmaInitializer.KEY)
-
-        }
-    }
-
-    fun setInitializer(initializer: EmaInitializer) {
-        intent = Intent().apply { putExtra(EmaInitializer.KEY, initializer) }
-    }
 
     /**
      * Destroy the activity and unbind the observers from view model
@@ -241,9 +226,9 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
         }
     }
 
-    override fun onEmaStateOverlayed(data: EmaExtraData) = Unit
+    override fun onEmaStateOverlapped(extra: EmaExtraData) = Unit
 
-    override fun onSingleEvent(data: EmaExtraData) = Unit
+    override fun onSingleEvent(extra: EmaExtraData) = Unit
 
     final override fun onBack(): Boolean {
         finish()

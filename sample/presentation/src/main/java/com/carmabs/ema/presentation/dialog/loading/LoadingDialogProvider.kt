@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentManager
 import com.carmabs.ema.android.ui.dialog.EmaAndroidDialogProvider
 import com.carmabs.ema.android.ui.dialog.EmaDialog
 import com.carmabs.ema.core.dialog.EmaDialogData
+import com.carmabs.ema.presentation.dialog.error.ErrorDialog
 
 /**
  * Simple dialog implementation

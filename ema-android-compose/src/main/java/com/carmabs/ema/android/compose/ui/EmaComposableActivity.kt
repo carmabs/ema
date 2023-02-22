@@ -38,7 +38,7 @@ abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, D>, 
                         onStateNormal(data = emaState.data)
                         isFirstNormalExecution = false
                     }
-                    is EmaState.Overlayed<S> -> {
+                    is EmaState.Overlapped<S> -> {
                         onStateNormal(data = emaState.data)
                         onStateOverlayed(data = emaState.dataOverlayed)
                         isFirstOverlayedExecution = false
@@ -57,5 +57,5 @@ abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, D>, 
     // Discard these methods because they are called now by compose
     final override fun onEmaStateNormal(data: S) = Unit
 
-    final override fun onEmaStateOverlayed(data: EmaExtraData) = Unit
+    final override fun onEmaStateOverlapped(extra: EmaExtraData) = Unit
 }

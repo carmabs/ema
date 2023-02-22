@@ -21,5 +21,5 @@ class EmaActivityNavControllerHost(
     navHostId: Int,
     graphId: Int
 ) : EmaActivityNavControllerNavigator<EmaEmptyDestination>(activity, navHostId, graphId) {
-    override fun navigate(navigationTarget: EmaEmptyDestination) = Unit
+    override fun navigate(destination: EmaEmptyDestination) = Unit
 }

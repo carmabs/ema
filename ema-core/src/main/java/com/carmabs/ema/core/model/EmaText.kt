@@ -1,5 +1,6 @@
 package com.carmabs.ema.core.model
 
+import com.carmabs.ema.core.constants.STRING_EMPTY
 import java.io.Serializable
 
 /**
@@ -15,11 +16,12 @@ sealed class EmaText(open val data: Array<out Any>? = null) : Serializable {
 
     companion object {
         fun text(text: String, vararg data: Any) = Text(text, data)
+        fun empty() = Text(STRING_EMPTY)
         fun id(id: Int, vararg data: Any) = Id(id, data)
         fun plural(id: Int, quantity: Int, vararg data: Any) = Plural(id, quantity, data)
     }
 
-    data class Text(val text: String, override val data: Array<out Any>?) : EmaText(data) {
+    data class Text(val text: String, override val data: Array<out Any>?=null) : EmaText(data) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -39,7 +41,7 @@ sealed class EmaText(open val data: Array<out Any>? = null) : Serializable {
         }
     }
 
-    data class Id(val id: Int, override val data: Array<out Any>?) : EmaText(data) {
+    data class Id(val id: Int, override val data: Array<out Any>?=null) : EmaText(data) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false

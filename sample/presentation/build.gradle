@@ -64,5 +64,6 @@ dependencies {
     implementation project(path: ':common')
     implementation emaLibraries.emaAndroidCompose
     implementation emaLibraries.emaAndroid
+    implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.compose.material3:material3'
 }

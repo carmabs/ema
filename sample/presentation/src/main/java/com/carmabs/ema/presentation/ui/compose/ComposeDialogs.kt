@@ -7,16 +7,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -27,44 +29,44 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.carmabs.ema.android.compose.extension.stringResource
 import com.carmabs.ema.core.constants.FLOAT_ONE
+import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.presentation.dialog.simple.SimpleDialogData
 import com.carmabs.ema.presentation.dialog.simple.SimpleDialogListener
 import com.carmabs.ema.sample.ema.R
 
 @Composable
-fun SimpleDialog(
-    dialogData: SimpleDialogData,
-    dialogListener: SimpleDialogListener
+fun SimpleDialogComposable(
+    dialogData: SimpleDialogData, dialogListener: SimpleDialogListener
 ) {
-    Dialog(onDismissRequest = {
-        dialogListener.onBackPressed()
-    }) {
+    Dialog(
+        onDismissRequest = {
+            dialogListener.onBackPressed()
+        }) {
         DialogContent(dialogData, dialogListener)
     }
 }
 
 @Composable
 private fun DialogContent(
-    dialogData: SimpleDialogData,
-    dialogListener: SimpleDialogListener
+    dialogData: SimpleDialogData, dialogListener: SimpleDialogListener
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(dialogData.proportionWidth?: FLOAT_ONE)
-            .wrapContentHeight()
-            .background(
-                color = colorResource(id = R.color.white),
-                shape = RoundedCornerShape(dimensionResource(id = R.dimen.cardview_default_radius))
-            )
-
-    ) {
-        Column (){
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
+    Box(modifier = Modifier
+        .run {
+            dialogData.proportionWidth?.let {
+                fillMaxWidth(it)
+            } ?: wrapContentWidth()
+        }
+        .clip(RoundedCornerShape(dimensionResource(id = R.dimen.radio_corner_big)))
+        .background(
+            color = colorResource(id = R.color.white),
+            shape = RoundedCornerShape(dimensionResource(id = R.dimen.cardview_default_radius))
+        )) {
+        Column(
+            verticalArrangement = Arrangement.Bottom,
+        ) {
+            Column() {
                 if (dialogData.showCross) {
                     Image(
                         modifier = Modifier
@@ -84,7 +86,7 @@ private fun DialogContent(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .size(dimensionResource(id = R.dimen.icon_size_huge)),
-                    painter = painterResource(id = dialogData.imageId ?: R.drawable.ic_cross),
+                    painter = painterResource(id = dialogData.image ?: R.drawable.ic_cross),
                     contentDescription = "Content image"
                 )
                 Text(
@@ -96,7 +98,7 @@ private fun DialogContent(
                         .align(
                             Alignment.CenterHorizontally
                         ),
-                    text = dialogData.title,
+                    text = dialogData.title.stringResource(),
                     fontSize = 22.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
@@ -106,44 +108,46 @@ private fun DialogContent(
             Text(
                 modifier = Modifier
                     .padding(
-                        top = dimensionResource(id = R.dimen.space_big),
+                        top = dimensionResource(id = R.dimen.space_medium),
                     )
                     .align(Alignment.CenterHorizontally)
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                text = dialogData.message,
+                text = dialogData.message.stringResource(),
                 fontSize = 18.sp,
                 color = colorResource(id = R.color.grayDark)
             )
 
-            val padding = dimensionResource(id = R.dimen.space_big_huge)
-            val paddingTop = dimensionResource(id = R.dimen.space_very_big)
+            val paddingTop = dimensionResource(id = R.dimen.space_big_medium)
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
-                    .padding(padding, paddingTop, padding, padding)
+                    .padding(top = paddingTop, bottom = paddingTop)
                     .fillMaxWidth(),
             ) {
                 if (dialogData.showCancel) {
-                    AppButton2(
-                        modifier = Modifier.wrapContentSize().weight(FLOAT_ONE),
+                    AppButton(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .weight(FLOAT_ONE),
                         text = stringResource(id = R.string.dialog_cancel),
                         onClick = {
                             // Change the state to close the dialog
-                            dialogListener.onConfirmClicked()
+                            dialogListener.onCancelClicked()
                         },
                     )
                 }
-                AppButtonAccent(
-                    modifier = Modifier.wrapContentSize().weight(FLOAT_ONE),
+                AppButton(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .weight(FLOAT_ONE),
                     text = stringResource(id = R.string.dialog_accept),
                     onClick = {
                         // Change the state to close the dialog
-                        dialogListener.onCancelClicked()
+                        dialogListener.onConfirmClicked()
                     },
                 )
             }
-
         }
     }
 }
@@ -154,13 +158,16 @@ private fun DialogContent(
 )
 @Composable
 fun OnDialogPreview() {
-    DialogContent(
-        SimpleDialogData(
-            "Preview title sample",
-            "Preview message sample",
-            showCancel = true
-        ),
-        object : SimpleDialogListener {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+        DialogContent(SimpleDialogData(
+            EmaText.text("Preview title sample"),
+            EmaText.text("Preview message sample"),
+            showCancel = true,
+        ), object : SimpleDialogListener {
             override fun onCancelClicked() {
 
             }
@@ -172,7 +179,7 @@ fun OnDialogPreview() {
             override fun onBackPressed() {
 
             }
-        }
-    )
+        })
+    }
 }
 //endregion

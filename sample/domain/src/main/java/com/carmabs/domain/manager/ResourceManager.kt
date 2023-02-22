@@ -1,5 +1,8 @@
 package com.carmabs.domain.manager
 
+import com.carmabs.domain.model.User
+import com.carmabs.ema.core.model.EmaText
+
 /**
  *<p>
  * Copyright (c) 2020, Carmabs. All rights reserved.
@@ -12,13 +15,20 @@ package com.carmabs.domain.manager
 
 interface ResourceManager {
 
-    fun getResultErrorFillName():String
-
-    fun getResultErrorFillSurname():String
-
-    fun getHomeUserToolbarTitle(): String
-
-    fun getCongratulations(): String
-
-    fun getNumberPeople(number: Int): String
+    fun getResultErrorFillName(): EmaText
+    fun getResultErrorFillSurname(): EmaText
+    fun getHomeUserToolbarTitle(): EmaText
+    fun getCongratulations(name: String): EmaText
+    fun getNumberPeopleAdded(number: Int): EmaText
+    fun getErrorTitle(): EmaText
+    fun getErrorLogin(): EmaText
+    fun getErrorLoginUserEmpty(): EmaText
+    fun getErrorLoginPasswordEmpty(): EmaText
+    fun getHomeAdminTitle(admin: User): EmaText
+    fun getHomeUserTitle(): EmaText
+    fun getUserImage(): Int
+    fun getAdminImage(): Int
+    fun getCreateUserMessage(): EmaText
+    fun getCreateUserBasicTitle(): EmaText
+    fun getCreateUserAdminTitle(): EmaText
 }

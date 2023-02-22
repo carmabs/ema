@@ -68,17 +68,17 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
         isFirstNormalExecution = false
     }
 
-    final override fun onEmaStateOverlayed(data: EmaExtraData) {
-        binding.onStateOverlayed(data)
+    final override fun onEmaStateOverlapped(extra: EmaExtraData) {
+        binding.onStateOverlapped(extra)
         isFirstOverlayedExecution = false
     }
 
-    final override fun onSingleEvent(data: EmaExtraData) {
-        binding.onSingleEvent(data)
+    final override fun onSingleEvent(extra: EmaExtraData) {
+        binding.onSingleEvent(extra)
     }
 
     abstract fun B.onStateNormal(data: S)
-    protected open fun B.onStateOverlayed(data: EmaExtraData) {}
-    protected open fun B.onSingleEvent(data: EmaExtraData) {}
+    protected open fun B.onStateOverlapped(extra: EmaExtraData) {}
+    protected open fun B.onSingleEvent(extra: EmaExtraData) {}
 
 }

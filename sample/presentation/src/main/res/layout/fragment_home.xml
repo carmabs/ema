@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/home_check_credentials"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorSecondary"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/layoutLightLoginUser"
         app:layout_constraintHorizontal_bias="0.0"
@@ -74,7 +74,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/home_check_credentials"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorSecondary"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/layoutLightLoginPassword"
         app:layout_constraintHorizontal_bias="0.0"
@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0"
-            android:trackTint="@color/colorAccent"
+            android:trackTint="@color/colorSecondary"
             android:thumbTint="@color/white"
             android:checked="true" />
 
@@ -113,7 +113,7 @@
 
         <Button
             android:id="@+id/bLightLoginSign"
-            style="@style/ButtonRed"
+            style="@style/ButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

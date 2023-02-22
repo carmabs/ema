@@ -11,7 +11,9 @@
         tools:layout="@layout/splash_fragment">
         <action
             android:id="@+id/action_splashFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -19,12 +21,23 @@
         android:label="LoginFragment"
         tools:layout="@layout/login_fragment">
         <action
-            android:id="@+id/action_loginFragment_to_profileActivity"
-            app:destination="@id/profileActivity" />
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
     </fragment>
+
     <activity
         android:id="@+id/profileActivity"
         android:name="com.carmabs.ema.presentation.ui.profile.ProfileActivity"
-        android:label="ProfileActivity" />
+        android:label="ProfileActivity"
+        tools:layout="@layout/profile_activity"/>
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.carmabs.ema.presentation.ui.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/home_fragment">
+        <action
+            android:id="@+id/action_homeFragment_to_profileActivity"
+            app:destination="@id/profileActivity" />
+    </fragment>
 
 </navigation>
