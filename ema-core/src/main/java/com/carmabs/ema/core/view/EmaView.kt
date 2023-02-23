@@ -6,6 +6,7 @@ import com.carmabs.ema.core.navigator.EmaNavigator
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
+import com.carmabs.ema.core.state.EmaStateTransition
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -48,14 +49,10 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
     /**
      * The previous state of the View
      */
-    var previousState: S?
+    var previousEmaState: EmaState<S>?
 
-
-    /**
-     * Determine if the previousState updates automatically after onNormalState or if
-     * has to be set up  manually
-     */
-    val updatePreviousStateAutomatically: Boolean
+    val previousStateData: S?
+        get() = previousEmaState?.data
 
 
     /**
@@ -68,22 +65,44 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
      * @param state of the view
      */
     private fun onDataUpdated(state: EmaState<S>) {
+
+        previousEmaState?.let { previousState ->
+            if (previousState.javaClass.name != state.javaClass.name) {
+                when (state) {
+                    is EmaState.Overlapped -> {
+                        onEmaStateTransition(
+                            EmaStateTransition.NormalToOverlapped(
+                                previousState.data,
+                                state.dataOverlapped
+                            )
+                        )
+                    }
+                    is EmaState.Normal -> {
+                        onEmaStateTransition(
+                            EmaStateTransition.OverlappedToNormal(
+                                (previousState as EmaState.Overlapped<S>).dataOverlapped,
+                                state.data
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
         onEmaStateNormal(state.data)
         when (state) {
-            is EmaState.Overlayed -> {
-                onEmaStateOverlayed(state.dataOverlayed)
-            }
-            is EmaState.Error -> {
-                onEmaStateErrorOverlayed(state.error)
+            is EmaState.Overlapped -> {
+                onEmaStateOverlapped(state.dataOverlapped)
             }
             else -> {
                 //DO NOTHING
             }
         }
 
-        if (updatePreviousStateAutomatically)
-            previousState = state.data
+        previousEmaState = state
     }
+
+    fun onEmaStateTransition(transition: EmaStateTransition) = Unit
 
     /**
      * Check EMA state selected property to execute action with new value if it has changed
@@ -102,11 +121,11 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
         val currentClass = (field as PropertyReference0).boundReceiver as? S
         currentClass?.also { _ ->
             val currentValue = (field.get() as T)
-            previousState?.also {
+            previousEmaState?.data?.also {
                 try {
                     val previousField = it.javaClass.getDeclaredField(field.name)
                     previousField.isAccessible = true
-                    val previousValue = previousField.get(previousState) as T
+                    val previousValue = previousField.get(previousEmaState?.data) as T
                     if (areEqualComparator?.invoke(previousValue, currentValue)?.not()
                             ?: (previousValue != currentValue)
                     ) {
@@ -138,11 +157,11 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
         val currentClass = (field as PropertyReference0).boundReceiver as? S
         currentClass?.also { _ ->
             val currentValue = (field.get() as T)
-            previousState?.also {
+            previousEmaState?.data?.also {
                 try {
                     val previousField = it.javaClass.getDeclaredField(field.name)
                     previousField.isAccessible = true
-                    val previousValue = previousField.get(previousState) as T
+                    val previousValue = previousField.get(previousEmaState?.data) as T
                     if (areEqualComparator?.invoke(previousValue, currentValue)?.not()
                             ?: (previousValue != currentValue)
                     ) {
@@ -184,22 +203,16 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
     fun onEmaStateNormal(data: S)
 
     /**
-     * Called when view model trigger a updateOverlayedState event
-     * @param data with information about updateOverlayedState
+     * Called when view model trigger a updateOverlappedState event
+     * @param extra with information about updateOverlappedState
      */
-    fun onEmaStateOverlayed(data: EmaExtraData)
+    fun onEmaStateOverlapped(extra: EmaExtraData)
 
     /**
      * Called when view model trigger an only once notified event.Not called when the view is first time attached to the view model
-     * @param data with information about updateAlternativeState
+     * @param extra with information about updateAlternativeState
      */
-    fun onSingleEvent(data: EmaExtraData)
-
-    /**
-     * Called when view model trigger an error event
-     * @param error generated by view model
-     */
-    fun onEmaStateErrorOverlayed(error: Throwable)
+    fun onSingleEvent(extra: EmaExtraData)
 
     /**
      * Called when view model trigger a navigation event
@@ -294,6 +307,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
     fun onPauseView(viewModel: VM) {
         viewModel.onPauseView()
     }
+
 
     fun onUnbindView(viewJob: MutableList<Job>?, viewModel: VM) {
         viewJob?.forEach {

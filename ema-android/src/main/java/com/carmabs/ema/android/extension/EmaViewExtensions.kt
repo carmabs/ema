@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -90,6 +91,11 @@ fun TextView.setIncrementAnimated(
     animator.start()
 }
 
+fun EditText.setTextWithCursorAtEnd(text:String){
+    setText(text)
+    setSelection((text.length).coerceAtLeast(INT_ZERO))
+}
+
 fun Activity.hideKeyboard() {
     (findViewById<View>(android.R.id.content)).rootView.hideKeyboard()
 }
@@ -163,7 +169,7 @@ fun ImageView.setImageWithOvershot(
 fun checkVisibility(visibility: Boolean, gone: Boolean = true): Int {
     return when {
         visibility -> View.VISIBLE
-        !visibility && gone -> View.GONE
+        gone -> View.GONE
         else -> View.INVISIBLE
     }
 }

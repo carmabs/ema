@@ -16,7 +16,7 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Ema"
 include ':app',
-        ':injection',
+        ':presentation',
         ':data',
         ':domain',
         ':common'

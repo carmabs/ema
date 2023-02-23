@@ -2,6 +2,7 @@ package com.carmabs.ema.android.ui
 
 import android.animation.Animator
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.View
 import androidx.annotation.CallSuper
 import androidx.appcompat.widget.Toolbar
@@ -35,9 +36,8 @@ abstract class EmaToolbarActivity<B : ViewBinding, S : EmaDataState, VM : EmaVie
      * Setup the toolbar
      * @param savedInstanceState for activity recreation
      */
-    @CallSuper
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
         setupActionBars()
     }
 

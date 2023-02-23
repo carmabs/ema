@@ -1,0 +1,42 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+
+    <!--Spaces-->
+    <dimen name="space_tiny">3dp</dimen>
+    <dimen name="space_small">5dp</dimen>
+    <dimen name="space_small_medium">7dp</dimen>
+    <dimen name="space_medium">10dp</dimen>
+    <dimen name="space_big_medium">15dp</dimen>
+    <dimen name="space_big">20dp</dimen>
+    <dimen name="space_huge_medium">26dp</dimen>
+    <dimen name="space_big_huge">50dp</dimen>
+    <dimen name="space_very_big">35dp</dimen>
+
+    <!--Spaces-->
+    <dimen name="icon_size_toolbar">30dp</dimen>
+    <dimen name="icon_size_big">48dp</dimen>
+    <dimen name="icon_size_mini">15dp</dimen>
+    <dimen name="icon_size_little">18dp</dimen>
+    <dimen name="icon_size_medium">24dp</dimen>
+    <dimen name="icon_size_medium_big">32dp</dimen>
+    <dimen name="icon_size_huge">96dp</dimen>
+    <dimen name="icon_size_very_huge">150dp</dimen>
+    <dimen name="icon_size_screen">200dp</dimen>
+
+    <!--Letter-->
+    <dimen name="letter_very_big">33sp</dimen>
+    <dimen name="letter_big">18sp</dimen>
+    <dimen name="letter_big_huge">22sp</dimen>
+    <dimen name="letter_small_medium">14sp</dimen>
+    <dimen name="letter_medium">16sp</dimen>
+
+    <!--Other-->
+    <dimen name="separator">1dp</dimen>
+    <dimen name="radio_corner_big">17dp</dimen>
+    <dimen name="circle">100dp</dimen>
+    <dimen name="radiusButton">6dp</dimen>
+    <dimen name="button_min_height_lda">30dp</dimen>
+    <dimen name="stroke_width_edittext">3dp</dimen>
+    <dimen name="screen_padding">10dp</dimen>
+
+</resources>

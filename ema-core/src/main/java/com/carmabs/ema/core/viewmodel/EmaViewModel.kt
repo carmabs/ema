@@ -1,8 +1,9 @@
 package com.carmabs.ema.core.viewmodel
 
-import com.carmabs.ema.core.concurrency.ConcurrencyManager
-import com.carmabs.ema.core.concurrency.DefaultConcurrencyManager
+import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.constants.INT_ONE
+import com.carmabs.ema.core.extension.ResultId
+import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaUseCaseResult
 import com.carmabs.ema.core.model.emaFlowSingleEvent
@@ -10,20 +11,33 @@ import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 /**
  * View model to handle view states.
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
+abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: CoroutineScope = EmaMainScope()) {
+
+
+    /**
+     * The scope where coroutines will be launched by default.
+     */
+    protected var scope: CoroutineScope = defaultScope
+        private set
+
+    internal fun setScope(scope: CoroutineScope) {
+        this.scope = scope
+    }
+
 
     private val pendingEvents = mutableListOf<() -> Unit>()
 
@@ -63,11 +77,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
     )
 
     /**
-     * Manager to handle the threads where the background tasks are going to be launched
-     */
-    var concurrencyManager: ConcurrencyManager = DefaultConcurrencyManager()
-
-    /**
      * The state of the view.
      */
     internal lateinit var state: EmaState<S>
@@ -87,7 +96,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
      * Determine if the viewmodel has initialized its state
      */
 
-    var hasBeenInitialized: Boolean = false
+    protected var hasBeenInitialized: Boolean = false
         private set
 
     /**
@@ -101,12 +110,14 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
      * Methods called the first time ViewModel is created
      * @param initializer
      * @param startedFinishListener: (() -> Unit) listener when starting has been finished
-     * @return true if it's the first time is started
      */
     fun onStart(initializer: EmaInitializer? = null, startedFinishListener: (() -> Unit)? = null) {
         if (!this::state.isInitialized) {
-            concurrencyManager.launch {
+            scope.launch {
                 normalContentData = onCreateState(initializer)
+                if(!normalContentData.checkIsValidStateDataClass()){
+                    throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
+                }
                 state = EmaState.Normal(normalContentData)
                 hasBeenInitialized = true
                 pendingEvents.forEach {
@@ -115,7 +126,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
                 onResultListenerSetup()
                 if (updateOnInitialization)
                     observableState.tryEmit(state)
-                onCreated()
+                onStateCreated()
                 pendingEvents.clear()
                 onViewStarted()
                 startedFinishListener?.invoke()
@@ -132,14 +143,14 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
     /**
      * Called when view is created by first time, it means, it is added to the stack
      */
-    abstract suspend fun onCreateState(initializer: EmaInitializer? = null): S
+    protected abstract suspend fun onCreateState(initializer: EmaInitializer? = null): S
 
-    protected open suspend fun onCreated() = Unit
+    protected open suspend fun onStateCreated() = Unit
 
     /**
      * Called when view is shown in foreground
      */
-    internal fun onResumeView() {
+    fun onResumeView() {
         useAfterStateIsCreated {
             onViewResumed()
         }
@@ -149,13 +160,13 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
     /**
      * Called when view is hidden in background
      */
-    internal fun onPauseView() {
+    fun onPauseView() {
         useAfterStateIsCreated {
             onViewPaused()
         }
     }
 
-    internal fun onStopView() {
+    fun onStopView() {
         useAfterStateIsCreated {
             onViewStopped()
         }
@@ -200,7 +211,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
     /**
      * Get current state of view
      */
-    fun getCurrentState(): EmaState<S> = state
+    protected fun getCurrentState(): EmaState<S> = state
 
     /**
      * Get navigation state as LiveData to avoid state setting from the view
@@ -259,28 +270,25 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
      * - job returns the job where the action function has been executed
      */
     protected fun <T> executeUseCase(
-        fullException: Boolean = false,
+        dispatcher: CoroutineContext = this.scope.coroutineContext,
         action: suspend CoroutineScope.() -> T
     ): EmaUseCaseResult<T> {
-        return EmaUseCaseResult(concurrencyManager, fullException, action)
+        return EmaUseCaseResult(scope, dispatcher, action)
     }
 
     /**
      * When a background task must be executed for data retrieving or other background job, it must
      * be called through this method with [block] function
      * @param block is the function that will be executed in background
-     * @param fullException If its is true, an exception launched on some child task affects to the
      * rest of task, including the parent one, if it is false, only affect to the child class
      * @return the job that can handle the lifecycle of the background task
      */
     protected fun runSuspend(
-        dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
-        fullException: Boolean = false,
+        dispatcher: CoroutineContext = scope.coroutineContext,
         block: suspend CoroutineScope.() -> Unit
     ): Job {
-        return concurrencyManager.launch(
-            dispatcher = dispatcher,
-            fullException = fullException,
+        return scope.launch(
+            dispatcher,
             block = block
         )
     }
@@ -309,17 +317,13 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
      */
     private fun updateData(newState: S): EmaState<S> {
         return when (state) {
-            is EmaState.Error -> {
-                val errorState = state as EmaState.Error
-                EmaState.Error(newState, errorState.error)
-            }
             is EmaState.Normal -> {
                 EmaState.Normal(newState)
             }
 
-            is EmaState.Overlayed -> {
-                val alternativeState = state as EmaState.Overlayed
-                EmaState.Overlayed(newState, alternativeState.dataOverlayed)
+            is EmaState.Overlapped -> {
+                val alternativeState = state as EmaState.Overlapped
+                EmaState.Overlapped(newState, alternativeState.dataOverlapped)
             }
         }
     }
@@ -356,9 +360,13 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
      * Get the current view state
      * @return the current viewState or null if it has not been initialized
      */
-    fun getDataState(): S {
+    @Deprecated("Use stateData instead. This method will be deleted in future.")
+    protected fun getDataState(): S {
         return normalContentData
     }
+
+    val stateData: S
+        get() = normalContentData
 
 
     /**
@@ -366,30 +374,21 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
      * Use the EmaState -> Alternative
      * @param data with updateOverlayedState information
      */
-    protected open fun updateToOverlayedState(data: EmaExtraData? = null) {
-        val overlayedData: EmaState.Overlayed<S> = data?.let {
-            EmaState.Overlayed(normalContentData, dataOverlayed = it)
-        } ?: EmaState.Overlayed(normalContentData)
-        updateView(overlayedData)
-    }
-
-    /**
-     * Used for trigger an updateErrorState event on the view
-     * Use the EmaState -> Error
-     * @param error with the exception object
-     */
-    protected open fun updateToErrorOverlayedState(error: Throwable) {
-        updateView(EmaState.Error(normalContentData, error))
+    protected open fun updateToOverlappedState(data: EmaExtraData? = null) {
+        val overlappedData: EmaState.Overlapped<S> = data?.let {
+            EmaState.Overlapped(normalContentData, dataOverlapped = it)
+        } ?: EmaState.Overlapped(normalContentData)
+        updateView(overlappedData)
     }
 
     /**
      * Set a result for previous view when the current one is destroyed
      */
-    protected fun addResult(code: Int, data: Any?) {
+    protected fun addResult(data: Any?, resultId: String?=null) {
         useAfterStateIsCreated {
             emaResultHandler.addResult(
                 EmaResultModel(
-                    code = code,
+                    code =  this::class.resultId(resultId).id,
                     ownerId = getId(),
                     data = data
                 )
@@ -398,16 +397,17 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
     }
 
     /**
-     * Set the listener for back data when the result view is destroyed
+     * Set the listener for back data when the result view is destroyed. To select the resultId use the EmaViewModel::class.resultId() method
+     * of the selected implementation of EmaViewModel whose result is required. Example SampleEmaViewModel::class.resultId()
      */
     protected fun addOnResultListener(
-        code: Int,
+        resultId: ResultId,
         receiver: (Any?) -> Unit
     ) {
         useAfterStateIsCreated {
             emaResultHandler.addResultReceiver(
                 EmaReceiverModel(
-                    resultCode = code,
+                    resultCode = resultId.id,
                     ownerId = getId(),
                     function = receiver
                 )
@@ -422,13 +422,13 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination> {
     internal fun onCleared() {
         emaResultHandler.notifyResults(getId())
         emaResultHandler.removeResultListener(getId())
-        concurrencyManager.cancelPendingTasks()
+        scope.cancel()
         useAfterStateIsCreated {
             onDestroy()
         }
     }
 
     fun getId(): String {
-        return this.javaClass.name
+        return "EmaViewModel ID: ${this.javaClass.name}"
     }
 }

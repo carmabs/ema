@@ -1,10 +1,11 @@
 package com.carmabs.ema.core.model
 
-import com.carmabs.ema.core.concurrency.ConcurrencyManager
 import com.carmabs.ema.core.delegate.emaSyncDelegate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by Carlos Mateo Benito on 16/8/22.
@@ -24,8 +25,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 
 class EmaUseCaseResult<T> internal constructor(
-    private val concurrencyManager: ConcurrencyManager,
-    fullException: Boolean,
+    scope: CoroutineScope,
+    dispatcher:CoroutineContext,
     onAction: suspend CoroutineScope.() -> T
 ) : EmaOnSuccessFinish<T>, EmaOnErrorFinish {
 
@@ -38,7 +39,7 @@ class EmaUseCaseResult<T> internal constructor(
 
     private var finished: AtomicBoolean = AtomicBoolean(false)
 
-    override val job: Job = concurrencyManager.launch(fullException = fullException) {
+    override val job: Job = scope.launch(dispatcher) {
         try {
             val data = onAction.invoke(this)
             result = EmaResult.success(data)

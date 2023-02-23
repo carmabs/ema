@@ -7,7 +7,6 @@ import com.carmabs.ema.android.ui.EmaAndroidView
 import com.carmabs.ema.android.ui.EmaFragment
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.core.state.EmaState
-import com.carmabs.ema.core.viewmodel.EmaViewModel
 import kotlin.reflect.KProperty
 
 /**

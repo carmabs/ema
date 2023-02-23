@@ -1,28 +1,9 @@
-ext{
-    composeVersion = "1.0.5"
-    composeActivityVersion = "1.4.0"
-    composeViewModelVersion = "2.4.0"
-}
+ext.composeConfig = {
+    composeOptions {
+        kotlinCompilerExtensionVersion "1.4.0"
+    }
 
-dependencies {
-
-
-    api "androidx.compose.ui:ui:$composeVersion"
-    // Tooling support (Previews, etc.)
-    api "androidx.compose.ui:ui-tooling:$composeVersion"
-    // Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
-    api "androidx.compose.foundation:foundation:$composeVersion"
-    // Material Design
-    api "androidx.compose.material:material:$composeVersion"
-    // Material design icons
-    api "androidx.compose.material:material-icons-core:$composeVersion"
-    api "androidx.compose.material:material-icons-extended:$composeVersion"
-    // Integration with activities
-    api "androidx.activity:activity-compose:$composeActivityVersion"
-    // Integration with ViewModels
-    api "androidx.lifecycle:lifecycle-viewmodel-compose:$composeViewModelVersion"
-
-
-    // UI Tests
-    androidTestApi "androidx.compose.ui:ui-test-junit4:$composeVersion"
+    buildFeatures {
+        compose true
+    }
 }
