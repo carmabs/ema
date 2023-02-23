@@ -17,24 +17,9 @@ import com.carmabs.ema.sample.data.R
 
 class AndroidResourceManager : ResourceManager {
 
-    override fun getResultErrorFillName(): EmaText {
-        return EmaText.id(R.string.back_result_fill_name)
-    }
-
-    override fun getResultErrorFillSurname(): EmaText {
-        return EmaText.id(R.string.back_result_fill_surname)
-    }
-
-    override fun getHomeUserToolbarTitle(): EmaText {
-        return EmaText.id(R.string.user_toolbar_title)
-    }
 
     override fun getCongratulations(name:String): EmaText {
         return EmaText.id(R.string.home_welcome,name)
-    }
-
-    override fun getNumberPeopleAdded(number: Int): EmaText {
-        return EmaText.id(R.string.user_number_people,number)
     }
 
     override fun getErrorTitle(): EmaText {
@@ -78,5 +63,17 @@ class AndroidResourceManager : ResourceManager {
 
     override fun getCreateUserMessage():EmaText{
         return EmaText.Id(R.string.profile_creation_user_message);
+    }
+
+    override fun getDoYouWantToExitTitleCreationUserTitle(): EmaText {
+        return EmaText.id(R.string.profile_creation_user_exit_title)
+    }
+
+    override fun getDoYouWantToExitTitleCreationUserMessage(): EmaText {
+        return EmaText.id(R.string.profile_creation_user_exit_message)
+    }
+
+    override fun getExitImage(): Int {
+        return R.drawable.ic_exit
     }
 }

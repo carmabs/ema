@@ -71,7 +71,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
                 when (state) {
                     is EmaState.Overlapped -> {
                         onEmaStateTransition(
-                            EmaStateTransition.NormalToOverlayed(
+                            EmaStateTransition.NormalToOverlapped(
                                 previousState.data,
                                 state.dataOverlapped
                             )
@@ -79,7 +79,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
                     }
                     is EmaState.Normal -> {
                         onEmaStateTransition(
-                            EmaStateTransition.OverlayedToNormal(
+                            EmaStateTransition.OverlappedToNormal(
                                 (previousState as EmaState.Overlapped<S>).dataOverlapped,
                                 state.data
                             )

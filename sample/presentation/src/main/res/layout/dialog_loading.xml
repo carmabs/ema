@@ -11,6 +11,7 @@
     <androidx.core.widget.ContentLoadingProgressBar
         android:id="@+id/contentLoadingProgressBar"
         style="@style/Base.Widget.AppCompat.ProgressBar"
+        android:indeterminateTint="@color/colorPrimary"
         android:layout_width="@dimen/icon_size_big"
         android:layout_height="@dimen/icon_size_big"
         android:layout_marginTop="24dp"

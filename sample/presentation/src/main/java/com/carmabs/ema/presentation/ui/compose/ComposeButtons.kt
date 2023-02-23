@@ -32,26 +32,6 @@ fun AppButton(text: String, modifier: Modifier = Modifier.fillMaxWidth(), onClic
 }
 
 @Composable
-fun AppButtonAccent(
-    text: String,
-    modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .defaultMinSize(50.dp),
-    onClick: () -> Unit
-) {
-    Button(
-        modifier = modifier,
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(colorResource(id = R.color.colorSecondary))
-    ) {
-        Text(
-            text = text,
-            color = colorResource(id = R.color.white)
-        )
-    }
-}
-
-@Composable
 fun AppButton2(
     text: String,
     modifier: Modifier = Modifier
@@ -78,14 +58,6 @@ fun AppButton2(
 @Composable
 fun AppButtonPreview() {
     AppButton(text = "Test") {
-
-    }
-}
-
-@Preview
-@Composable
-fun AppButton2Preview() {
-    AppButton2(text = "Test") {
 
     }
 }

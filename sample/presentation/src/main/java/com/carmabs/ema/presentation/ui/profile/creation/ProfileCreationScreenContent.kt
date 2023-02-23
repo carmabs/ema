@@ -21,9 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carmabs.domain.model.Role
-import com.carmabs.ema.android.compose.ui.EmaComposableScreenContent
 import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.core.state.EmaExtraData
+import com.carmabs.ema.presentation.base.compose.BaseScreenComposable
 import com.carmabs.ema.presentation.dialog.simple.SimpleDialogData
 import com.carmabs.ema.presentation.dialog.simple.SimpleDialogListener
 import com.carmabs.ema.presentation.ui.compose.AppButton
@@ -31,11 +31,11 @@ import com.carmabs.ema.presentation.ui.compose.SimpleDialogComposable
 import com.carmabs.ema.sample.ema.R
 
 class ProfileCreationScreenContent :
-    EmaComposableScreenContent<ProfileCreationState, ProfileCreationScreenActions> {
+    BaseScreenComposable<ProfileCreationState, ProfileCreationScreenActions>() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    override fun onStateNormal(
+    override fun onNormal(
         state: ProfileCreationState,
         actions: ProfileCreationScreenActions
     ) {
@@ -98,7 +98,7 @@ class ProfileCreationScreenContent :
     }
 
     @Composable
-    override fun onStateOverlayed(extraData: EmaExtraData, actions: ProfileCreationScreenActions) {
+    override fun onOverlapped(extraData: EmaExtraData, actions: ProfileCreationScreenActions) {
         when (extraData.id) {
             ProfileCreationViewModel.OVERLAPPED_DIALOG_CONFIRMATION -> {
                 val dialogData = extraData.data as SimpleDialogData
@@ -160,36 +160,26 @@ class ProfileCreationScreenContent :
     @Composable
     fun overlappedPreview() {
         normalPreview()
-        onStateOverlayed(
-            extraData = EmaExtraData(
-                ProfileCreationViewModel.OVERLAPPED_DIALOG_CONFIRMATION,
-                SimpleDialogData(
-                    EmaText.text("Test"),
-                    EmaText.text("Test description"),
-                    showCancel = true,
-                    proportionWidth = 1f
-                )
+        showDialog(
+            SimpleDialogData(
+                title = EmaText.text("Test title"),
+                message = EmaText.text("test message"),
+                proportionWidth = 0.8f,
+                showCancel = true
             ),
-            object : ProfileCreationScreenActions {
-                override fun onActionUserNameWritten(name: String) {
-                    TODO("Not yet implemented")
+            object : SimpleDialogListener{
+                override fun onCancelClicked() {
+
                 }
 
-                override fun onActionUserSurnameWritten(surname: String) {
-                    TODO("Not yet implemented")
+                override fun onConfirmClicked() {
+
                 }
 
-                override fun onActionCreateClicked() {
-                    TODO("Not yet implemented")
+                override fun onBackPressed() {
+
                 }
 
-                override fun onActionDialogConfirmClicked() {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onActionDialogCancelClicked() {
-                    TODO("Not yet implemented")
-                }
             }
         )
     }

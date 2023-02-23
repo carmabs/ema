@@ -6,14 +6,14 @@ import com.carmabs.domain.model.User
 import com.carmabs.domain.usecase.GetUserFriendsUseCase
 import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.carmabs.ema.presentation.base.BaseViewModel
 import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationViewModel
 import com.carmabs.ema.presentation.ui.profile.onboarding.ProfileOnBoardingInitializer
 
 class HomeViewModel(
     private val getUserFriendsUseCase: GetUserFriendsUseCase,
     private val resourceManager: ResourceManager
-) : EmaViewModel<HomeState, HomeDestination>() {
+) : BaseViewModel<HomeState, HomeDestination>() {
 
     private var admin:User?=null
     override suspend fun onCreateState(initializer: EmaInitializer?): HomeState {

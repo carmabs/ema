@@ -2,20 +2,26 @@
 <resources>
     <string name="app_name">EMA SAMPLE</string>
 
+    <!--LOGIN-->
+    <string name="login_last_user_added">Ultimo usuario añadido: %S</string>
+    <string name="login_error_password_empty">La contraseña no puede estar vacía</string>
+    <string name="login_error_user_empty">El usuario no puede estar vacío</string>
+    <string name="login_error_fail">Credenciales no válidas</string>
+
+
     <!--HOME-->
     <string name="home_access">Acceder</string>
-    <string name="home_remember_user">Recordar usuario</string>
     <string name="home_hello">EMA SAMPLE</string>
-    <string name="home_invalid_credentials_title">CREDENCIALES INVÁLIDOS</string>
-    <string name="home_invalid_credentials_message">Tus credenciales son inválidos, por favor, inténtalo de nuevo</string>
-    <string name="dialog_loading_title">Cargando</string>
     <string name="home_check_credentials">Por favor, revisa tus datos</string>
     <string name="home_loading_title_message">Obteniendo datos de usuario</string>
     <string name="home_user">Usuario:</string>
+    <string name="home_admin_title">Panel administrador de %s %s</string>
     <string name="home_welcome">¡¡Bienvenido %s!!</string>
     <string name="home_last_user">Ultimo usuario creado: %s a las %s</string>
     <string name="home_toolbar_title">EMA INICIO</string>
     <string name="home_password">Contraseña:</string>
+    <string name="home_user_title">Amigos</string>
+    <string name="home_create">Crear usuario</string>
     <string name="home_identify">Identifícate para acceder a todos los servicios de la aplicación</string>
 
     <!--DIALOG-->
@@ -23,60 +29,28 @@
     <string name="dialog_accept">Aceptar</string>
     <string name="dialog_cancel">Cancelar</string>
     <string name="dialog_no">No</string>
-
-    <!--UNLOGGED-->
-    <string name="unlogged_invalid_credentials">Credenciales inválidas</string>
-    <string name="unlogged_toolbar_title">EMA UNLOGGED</string>
-    <string name="unlogged_show_toolbar">Mostrar toolbar</string>
-    <string name="unlogged_add_user">Añadir usuario</string>
-    <string name="unlogged_user_created">Usuarios creados: %d</string>
-    <string name="unlogged_hide_toolbar">Ocultar toolbar</string>
-    <string name="unlogged_dialog_title">OnOverlayed Dialog</string>
-    <string name="unlogged_show_dialog">Mostrar diálogo</string>
-    <string name="unlogged_show_single_event">Enviar Single Event</string>
-    <string name="unlogged_toast_sample">Single Event Sample</string>
+    <string name="dialog_loading_title">Cargando</string>
+    <string name="dialog_loading_message">Espere un momento...</string>
 
 
 
-    <!--OTHER-->
-
-    <!--USER-->
-    <string name="user_name">Admin: %s</string>
-    <string name="user_number_people">Añadidas  %d personas</string>
-    <string name="user_hello_group">Esto es un grupo %d personas</string>
-    <string name="user_hello_user">Hola %s !!</string>
-    <string name="user_toolbar_title">EMA USUARIOS</string>
-
-
-    <!--BACK DATA-->
-    <string name="back_toolbar_title">EMA NUEVOS USUARIOS</string>
-    <string name="back_no_user_added">Ningun usuario ha sido añadido todavía</string>
-    <string name="back_data_button">Añadir usuario</string>
-
-    <!--BACK RESULT-->
-    <string name="back_result_name">Nombre</string>
-    <string name="back_result_surname">Apellidos</string>
-    <string name="back_result_title">Introduce usuario:</string>
-    <string name="back_result_add">Añadir</string>
-    <string name="back_result_fill_name">Por favor, rellena el nombre</string>
-    <string name="back_result_fill_surname">Por favor, rellena el apellido</string>
-    <string name="back_result_toolbar_title">EMA CREACION NUEVO USUARIO</string>
 
     <!--EMA HEADER-->
     <string name="ema_header_title">EMA</string>
     <string name="ema_header_subtitle">MVVM Architecture, powered by Carmabs</string>
-    <string name="ema_back_data_sample">Ejemplo datos de retorno</string>
-    <string name="ema_recycler_adapter_sample">Ejemplo EMA Recycler Adapter</string>
-    <string name="home_admin_title">Panel administrador de %s %s</string>
-    <string name="home_user_title">Amigos</string>
-    <string name="home_create">Crear usuario</string>
 
 
-    <string name="profile_admin">Usuario administrador: %s</string>
+
     <string name="general_error_title">Error</string>
-    <string name="login_error_fail">Credenciales no válidas</string>
-    <string name="dialog_loading_message">Espere un momento...</string>
 
+    <!--PROFILE ONBOARDING-->
+    <string name="profile_admin">Usuario administrador: %s</string>
+    <string name="profile_panel">Panel de administración</string>
+    <string name="profile_type_user_title">¿Que tipo de usuario quieres crear?</string>
+    <string name="profile_user_basic">Basic</string>
+    <string name="profile_user_admin">Admin</string>
+
+    <!--PROFILE CREATION-->
     <string name="profile_creation_user_admin_title">Usuario ADMIN</string>
     <string name="profile_creation_user_basic_title">Usuario BASIC</string>
     <string name="profile_creation_user_message">¿Quiere crear este usuario?</string>
@@ -84,13 +58,8 @@
     <string name="profile_creation_create_title">Formulario %s</string>
     <string name="profile_creation_create_name">Nombre</string>
     <string name="profile_creation_create_surname">Apellido</string>
-    <string name="profile_panel">Panel de administración</string>
-    <string name="profile_type_user_title">¿Que tipo de usuario quieres crear?</string>
-    <string name="profile_user_basic">Basic</string>
-    <string name="profile_user_admin">Admin</string>
-    <string name="login_last_user_added">Ultimo usuario añadido: %S</string>
-    <string name="login_error_password_empty">La contraseña no puede estar vacía</string>
-    <string name="login_error_user_empty">El usuario no puede estar vacío</string>
+    <string name="profile_creation_user_exit_title">Salir del panel de creación</string>
+    <string name="profile_creation_user_exit_message">¿Deseas salir sin crear usuario?</string>
 
 
 </resources>

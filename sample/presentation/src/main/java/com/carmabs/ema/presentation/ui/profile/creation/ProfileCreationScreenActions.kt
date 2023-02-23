@@ -4,7 +4,6 @@ import com.carmabs.ema.android.compose.action.EmaComposableScreenActions
 
 interface ProfileCreationScreenActions : EmaComposableScreenActions {
 
-
     fun onActionUserNameWritten(name: String)
 
     fun onActionUserSurnameWritten(surname:String)

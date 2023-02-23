@@ -6,12 +6,13 @@ import com.carmabs.domain.model.User
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaEmptyDestination
 import com.carmabs.ema.core.state.EmaExtraData
-import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.carmabs.ema.presentation.base.BaseViewModel
 import com.carmabs.ema.presentation.dialog.simple.SimpleDialogData
+import com.carmabs.ema.presentation.dialog.simple.SimpleDialogListener
 
 class ProfileCreationViewModel(
     private val resourceManager: ResourceManager
-) : EmaViewModel<ProfileCreationState, EmaEmptyDestination>(),
+) : BaseViewModel<ProfileCreationState, EmaEmptyDestination>(),
     ProfileCreationScreenActions {
 
     companion object {
@@ -29,26 +30,24 @@ class ProfileCreationViewModel(
         }
     }
 
-
-
     override fun onActionUserNameWritten(name: String) {
         updateToNormalState {
             copy(name = name)
         }
     }
 
-    override fun onActionUserSurnameWritten(surname:String) {
+    override fun onActionUserSurnameWritten(surname: String) {
         updateToNormalState {
             copy(surname = surname)
         }
     }
 
     override fun onActionCreateClicked() {
-        val image = when(stateData.role){
+        val image = when (stateData.role) {
             Role.ADMIN -> resourceManager.getAdminImage()
             Role.BASIC -> resourceManager.getUserImage()
         }
-        val title = when(stateData.role){
+        val title = when (stateData.role) {
             Role.ADMIN -> resourceManager.getCreateUserAdminTitle()
             Role.BASIC -> resourceManager.getCreateUserBasicTitle()
         }
@@ -75,25 +74,31 @@ class ProfileCreationViewModel(
         updateToNormalState()
     }
 
-    /*
-    private var counter = 0
     override val onBackHardwarePressedListener: (() -> Boolean) = {
-        counter++
-        val defaultBack = counter>3
-        if(!defaultBack){
-            updateToOverlappedState(
-                EmaExtraData(
-                    OVERLAPPED_DIALOG_CONFIRMATION, SimpleDialogData(
-                        title = EmaText.empty(),
-                        message = resourceManager.getCreateUserMessage(),
-                        showCancel = true,
-                        image = resourceManager.getAdminImage(),
-                        proportionWidth = 0.9f
-                    )
-                )
-            )
-        }
-        defaultBack
+        showDialog(
+            SimpleDialogData(
+                title = resourceManager.getDoYouWantToExitTitleCreationUserTitle(),
+                message = resourceManager.getDoYouWantToExitTitleCreationUserMessage(),
+                proportionWidth = 0.8f,
+                showCancel = true,
+                image = resourceManager.getExitImage()
+            ),
+            object : SimpleDialogListener{
+                override fun onCancelClicked() {
+                   updateToNormalState()
+                }
+
+                override fun onConfirmClicked() {
+                    updateToNormalState()
+                    navigateBack()
+                }
+
+                override fun onBackPressed() {
+                   updateToNormalState()
+                }
+
+            }
+        )
+        false
     }
-    */
 }

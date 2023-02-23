@@ -2,6 +2,7 @@ package com.carmabs.ema.core.viewmodel
 
 import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.constants.INT_ONE
+import com.carmabs.ema.core.extension.ResultId
 import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaUseCaseResult
@@ -279,7 +280,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * When a background task must be executed for data retrieving or other background job, it must
      * be called through this method with [block] function
      * @param block is the function that will be executed in background
-     * @param fullException If its is true, an exception launched on some child task affects to the
      * rest of task, including the parent one, if it is false, only affect to the child class
      * @return the job that can handle the lifecycle of the background task
      */
@@ -384,11 +384,11 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
     /**
      * Set a result for previous view when the current one is destroyed
      */
-    protected fun addResult(data: Any?, codeId: String = this::class.resultId()) {
+    protected fun addResult(data: Any?, resultId: String?=null) {
         useAfterStateIsCreated {
             emaResultHandler.addResult(
                 EmaResultModel(
-                    code = codeId,
+                    code =  this::class.resultId(resultId).id,
                     ownerId = getId(),
                     data = data
                 )
@@ -397,16 +397,17 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
     }
 
     /**
-     * Set the listener for back data when the result view is destroyed
+     * Set the listener for back data when the result view is destroyed. To select the resultId use the EmaViewModel::class.resultId() method
+     * of the selected implementation of EmaViewModel whose result is required. Example SampleEmaViewModel::class.resultId()
      */
     protected fun addOnResultListener(
-        codeId: String,
+        resultId: ResultId,
         receiver: (Any?) -> Unit
     ) {
         useAfterStateIsCreated {
             emaResultHandler.addResultReceiver(
                 EmaReceiverModel(
-                    resultCode = codeId,
+                    resultCode = resultId.id,
                     ownerId = getId(),
                     function = receiver
                 )
@@ -428,6 +429,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
     }
 
     fun getId(): String {
-        return this.javaClass.name
+        return "EmaViewModel ID: ${this.javaClass.name}"
     }
 }

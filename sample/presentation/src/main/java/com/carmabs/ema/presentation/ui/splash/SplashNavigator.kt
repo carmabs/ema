@@ -8,8 +8,8 @@ class SplashNavigator(
     fragment: Fragment
 ) : EmaFragmentNavControllerNavigator<SplashDestination>(fragment) {
 
-    override fun navigate(navigationTarget: SplashDestination) {
-        when(navigationTarget){
+    override fun navigate(destination: SplashDestination) {
+        when(destination){
             SplashDestination.Login -> navController.navigate(R.id.action_splashFragment_to_loginFragment)
         }
         

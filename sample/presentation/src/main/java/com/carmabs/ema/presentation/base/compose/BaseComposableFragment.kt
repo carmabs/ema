@@ -1,4 +1,4 @@
-package com.carmabs.ema.presentation.base
+package com.carmabs.ema.presentation.base.compose
 
 import androidx.compose.runtime.Composable
 import com.carmabs.ema.android.compose.ui.EmaComposableFragment
@@ -25,8 +25,8 @@ abstract class BaseComposableFragment<S : EmaDataState, VM : EmaViewModel<S, D>,
     }
 
     @Composable
-    override fun onStateOverlayed(data: EmaExtraData) {
-        onOverlayed(data = data)
+    override fun onStateOverlapped(data: EmaExtraData) {
+        onOverlapped(data = data)
     }
 
     final override fun onSingleEvent(extra: EmaExtraData) {
@@ -38,8 +38,8 @@ abstract class BaseComposableFragment<S : EmaDataState, VM : EmaViewModel<S, D>,
     abstract fun onNormal(data: S)
 
     @Composable
-    protected open fun onOverlayed(data: EmaExtraData){}
+    protected open fun onOverlapped(data: EmaExtraData) = Unit
 
-    protected open fun onSingle(data: EmaExtraData){}
+    protected open fun onSingle(data: EmaExtraData) = Unit
 
 }

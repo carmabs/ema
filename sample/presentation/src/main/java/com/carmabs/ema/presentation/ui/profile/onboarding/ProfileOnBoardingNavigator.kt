@@ -23,8 +23,7 @@ class ProfileOnBoardingNavigator(
                 navController.navigate(
                     ProfileCreationScreenContent::class.routeId(),
                     destination.initializer
-                ) {
-                }
+                )
             }
         }
 

@@ -14,12 +14,7 @@ import com.carmabs.ema.core.model.EmaText
  */
 
 interface ResourceManager {
-
-    fun getResultErrorFillName(): EmaText
-    fun getResultErrorFillSurname(): EmaText
-    fun getHomeUserToolbarTitle(): EmaText
     fun getCongratulations(name: String): EmaText
-    fun getNumberPeopleAdded(number: Int): EmaText
     fun getErrorTitle(): EmaText
     fun getErrorLogin(): EmaText
     fun getErrorLoginUserEmpty(): EmaText
@@ -31,4 +26,7 @@ interface ResourceManager {
     fun getCreateUserMessage(): EmaText
     fun getCreateUserBasicTitle(): EmaText
     fun getCreateUserAdminTitle(): EmaText
+    fun getDoYouWantToExitTitleCreationUserTitle(): EmaText
+    fun getDoYouWantToExitTitleCreationUserMessage(): EmaText
+    fun getExitImage():Int
 }

@@ -10,7 +10,7 @@ import com.carmabs.ema.core.state.EmaExtraData
 interface EmaComposableScreenContent<S : EmaDataState, A : EmaComposableScreenActions> {
 
     @Composable
-    fun onStateOverlayed(extraData: EmaExtraData, actions: A) = Unit
+    fun onStateOverlapped(extra: EmaExtraData, actions: A) = Unit
 
     suspend fun onSingleEvent(localContext: Context, extraData: EmaExtraData, actions: A) = Unit
 

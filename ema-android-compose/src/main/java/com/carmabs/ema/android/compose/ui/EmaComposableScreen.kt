@@ -95,7 +95,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaCompo
         }
         is EmaState.Overlapped -> {
             screenContent.onStateNormal(state.data, actions)
-            screenContent.onStateOverlayed(state.dataOverlapped, actions)
+            screenContent.onStateOverlapped(state.dataOverlapped, actions)
         }
     }
 
