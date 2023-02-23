@@ -1,7 +1,7 @@
 package com.carmabs.ema.presentation.base.compose
 
 import androidx.compose.runtime.Composable
-import com.carmabs.ema.android.compose.ui.EmaComposableFragment
+import com.carmabs.ema.compose.ui.EmaComposableFragment
 import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData

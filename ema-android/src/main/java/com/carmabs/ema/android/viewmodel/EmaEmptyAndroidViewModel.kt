@@ -11,4 +11,4 @@ import com.carmabs.ema.core.viewmodel.EmaEmptyViewModel
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class EmaAndroidEmptyViewModel : EmaAndroidViewModel(EmaEmptyViewModel())
+object EmaEmptyAndroidViewModel : EmaAndroidViewModel(EmaEmptyViewModel)

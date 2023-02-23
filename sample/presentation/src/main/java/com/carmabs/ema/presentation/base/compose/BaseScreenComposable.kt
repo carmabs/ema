@@ -1,8 +1,8 @@
 package com.carmabs.ema.presentation.base.compose
 
 import androidx.compose.runtime.Composable
-import com.carmabs.ema.android.compose.action.EmaComposableScreenActions
-import com.carmabs.ema.android.compose.ui.EmaComposableScreenContent
+import com.carmabs.ema.compose.action.EmaComposableScreenActions
+import com.carmabs.ema.compose.ui.EmaComposableScreenContent
 import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData

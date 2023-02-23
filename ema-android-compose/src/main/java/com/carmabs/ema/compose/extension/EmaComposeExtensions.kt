@@ -1,8 +1,8 @@
-package com.carmabs.ema.android.compose.extension
+package com.carmabs.ema.compose.extension
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.carmabs.ema.android.compose.ui.EmaComposableScreenContent
+import com.carmabs.ema.compose.ui.EmaComposableScreenContent
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.java.KoinJavaComponent

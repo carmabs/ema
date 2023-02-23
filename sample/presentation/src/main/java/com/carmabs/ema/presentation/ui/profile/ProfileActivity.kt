@@ -5,23 +5,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.carmabs.ema.android.compose.extension.createComposableScreen
-import com.carmabs.ema.android.compose.extension.injectDirectRemembered
-import com.carmabs.ema.android.compose.extension.routeId
-import com.carmabs.ema.android.compose.navigation.EmaComposableNavigatorEmpty
-import com.carmabs.ema.android.compose.ui.EmaComposableScreenContent
-import com.carmabs.ema.android.di.injectDirect
 import com.carmabs.ema.android.extension.getInitializer
+import com.carmabs.ema.compose.extension.createComposableScreen
+import com.carmabs.ema.compose.extension.injectDirectRemembered
+import com.carmabs.ema.compose.extension.routeId
 import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationAndroidViewModel
 import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationScreenContent
 import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationState
-import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationViewModel
 import com.carmabs.ema.presentation.ui.profile.onboarding.ProfileOnBoardingAndroidViewModel
 import com.carmabs.ema.presentation.ui.profile.onboarding.ProfileOnBoardingNavigator
 import com.carmabs.ema.presentation.ui.profile.onboarding.ProfileOnBoardingScreenContent
 import com.carmabs.ema.presentation.ui.profile.onboarding.ProfileOnBoardingState
-import com.carmabs.ema.presentation.ui.profile.onboarding.ProfileOnBoardingViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class ProfileActivity : ComponentActivity() {

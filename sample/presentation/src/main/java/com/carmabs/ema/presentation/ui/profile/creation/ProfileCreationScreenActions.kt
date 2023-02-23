@@ -1,6 +1,6 @@
 package com.carmabs.ema.presentation.ui.profile.creation
 
-import com.carmabs.ema.android.compose.action.EmaComposableScreenActions
+import com.carmabs.ema.compose.action.EmaComposableScreenActions
 
 interface ProfileCreationScreenActions : EmaComposableScreenActions {
 

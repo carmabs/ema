@@ -10,7 +10,7 @@ class SplashNavigator(
 
     override fun navigate(destination: SplashDestination) {
         when(destination){
-            SplashDestination.Login -> navController.navigate(R.id.action_splashFragment_to_loginFragment)
+            is SplashDestination.Login -> navController.navigate(R.id.action_splashFragment_to_loginFragment)
         }
         
     }

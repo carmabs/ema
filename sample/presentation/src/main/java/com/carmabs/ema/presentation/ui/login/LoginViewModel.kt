@@ -70,7 +70,7 @@ class LoginViewModel(
                 Role.BASIC ->
                     HomeInitializer.BasicUser
             }
-            navigate(LoginDestination.Home(initializerHome))
+            navigate(LoginDestination.Home().setInitializer(initializerHome))
 
         }.onError {
             showError(ErrorDialogData(

@@ -1,4 +1,4 @@
-package com.carmabs.ema.android.compose.ui
+package com.carmabs.ema.compose.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater

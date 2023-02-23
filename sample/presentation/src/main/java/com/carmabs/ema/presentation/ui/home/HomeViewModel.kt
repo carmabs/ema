@@ -15,7 +15,7 @@ class HomeViewModel(
     private val resourceManager: ResourceManager
 ) : BaseViewModel<HomeState, HomeDestination>() {
 
-    private var admin:User?=null
+    private var admin: User? = null
     override suspend fun onCreateState(initializer: EmaInitializer?): HomeState {
         return when (val homeInitializer = initializer as HomeInitializer) {
             is HomeInitializer.Admin -> {
@@ -40,9 +40,12 @@ class HomeViewModel(
 
     fun onActionCreateProfileClicked() {
         navigate(
-            HomeDestination.Profile(
-                initializer = ProfileOnBoardingInitializer.Default(admin?:throw IllegalStateException("Admin cannot be null"))
-            )
+            HomeDestination.Profile()
+                .setInitializer(
+                    ProfileOnBoardingInitializer.Default(
+                        admin ?: throw IllegalStateException("Admin cannot be null")
+                    )
+                )
         )
     }
 

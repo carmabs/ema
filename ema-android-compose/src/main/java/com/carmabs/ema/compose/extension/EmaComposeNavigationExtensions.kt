@@ -1,4 +1,4 @@
-package com.carmabs.ema.android.compose.extension
+package com.carmabs.ema.compose.extension
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -9,13 +9,13 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.Navigator
 import androidx.navigation.compose.composable
-import com.carmabs.ema.android.compose.action.EmaComposableScreenActions
-import com.carmabs.ema.android.compose.navigation.EmaComposableNavigatorEmpty
-import com.carmabs.ema.android.compose.provider.EmaScreenProvider
-import com.carmabs.ema.android.compose.ui.EmaComposableScreen
-import com.carmabs.ema.android.compose.ui.EmaComposableScreenContent
 import com.carmabs.ema.android.extension.findActivity
+import com.carmabs.ema.android.navigation.EmaEmptyNavigator
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
+import com.carmabs.ema.compose.action.EmaComposableScreenActions
+import com.carmabs.ema.compose.provider.EmaScreenProvider
+import com.carmabs.ema.compose.ui.EmaComposableScreen
+import com.carmabs.ema.compose.ui.EmaComposableScreenContent
 import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaDestination
@@ -62,7 +62,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaCompo
         val creator =
             EmaScreenProvider<VM, A>().provide(androidViewModel = androidViewModel.invoke())
         EmaComposableScreen(
-            initializer = overrideInitializer?:getAndReleaseInitializer(routeId),
+            initializer = overrideInitializer ?: getAndReleaseInitializer(routeId),
             defaultState = defaultState,
             navigator = navigator.invoke(navBack),
             vm = creator.first,
@@ -84,9 +84,9 @@ fun <S : EmaDataState, VM : EmaViewModel<S, EmaEmptyDestination>, A : EmaComposa
         val creator =
             EmaScreenProvider<VM, A>().provide(androidViewModel = androidViewModel.invoke())
         EmaComposableScreen(
-            initializer = overrideInitializer?:getAndReleaseInitializer(routeId),
+            initializer = overrideInitializer ?: getAndReleaseInitializer(routeId),
             defaultState = defaultState,
-            navigator = EmaComposableNavigatorEmpty(
+            navigator = EmaEmptyNavigator(
                 LocalContext.current.findActivity(),
                 navController
             ),

@@ -1,5 +1,7 @@
 package com.carmabs.ema.core.navigator
 
+import com.carmabs.ema.core.initializer.EmaInitializer
+
 /**
  * Navigation state to set navigation destination. All clases where [EmaNavigator] can navigate
  * have to implement this interface
@@ -8,6 +10,13 @@ package com.carmabs.ema.core.navigator
  */
 
 abstract class EmaDestination {
+
+    var initializer:EmaInitializer?=null
+    private set
+    fun <T:EmaDestination>setInitializer(initializer: EmaInitializer):T{
+        this.initializer = initializer
+        return this as T
+    }
 
     var isNavigated: Boolean = false
         private set

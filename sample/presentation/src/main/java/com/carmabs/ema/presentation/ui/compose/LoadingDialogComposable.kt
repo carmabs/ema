@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.carmabs.ema.android.compose.extension.stringResource
+import com.carmabs.ema.compose.extension.stringResource
 import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.presentation.dialog.loading.LoadingDialogData
 import com.carmabs.ema.sample.ema.R
