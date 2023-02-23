@@ -10,7 +10,7 @@ package com.carmabs.ema.core.navigator
 
 interface EmaNavigator<D : EmaDestination> {
 
-    fun navigate(navigationTarget: D)
+    fun navigate(destination: D)
 
     fun navigateBack():Boolean
 }

@@ -26,11 +26,8 @@ interface EmaApplicationAware {
 
             val modulesList = mutableListOf<Module>()
             modulesList.add(emaInjectionModule())
-            injectAppModules()?.also {
-                it.forEach { module->
-                    modulesList.add(module)
-                }
-
+            injectAppModules()?.onEach { module->
+                modulesList.add(module)
             }
             modules(modulesList)
         }

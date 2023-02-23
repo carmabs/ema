@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_dialog_white"
+    android:padding="5dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <ImageView
+        android:id="@+id/ivDialogError"
+        style="@style/Base.Widget.AppCompat.ProgressBar"
+        android:layout_width="@dimen/icon_size_big"
+        android:src="@drawable/ic_error"
+        android:layout_height="@dimen/icon_size_big"
+        android:layout_marginTop="24dp"
+        android:indeterminate="true"
+        app:layout_constraintEnd_toEndOf="@+id/tvDialogErrorTitle"
+        app:layout_constraintStart_toStartOf="@+id/tvDialogErrorTitle"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/tvDialogErrorTitle"
+            style="@style/DialogTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivDialogError"
+            tools:text="TITLE"/>
+
+    <TextView
+        android:id="@+id/tvDialogErrorMessage"
+        style="@style/DialogMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDialogErrorTitle"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="MESSAGE" />
+
+    <TextView
+        android:id="@+id/tvDialogErrorAccept"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:padding="5dp"
+        android:textStyle="bold"
+        android:text="@string/dialog_accept"
+        android:textColor="@color/error"
+        android:textSize="@dimen/letter_big"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDialogErrorMessage" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

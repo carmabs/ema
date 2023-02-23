@@ -3,67 +3,62 @@
 
     <!--HOME-->
     <string name="home_access">Access</string>
-    <string name="home_remember_user">Remember user</string>
     <string name="home_hello">Hello</string>
-    <string name="home_invalid_credentials_title">INVALID CREDENTIALS</string>
-    <string name="home_invalid_credentials_message">Your credentials are not valid, please, try again</string>
-    <string name="home_loading_title">Loading…</string>
     <string name="home_check_credentials">Please, check your data</string>
     <string name="home_loading_title_message">Getting user data</string>
     <string name="home_user">User:</string>
-    <string name="home_congratulations">Congratulations</string>
+    <string name="home_welcome">Welcome %s</string>
     <string name="home_password">Password:</string>
     <string name="home_identify">Identify to access app services</string>
     <string name="home_toolbar_title">EMA HOME</string>
     <string name="home_last_user">Last user created: %s on %s</string>
 
     <!--DIALOG-->
+    <string name="dialog_loading_title">Loading…</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_accept">Accept</string>
     <string name="dialog_cancel">Cancelar</string>
     <string name="dialog_no">No</string>
 
-    <!--UNLOGGED-->
-
-
-    <string name="unlogged_invalid_credentials">Invalid credentials</string>
-    <string name="unlogged_toolbar_title">EMA UNLOGGED</string>
-    <string name="unlogged_show_toolbar">Show toolbar</string>
-    <string name="unlogged_add_user">Add user</string>
-    <string name="unlogged_hide_toolbar">Hide toolbar</string>
-    <string name="unlogged_user_created">Users created: %d</string>
-    <string name="unlogged_show_dialog">Show dialog</string>
-    <string name="unlogged_dialog_title">OnOverlayed Dialog</string>
-    <string name="unlogged_show_single_event">Send Single Event</string>
-    <string name="unlogged_toast_sample">Single Event Sample</string>
-
-
-    <!--USER-->
-    <string name="user_name">Admin: %s</string>
-    <string name="user_number_people">Group : %d people</string>
-    <string name="user_hello_group">This is a group of %d people</string>
-    <string name="user_hello_user">Hello %s !!</string>
-    <string name="user_toolbar_title">EMA USERS</string>
-
-    <!--BACK DATA-->
-    <string name="back_data_button">Add user</string>
-    <string name="back_no_user_added">No users added yet</string>
-    <string name="back_toolbar_title">EMA NEW USERS</string>
-
-    <!--BACK RESULT-->
-    <string name="back_result_name">Name</string>
-    <string name="back_result_surname">Surname</string>
-    <string name="back_result_title">Create an user:</string>
-    <string name="back_result_add">Add</string>
-    <string name="back_result_fill_name">Please, fill the name</string>
-    <string name="back_result_fill_surname">Please, fill the surname</string>
-    <string name="back_result_toolbar_title">EMA NEW  USER CREATION</string>
-
 
     <!--EMA HEADER-->
     <string name="ema_header_title">EMA</string>
     <string name="ema_header_subtitle">MVVM Architecture, powered by Carmabs</string>
-    <string name="ema_back_data_sample">EMA Back Data Sample</string>
-    <string name="ema_recycler_adapter_sample">EMA Recycler Adapter Sample</string>
+    <string name="home_admin_title">Administrator panel of %s %s</string>
+    <string name="home_user_title">Friends</string>
+
+
+    <!--LOGIN-->
+    <string name="login_last_user_added">Ultimo usuario añadido: %S</string>
+    <string name="login_error_password_empty">La contraseña no puede estar vacía</string>
+    <string name="login_error_user_empty">El usuario no puede estar vacío</string>
+    <string name="login_error_fail">Credenciales no válidas</string>
+
+    <!--HOME-->
+    <string name="home_create">Crear usuario</string>
+
+    <!--DIALOG-->
+    <string name="dialog_loading_message">Espere un momento...</string>
+
+    <!--GENERAL-->
+    <string name="general_error_title">Error</string>
+
+    <!--PROFILE ONBOARDING-->
+    <string name="profile_admin">Administrator user: %s</string>
+    <string name="profile_panel">Administration panel</string>
+    <string name="profile_type_user_title">¿What type of user do you want to create?</string>
+    <string name="profile_user_basic">Basic</string>
+    <string name="profile_user_admin">Admin</string>
+
+    <!--PROFILE CREATION-->
+    <string name="profile_creation_user_admin_title">User ADMIN</string>
+    <string name="profile_creation_user_basic_title">User BASIC</string>
+    <string name="profile_creation_user_message">¿Do you want to create this user?</string>
+    <string name="profile_creation_create_user">Create user</string>
+    <string name="profile_creation_create_title">Form %s</string>
+    <string name="profile_creation_create_name">Name</string>
+    <string name="profile_creation_create_surname">Surname</string>
+    <string name="profile_creation_user_exit_title">Exit</string>
+    <string name="profile_creation_user_exit_message">¿Do you want to exit without create the user?</string>
 
 </resources>

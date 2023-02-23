@@ -1,7 +1,5 @@
 package com.carmabs.ema.core.state
 
-import java.io.Serializable
-
 /**
  * Interface which all state view classes must use to be handled by the library
  *
@@ -11,4 +9,6 @@ import java.io.Serializable
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
-interface EmaDataState : Serializable
+interface EmaDataState {
+    fun checkIsValidStateDataClass() = this is EmaEmptyState || this::class.isData
+}

@@ -11,6 +11,7 @@ compileKotlin {
 dependencies {
     api emaCoreDependencies.kotlin
     api emaCoreDependencies.coroutines
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.0"
 }
 
 

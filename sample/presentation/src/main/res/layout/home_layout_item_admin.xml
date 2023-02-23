@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/grayLight"
+
+    android:padding="@dimen/space_big">
+
+    <ImageView
+        android:id="@+id/ivHomeItemAdmin"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_admin" />
+
+    <TextView
+        android:id="@+id/tvHomeItemAdmin"
+        android:layout_width="0dp"
+        android:gravity="start"
+        android:textStyle="bold"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_big"
+        app:layout_constraintBottom_toBottomOf="@id/ivHomeItemAdmin"
+        app:layout_constraintEnd_toStartOf="@id/ivHomeItemAdmin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ivHomeItemAdmin"
+        tools:text="Group: 7 people" />
+</androidx.constraintlayout.widget.ConstraintLayout>

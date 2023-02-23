@@ -18,8 +18,8 @@ internal class EmaResultHandler private constructor() {
         fun getInstance(): EmaResultHandler = emaResultHandler
     }
 
-    private val resultMap: HashMap<Int, EmaResultModel> = HashMap()
-    private val receiverMap: HashMap<Int, HashMap<String, EmaReceiverModel>> = HashMap()
+    private val resultMap: HashMap<String, EmaResultModel> = HashMap()
+    private val receiverMap: HashMap<String, HashMap<String, EmaReceiverModel>> = HashMap()
 
     /**
      * Used for notify result data between views
@@ -34,7 +34,7 @@ internal class EmaResultHandler private constructor() {
      * the class (viewmodel) is notifying, to avoid notify results that are not theirs
      */
     fun notifyResults(ownerId: String) {
-        val keysToRemove = mutableListOf<Int>()
+        val keysToRemove = mutableListOf<String>()
 
         //Map for avoid iteration exception if a result is added on receiver invocation
         val receiverExecutions = mutableListOf<() -> Unit>()
@@ -84,7 +84,7 @@ internal class EmaResultHandler private constructor() {
      * Remove listener based on ownerId
      */
     fun removeResultListener(ownerId: String) {
-        val codeToClear = mutableSetOf<Int>()
+        val codeToClear = mutableSetOf<String>()
         receiverMap.forEach {
             val receiverOwners = it.value
             receiverOwners.remove(ownerId)

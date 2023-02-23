@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -88,6 +89,11 @@ fun TextView.setIncrementAnimated(
         text = formatter?.let { form -> String.format(form, value) } ?: value.toString()
     }
     animator.start()
+}
+
+fun EditText.setTextWithCursorAtEnd(text:String){
+    setText(text)
+    setSelection((text.length).coerceAtLeast(INT_ZERO))
 }
 
 fun Activity.hideKeyboard() {

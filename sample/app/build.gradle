@@ -1,11 +1,7 @@
 plugins {
-    id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
+    id 'com.android.application'
 }
-
-apply plugin: 'androidx.navigation.safeargs.kotlin'
-
 android {
 
     defaultConfig {
@@ -17,53 +13,32 @@ android {
         versionName emaVersioning.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    flavorDimensions 'default'
 
     buildTypes {
-        debug {
-            debuggable true
-            minifyEnabled false
-        }
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-    }
-
-    buildFeatures {
-        compose true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion "1.0.5"
-        kotlinCompilerVersion '1.5.31'
     }
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        //useIR = true
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    packagingOptions {
-        resources {
-            excludes += ['META-INF/LICENSE', 'META-INF/DEPENDENCIES']
-        }
-    }
+    namespace 'com.carmabs.ema.sample.injection'
 
-    namespace 'com.carmabs.ema.sample.ema'
-    buildFeatures {
-        viewBinding true
-    }
 }
 
 dependencies {
-    implementation project(path: ':domain')
+    implementation project(path: ':data')
+    implementation project(path: ':presentation')
     implementation project(path: ':common')
-    implementation project(path: ':injection')
-    implementation emaLibraries.emaAndroidCompose
+    implementation project(path: ':domain')
+
     implementation emaLibraries.emaAndroid
+    implementation emaAndroidDependencies.koin
 }
