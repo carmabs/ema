@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply from: '../build-system/compose.gradle'
+apply plugin: 'maven-publish'
 
 android {
 
@@ -56,4 +57,17 @@ dependencies {
 
     //Java Time API for SDK version < 26
     coreLibraryDesugaring emaAndroidDependencies.desugaring
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = emaVersioning.groupId
+                artifactId = emaVersioning.artifactComposeId
+                version = emaVersioning.versionName
+            }
+        }
+    }
 }

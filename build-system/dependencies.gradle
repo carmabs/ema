@@ -37,20 +37,24 @@ rootProject.ext {
 
     fragmentVersion = "1.5.4"
 
+    reflectVersion = "1.8.0"
+
     emaVersioning = [
             minSdk           : 24,
             compileSdk       : 33,
             targetSdk        : 33,
-            versionCode      : 14,
-            versionName      : "4.2.3",
+            versionCode      : 15,
+            versionName      : "5.0.0",
             groupId          : 'com.github.carmabs',
             artifactCoreId   : 'ema-core',
-            artifactAndroidId: 'ema-android'
+            artifactAndroidId: 'ema-android',
+            artifactComposeId: 'ema-compose'
     ]
 
     emaCoreDependencies = [
             kotlin    : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:" + project.kotlinVersion,
-            coroutines: 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + project.coroutinesVersion
+            coroutines: 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + project.coroutinesVersion,
+            reflect   : 'org.jetbrains.kotlin:kotlin-reflect:' + project.reflectVersion
     ]
 
     emaTesting = [
