@@ -1,4 +1,4 @@
-package com.carmabs.ema.android.compose.extension
+package com.carmabs.ema.compose.extension
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi

@@ -36,6 +36,12 @@ interface EmaNavControllerNavigator<D : EmaDestination> : EmaNavigator<D> {
      * Set the initializer for the incoming fragment.
      * @param initializer for the incoming view
      */
+    @Deprecated( "Use extension EmaInitializer.toBundle() instead", ReplaceWith(
+        "initializer.toBundle()",
+        "android.os.Bundle",
+        "com.carmabs.ema.android.extension.toBundle"
+    )
+    )
     fun setInitializer(
         initializer: EmaInitializer
     ): Bundle =

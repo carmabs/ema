@@ -3,9 +3,9 @@ package com.carmabs.ema.presentation.ui.profile.onboarding
 import androidx.activity.ComponentActivity
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import com.carmabs.ema.android.compose.extension.navigate
-import com.carmabs.ema.android.compose.extension.routeId
-import com.carmabs.ema.android.compose.navigation.EmaComposableNavigator
+import com.carmabs.ema.compose.extension.navigate
+import com.carmabs.ema.compose.extension.routeId
+import com.carmabs.ema.compose.navigation.EmaComposableNavigator
 import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationScreenContent
 
 class ProfileOnBoardingNavigator(

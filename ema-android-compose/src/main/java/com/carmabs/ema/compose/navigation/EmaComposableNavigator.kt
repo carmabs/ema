@@ -1,4 +1,4 @@
-package com.carmabs.ema.android.compose.navigation
+package com.carmabs.ema.compose.navigation
 
 import android.app.Activity
 import androidx.navigation.NavBackStackEntry

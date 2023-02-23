@@ -8,12 +8,12 @@ import kotlinx.coroutines.delay
 class SplashViewModel: BaseViewModel<EmaEmptyState,SplashDestination>(){
 	
 	override suspend fun onCreateState(initializer: EmaInitializer?): EmaEmptyState {
-        return EmaEmptyState()
+        return EmaEmptyState
     }
 
     override suspend fun onStateCreated() {
         super.onStateCreated()
         delay(1500)
-        navigate(SplashDestination.Login)
+        navigate(SplashDestination.Login())
     }
 }

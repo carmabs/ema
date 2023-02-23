@@ -115,7 +115,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
         if (!this::state.isInitialized) {
             scope.launch {
                 normalContentData = onCreateState(initializer)
-                if(!normalContentData.checkIsValidStateDataClass()){
+                if (!normalContentData.checkIsValidStateDataClass()) {
                     throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
                 }
                 state = EmaState.Normal(normalContentData)
@@ -360,12 +360,15 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * Get the current view state
      * @return the current viewState or null if it has not been initialized
      */
-    @Deprecated("Use stateData instead. This method will be deleted in future.")
+    @Deprecated(
+        "Use stateData instead. This method will be deleted in future.",
+        replaceWith = ReplaceWith("stateData")
+    )
     protected fun getDataState(): S {
         return normalContentData
     }
 
-    val stateData: S
+    protected val stateData: S
         get() = normalContentData
 
 
@@ -384,11 +387,11 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
     /**
      * Set a result for previous view when the current one is destroyed
      */
-    protected fun addResult(data: Any?, resultId: String?=null) {
+    protected fun addResult(data: Any?, resultId: String? = null) {
         useAfterStateIsCreated {
             emaResultHandler.addResult(
                 EmaResultModel(
-                    code =  this::class.resultId(resultId).id,
+                    code = this::class.resultId(resultId).id,
                     ownerId = getId(),
                     data = data
                 )

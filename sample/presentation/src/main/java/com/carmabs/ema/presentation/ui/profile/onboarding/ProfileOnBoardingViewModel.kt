@@ -16,11 +16,11 @@ class ProfileOnBoardingViewModel: BaseViewModel<ProfileOnBoardingState, ProfileO
     }
 
     override fun onActionAdminClicked() {
-        navigate(ProfileOnBoardingDestination.ProfileCreation(ProfileCreationInitializer.Admin))
+        navigate(ProfileOnBoardingDestination.ProfileCreation().setInitializer(ProfileCreationInitializer.Admin))
     }
 
     override fun onActionUserClicked() {
-        navigate(ProfileOnBoardingDestination.ProfileCreation(ProfileCreationInitializer.User))
+        navigate(ProfileOnBoardingDestination.ProfileCreation().setInitializer(ProfileCreationInitializer.User))
     }
 
 

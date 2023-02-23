@@ -39,7 +39,7 @@ android {
 
 
     with(composeConfig)
-    namespace 'com.carmabs.ema.android.compose'
+    namespace 'com.carmabs.ema.compose'
 }
 
 dependencies {

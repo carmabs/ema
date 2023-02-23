@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.carmabs.ema.android.compose.extension.stringResource
+import com.carmabs.ema.compose.extension.stringResource
 import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.presentation.dialog.error.ErrorDialogData
 import com.carmabs.ema.presentation.dialog.error.ErrorDialogListener

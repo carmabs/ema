@@ -1,4 +1,4 @@
-package com.carmabs.ema.android.compose.ui
+package com.carmabs.ema.compose.ui
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.carmabs.ema.android.compose.action.EmaComposableScreenActions
+import com.carmabs.ema.compose.action.EmaComposableScreenActions
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.navigator.EmaNavigator

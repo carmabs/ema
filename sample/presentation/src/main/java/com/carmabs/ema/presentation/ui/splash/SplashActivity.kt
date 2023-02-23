@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import androidx.appcompat.widget.Toolbar
 import com.carmabs.ema.android.navigation.EmaActivityNavControllerHost
 import com.carmabs.ema.android.ui.EmaToolbarActivity
-import com.carmabs.ema.android.viewmodel.EmaAndroidEmptyViewModel
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
+import com.carmabs.ema.android.viewmodel.EmaEmptyAndroidViewModel
 import com.carmabs.ema.core.navigator.EmaEmptyDestination
 import com.carmabs.ema.core.navigator.EmaNavigator
 import com.carmabs.ema.core.state.EmaEmptyState
@@ -38,7 +38,7 @@ class SplashActivity :
     }
 
     override fun provideAndroidViewModel(): EmaAndroidViewModel {
-        return EmaAndroidEmptyViewModel()
+        return EmaEmptyAndroidViewModel
     }
 
     override fun SplashActivityBinding.onStateNormal(data: EmaEmptyState){

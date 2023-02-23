@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
 import com.carmabs.ema.core.initializer.EmaInitializer
 
@@ -16,6 +15,10 @@ fun Bundle.setInitializer(
 ): Bundle {
     putSerializable(EmaInitializer.KEY, initializer)
     return this
+}
+
+fun EmaInitializer?.toBundle():Bundle?{
+    return this?.let { Bundle().setInitializer(it) }
 }
 
 /**
