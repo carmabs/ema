@@ -58,14 +58,15 @@ abstract class EmaAndroidDialogProvider constructor(private val fragmentManager:
         dialog?.let {
             if (!it.isHidden) {
                 Log.d(getTag(), "Alternative dialog totally hidden")
-                it.dismiss()
+                it.dismissAllowingStateLoss()
             }
-            fragmentManager.beginTransaction().remove(it).commit()
+            fragmentManager.beginTransaction().remove(it).commitNowAllowingStateLoss()
         }
 
 
         dialog = null
     }
+
 
     override val isVisible: Boolean
         get() = fragmentManager.findFragmentByTag(getTag())?.isVisible?:false

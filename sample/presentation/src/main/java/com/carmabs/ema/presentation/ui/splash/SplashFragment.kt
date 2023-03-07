@@ -20,6 +20,8 @@ class SplashFragment :
         return SplashFragmentBinding.inflate(inflater,container,false)
     }
 
+
+
     override fun provideAndroidViewModel(): EmaAndroidViewModel {
         return SplashAndroidViewModel(injectDirect())
     }
