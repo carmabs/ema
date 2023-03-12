@@ -57,6 +57,7 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
      */
     protected abstract fun B.setup(data: T)
 
+    @CallSuper
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog =  super.onCreateDialog(savedInstanceState)
         val savedData = (savedInstanceState?.getSerializableCompat(KEY_DIALOG_DATA) as? java.io.Serializable) as? T
@@ -89,6 +90,7 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
         binding.setup(data)
     }
 
+    @CallSuper
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -102,6 +104,7 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
         return binding.root
     }
 
+    @CallSuper
     override fun onResume() {
         super.onResume()
         dialog?.window?.also { win ->
@@ -127,11 +130,13 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
 
     }
 
+    @CallSuper
     override fun onShow(p0: DialogInterface?) {
         if (isDismissed)
             dismissAllowingStateLoss()
     }
 
+    @CallSuper
     override fun show(manager: FragmentManager, tag: String?) {
         manager.apply {
             val oldFragment = findFragmentByTag(tag)
@@ -142,13 +147,15 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
         }
     }
 
+    @CallSuper
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putSerializable(KEY_DIALOG_DATA, data)
     }
 
     protected abstract fun createInitialState(): T
 
-    override fun onDestroyView() {
+   @CallSuper
+   override fun onDestroyView() {
         _binding = null
         dialogListener = null
         super.onDestroyView()

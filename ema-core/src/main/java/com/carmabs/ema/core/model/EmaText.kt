@@ -86,4 +86,8 @@ sealed class EmaText(open val data: Array<out Any>? = null) : Serializable {
             return result
         }
     }
+
+    fun isEmpty():Boolean{
+       return (this is Text) && this.text.isEmpty()
+    }
 }
