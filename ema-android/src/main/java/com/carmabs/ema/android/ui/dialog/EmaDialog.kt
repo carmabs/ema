@@ -39,7 +39,7 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
     var data: T by emaStateDelegate {
         createInitialState()
     }
-    private set
+        private set
 
     private var isDismissed: Boolean = false
 
@@ -59,8 +59,9 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
 
     @CallSuper
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog =  super.onCreateDialog(savedInstanceState)
-        val savedData = (savedInstanceState?.getSerializableCompat(KEY_DIALOG_DATA) as? java.io.Serializable) as? T
+        val dialog = super.onCreateDialog(savedInstanceState)
+        val savedData =
+            (savedInstanceState?.getSerializableCompat(KEY_DIALOG_DATA) as? java.io.Serializable) as? T
         savedData?.also {
             data = it
         }
@@ -154,10 +155,17 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
 
     protected abstract fun createInitialState(): T
 
-   @CallSuper
-   override fun onDestroyView() {
+    @CallSuper
+    override fun onDestroyView() {
         _binding = null
-        dialogListener = null
         super.onDestroyView()
+    }
+
+
+    @CallSuper
+    override fun onDestroy() {
+        dialogListener?.onDestroyed()
+        dialogListener = null
+        super.onDestroy()
     }
 }
