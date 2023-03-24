@@ -19,6 +19,31 @@ sealed class EmaText(open val data: Array<out Any>? = null) : Serializable {
         fun empty() = Text(STRING_EMPTY)
         fun id(id: Int, vararg data: Any) = Id(id, data)
         fun plural(id: Int, quantity: Int, vararg data: Any) = Plural(id, quantity, data)
+        fun composable(vararg texts: EmaText) = Composition(listOf(*texts))
+    }
+
+    data class Composition(val texts:List<EmaText>) : EmaText(null) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Composition
+
+            if (texts != other.texts) return false
+            if (data != null) {
+                if (other.data == null) return false
+                if (!data.contentEquals(other.data)) return false
+            } else if (other.data != null) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = texts.hashCode()
+            result = 31 * result + (data?.contentHashCode() ?: 0)
+            return result
+        }
+
     }
 
     data class Text(val text: String, override val data: Array<out Any>?=null) : EmaText(data) {
