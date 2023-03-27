@@ -138,15 +138,10 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
     /**
      * The view model is instantiated on fragment resume.
      */
+    @CallSuper
     override fun onStart() {
         super.onStart()
         onStartView(vm)
-        //Call after. It will set the last value of normalContentData, and avoid to delivered the last value of flow if it has not be updated due to
-        //updateToDataState
-        viewJob = onBindView(
-            getScope(),
-            vm
-        )
     }
 
     /**
@@ -154,6 +149,16 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
      */
     @CallSuper
     override fun onResume() {
+        //It will set the last value of normalContentData, and avoid to delivered the last value of flow if it has not be updated due to
+        //updateToDataState
+        //We call this and not in onStart, because is some cases, the view that receives the state could be use a
+        //dialog, that needs to be restored after onRestoreInstance state is called. Otherwise, java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
+        //could be launched.
+        //On restoreInstanceState is called between onStart and onResume, on re-initialization, so binding the views here, guarantees the state of
+        //savedInstances has been restored
+        if(viewJob == null){
+            viewJob = onBindView(getScope(), vm)
+        }
         super.onResume()
         onResumeView(vm)
     }
@@ -216,6 +221,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
     override fun onStop() {
         super.onStop()
         onUnbindView(viewJob, vm)
+        viewJob = null
         removeExtraViewModels()
     }
 

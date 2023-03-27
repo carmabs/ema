@@ -44,7 +44,7 @@ class ViewModelTest : EmaTest() {
 
 
         override suspend fun onCreateState(initializer: EmaInitializer?): EmaEmptyState {
-            return EmaEmptyState()
+            return EmaEmptyState
         }
 
         suspend fun onActionTestExecuteUseCase() {
