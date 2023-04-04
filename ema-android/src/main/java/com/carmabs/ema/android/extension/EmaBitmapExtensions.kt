@@ -137,7 +137,7 @@ fun Bitmap.resizeFitInside(destWidth: Int, destHeight: Int): Bitmap {
     return background
 }
 
-fun Drawable.toBitmap(maxSize: Size? = null): Bitmap {
+fun Drawable.toBitmapWithMaxSize(maxSize: Size? = null): Bitmap {
     return if (this is BitmapDrawable && this.bitmap != null) {
         val bitmapDrawable = this
         if (maxSize == null) {
