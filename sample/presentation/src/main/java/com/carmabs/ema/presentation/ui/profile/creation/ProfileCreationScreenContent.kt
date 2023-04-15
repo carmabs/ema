@@ -21,6 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carmabs.domain.model.Role
+import com.carmabs.ema.core.action.EmaActionDispatcher
+import com.carmabs.ema.core.action.EmaActionDispatcherEmpty
 import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.presentation.base.compose.BaseScreenComposable
@@ -31,13 +33,13 @@ import com.carmabs.ema.presentation.ui.compose.SimpleDialogComposable
 import com.carmabs.ema.sample.ema.R
 
 class ProfileCreationScreenContent :
-    BaseScreenComposable<ProfileCreationState, ProfileCreationScreenActions>() {
+    BaseScreenComposable<ProfileCreationState, ProfileCreationActions>() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun onNormal(
         state: ProfileCreationState,
-        actions: ProfileCreationScreenActions
+        actions: EmaActionDispatcher<ProfileCreationActions>
     ) {
         Surface(
             modifier = Modifier
@@ -69,7 +71,7 @@ class ProfileCreationScreenContent :
                         Text(stringResource(id = R.string.profile_creation_create_name))
                     },
                     onValueChange = {
-                        actions.onActionUserNameWritten(it)
+                        actions.onAction(ProfileCreationActions.UserNameWritten(it))
                     }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -80,7 +82,7 @@ class ProfileCreationScreenContent :
                         Text(stringResource(id = R.string.profile_creation_create_surname))
                     },
                     onValueChange = {
-                        actions.onActionUserSurnameWritten(it)
+                        actions.onAction(ProfileCreationActions.UserSurnameWritten(it))
                     }
                 )
 
@@ -90,7 +92,7 @@ class ProfileCreationScreenContent :
                         .fillMaxWidth()
                         .padding(top = 20.dp)
                 ) {
-                    actions.onActionCreateClicked()
+                    actions.onAction(ProfileCreationActions.CreateClicked)
                 }
             }
         }
@@ -98,7 +100,7 @@ class ProfileCreationScreenContent :
     }
 
     @Composable
-    override fun onOverlapped(extraData: EmaExtraData, actions: ProfileCreationScreenActions) {
+    override fun onOverlapped(extraData: EmaExtraData, actions: EmaActionDispatcher<ProfileCreationActions>) {
         when (extraData.id) {
             ProfileCreationViewModel.OVERLAPPED_DIALOG_CONFIRMATION -> {
                 val dialogData = extraData.data as SimpleDialogData
@@ -106,15 +108,15 @@ class ProfileCreationScreenContent :
                     dialogData = dialogData,
                     dialogListener = object : SimpleDialogListener {
                         override fun onCancelClicked() {
-                            actions.onActionDialogCancelClicked()
+                            actions.onAction(ProfileCreationActions.DialogCancelClicked)
                         }
 
                         override fun onConfirmClicked() {
-                            actions.onActionDialogConfirmClicked()
+                            actions.onAction(ProfileCreationActions.DialogConfirmClicked)
                         }
 
                         override fun onBackPressed() {
-                            actions.onActionDialogCancelClicked()
+                            actions.onAction(ProfileCreationActions.DialogCancelClicked)
                         }
 
                     })
@@ -132,27 +134,7 @@ class ProfileCreationScreenContent :
                 "Carlos",
                 "Mateo"
             ),
-            object : ProfileCreationScreenActions {
-                override fun onActionUserNameWritten(name: String) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onActionUserSurnameWritten(surname: String) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onActionCreateClicked() {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onActionDialogConfirmClicked() {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onActionDialogCancelClicked() {
-                    TODO("Not yet implemented")
-                }
-            }
+            actions = EmaActionDispatcherEmpty()
         )
     }
 

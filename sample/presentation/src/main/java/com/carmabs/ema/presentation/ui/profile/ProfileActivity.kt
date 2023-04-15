@@ -41,7 +41,6 @@ class ProfileActivity : ComponentActivity() {
                     },
                     screenContent = ProfileOnBoardingScreenContent(),
                     androidViewModel = { ProfileOnBoardingAndroidViewModel(injectDirectRemembered()) }
-
                 )
                 createComposableScreen(
                     defaultState = ProfileCreationState(),

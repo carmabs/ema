@@ -4,20 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
-import com.carmabs.ema.compose.action.EmaComposableScreenActions
-import com.carmabs.ema.compose.action.EmaEmptyComposableScreenActions
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 
-class EmaScreenProvider<VM:EmaViewModel<*,*>,A: EmaComposableScreenActions> {
+class EmaScreenProvider {
 
     @Composable
-    fun provide(androidViewModel:EmaAndroidViewModel):Pair<VM,A>{
+    fun provideComposableViewModel(androidViewModel:EmaAndroidViewModel):EmaViewModel<*,*>{
         val vm = viewModel(
             androidViewModel::class.java,
             factory = EmaViewModelFactory(androidViewModel)
-        ).emaViewModel as VM
-        val actions = (vm as? A)?: EmaEmptyComposableScreenActions as A
+        ).emaViewModel
 
-        return  Pair(vm, actions)
+        return vm
     }
 }

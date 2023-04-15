@@ -10,7 +10,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.carmabs.ema.compose.action.EmaComposableScreenActions
+import com.carmabs.ema.core.action.EmaAction
+import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.navigator.EmaNavigator
@@ -22,11 +23,11 @@ import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaMethod
 
 @Composable
-fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaComposableScreenActions> EmaComposableScreen(
+fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaAction> EmaComposableScreen(
     initializer: EmaInitializer? = null,
     defaultState: S,
     vm: VM,
-    actions: A,
+    actions:EmaActionDispatcher<A>,
     navigator: EmaNavigator<D>,
     screenContent: EmaComposableScreenContent<S, A>
 ) {

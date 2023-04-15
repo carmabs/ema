@@ -3,6 +3,7 @@ package com.carmabs.ema.presentation.ui.profile.creation
 import com.carmabs.domain.manager.ResourceManager
 import com.carmabs.domain.model.Role
 import com.carmabs.domain.model.User
+import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaEmptyDestination
 import com.carmabs.ema.core.state.EmaExtraData
@@ -12,8 +13,7 @@ import com.carmabs.ema.presentation.dialog.simple.SimpleDialogListener
 
 class ProfileCreationViewModel(
     private val resourceManager: ResourceManager
-) : BaseViewModel<ProfileCreationState, EmaEmptyDestination>(),
-    ProfileCreationScreenActions {
+) : BaseViewModel<ProfileCreationState, EmaEmptyDestination>(), EmaActionDispatcher<ProfileCreationActions> {
 
     companion object {
         const val OVERLAPPED_DIALOG_CONFIRMATION = "OVERLAPPED_DIALOG_CONFIRMATION"
@@ -30,19 +30,29 @@ class ProfileCreationViewModel(
         }
     }
 
-    override fun onActionUserNameWritten(name: String) {
+    override fun onAction(action: ProfileCreationActions) {
+        when(action){
+            ProfileCreationActions.CreateClicked -> onActionCreateClicked()
+            ProfileCreationActions.DialogCancelClicked -> onActionDialogCancelClicked()
+            ProfileCreationActions.DialogConfirmClicked -> onActionDialogConfirmClicked()
+            is ProfileCreationActions.UserNameWritten -> onActionUserNameWritten(action.name)
+            is ProfileCreationActions.UserSurnameWritten ->onActionUserNameWritten(action.surname)
+        }
+    }
+
+    private fun onActionUserNameWritten(name: String) {
         updateToNormalState {
             copy(name = name)
         }
     }
 
-    override fun onActionUserSurnameWritten(surname: String) {
+    private fun onActionUserSurnameWritten(surname: String) {
         updateToNormalState {
             copy(surname = surname)
         }
     }
 
-    override fun onActionCreateClicked() {
+    private fun onActionCreateClicked() {
         val image = when (stateData.role) {
             Role.ADMIN -> resourceManager.getAdminImage()
             Role.BASIC -> resourceManager.getUserImage()
@@ -65,12 +75,12 @@ class ProfileCreationViewModel(
         addResult(User(stateData.name, stateData.surname, stateData.role))
     }
 
-    override fun onActionDialogConfirmClicked() {
+    private fun onActionDialogConfirmClicked() {
         updateToNormalState()
         navigateBack()
     }
 
-    override fun onActionDialogCancelClicked() {
+    private fun onActionDialogCancelClicked() {
         updateToNormalState()
     }
 

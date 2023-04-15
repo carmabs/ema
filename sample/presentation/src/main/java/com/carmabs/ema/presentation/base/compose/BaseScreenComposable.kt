@@ -1,8 +1,9 @@
 package com.carmabs.ema.presentation.base.compose
 
 import androidx.compose.runtime.Composable
-import com.carmabs.ema.compose.action.EmaComposableScreenActions
 import com.carmabs.ema.compose.ui.EmaComposableScreenContent
+import com.carmabs.ema.core.action.EmaAction
+import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
@@ -18,16 +19,16 @@ import com.carmabs.ema.presentation.ui.compose.LoadingDialogComposable
 import com.carmabs.ema.presentation.ui.compose.SimpleDialogComposable
 import com.carmabs.ema.sample.ema.R
 
-abstract class BaseScreenComposable<S : EmaDataState, A : EmaComposableScreenActions> :
+abstract class BaseScreenComposable<S : EmaDataState, A : EmaAction> :
     EmaComposableScreenContent<S, A> {
 
     @Composable
-    final override fun onStateNormal(state: S, actions: A) {
+    final override fun onStateNormal(state: S, actions: EmaActionDispatcher<A>) {
         onNormal(state = state, actions = actions)
     }
 
     @Composable
-    final override fun onStateOverlapped(extra: EmaExtraData, actions: A) {
+    final override fun onStateOverlapped(extra: EmaExtraData, actions: EmaActionDispatcher<A>) {
         super.onStateOverlapped(extra, actions)
         when (extra.id) {
             BaseViewModel.OVERLAPPED_LOADING -> {
@@ -52,10 +53,10 @@ abstract class BaseScreenComposable<S : EmaDataState, A : EmaComposableScreenAct
     }
 
     @Composable
-    open fun onOverlapped(extra: EmaExtraData,actions: A) = Unit
+    open fun onOverlapped(extra: EmaExtraData,actions: EmaActionDispatcher<A>) = Unit
 
     @Composable
-    abstract fun onNormal(state: S, actions: A)
+    abstract fun onNormal(state: S, actions: EmaActionDispatcher<A>)
 
     @Composable
     protected fun showDialog(data: SimpleDialogData, listener: SimpleDialogListener) {
