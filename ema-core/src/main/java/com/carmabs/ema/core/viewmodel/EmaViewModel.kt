@@ -233,8 +233,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * When a background task must be executed for data retrieving or other background job, it must
      * be called through this method with [action] function
      * @param action is the function that will be executed in background
-     * @param fullException If its is true, an exception launched on some child task affects to the
-     * rest of task, including the parent one, if it is false, only affect to the child class
+     * @param dispatcher where the useCase is launched by default
      * @return The EmaUseCaseResult where you can handle the result with the methods
      * - onSuccess when the result of action function is successful
      * - onError when the action function has thrown an error
@@ -251,8 +250,8 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
     /**
      * When a background task must be executed for data retrieving or other background job, it must
      * be called through this method with [block] function
+     * @param dispatcher where the useCase is launched by default
      * @param block is the function that will be executed in background
-     * rest of task, including the parent one, if it is false, only affect to the child class
      * @return the job that can handle the lifecycle of the background task
      */
     protected fun runSuspend(
@@ -370,7 +369,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
         emaResultHandler.addResult(
             EmaResultModel(
                 code = this::class.resultId(resultId).id,
-                ownerId = getId(),
+                ownerId = id,
                 data = data
             )
         )
@@ -387,7 +386,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
         emaResultHandler.addResultReceiver(
             EmaReceiverModel(
                 resultCode = resultId.id,
-                ownerId = getId(),
+                ownerId = id,
                 function = receiver
             )
         )
@@ -398,13 +397,14 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * Check call name for EmaAndroidView. It uses reflection to call this internal method
      */
     internal fun onCleared() {
-        emaResultHandler.notifyResults(getId())
-        emaResultHandler.removeResultListener(getId())
+        emaResultHandler.notifyResults(id)
+        emaResultHandler.removeResultListener(id)
         scope.cancel()
         onDestroy()
     }
 
-    fun getId(): String {
-        return "EmaViewModel ID: ${this.javaClass.name}"
-    }
+    val id: String
+        get() {
+            return "EmaViewModel ID: ${this.javaClass.name}"
+        }
 }

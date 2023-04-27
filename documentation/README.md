@@ -301,7 +301,7 @@ These are the main features of ***EmaViewModel***:
 		//THE BLOCK TO HANDLE THE LOGIC IN BACKGROUND THREAD
                    
        val responseLogin  = loginUseCase
-                   				.execute(requestLogin)
+                   				(requestLogin)
                    				.await()
        updateToNormalState()  
        
@@ -315,7 +315,7 @@ These are the main features of ***EmaViewModel***:
                 {  //THE BLOCK TO HANDLE THE LOGIC IN BACKGROUND THREAD
                    
                    val responseLogin  = loginUseCase
-                   							.execute(requestLogin)
+                   							(requestLogin)
                    							.await()
                    updateToNormalState()  
                 },

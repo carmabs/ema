@@ -27,7 +27,7 @@ class HomeViewModel(
                 )
             }
             HomeInitializer.BasicUser -> {
-                val friends = getUserFriendsUseCase.execute(Unit)
+                val friends = getUserFriendsUseCase(Unit)
                 HomeState(
                     userRole = Role.BASIC,
                     listName = resourceManager.getHomeUserTitle(),

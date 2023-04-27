@@ -55,7 +55,7 @@ class LoginViewModel(
         executeUseCase {
             showLoading()
             val user =
-                loginUseCase.execute(LoginRequest(stateData.userName, stateData.userPassword))
+                loginUseCase.invoke(LoginRequest(stateData.userName, stateData.userPassword))
             updateToNormalState()
             notifySingleEvent(
                 EmaExtraData(

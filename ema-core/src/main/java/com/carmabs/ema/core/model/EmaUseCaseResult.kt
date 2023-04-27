@@ -18,8 +18,8 @@ import kotlin.coroutines.CoroutineContext
  * - onError when the action function has thrown an error
  * - onFinish when the action function has ended, independently if an error has been thrown
  * - job returns the job where the action function has been executed+
- * @param concurrencyManager than launch the coroutine
- * @param fullException to use a job or supervisor job
+ * @param scope than launch the coroutine
+ * @param dispatcher where the coroutine is handled
  * @param onAction function that will be executed inside the concurrency manager
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */

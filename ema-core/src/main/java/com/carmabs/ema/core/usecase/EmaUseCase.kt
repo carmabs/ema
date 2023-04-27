@@ -22,14 +22,14 @@ abstract class EmaUseCase<I, O>(
     /**
      * Dispatcher used for useCase execution
      */
-    val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : UseCase<I, O> {
 
     /**
      * Executes a function inside a background thread provided by dispatcher
      * @return the object with the return value
      */
-    override suspend fun execute(input: I): O {
+    override suspend operator fun invoke(input: I): O {
         return withContext(dispatcher) { useCaseFunction(input) }
     }
 
