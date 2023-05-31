@@ -10,16 +10,30 @@ package com.carmabs.ema.core.extension
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 
-inline fun Boolean.ifTrue(action: () -> Unit):Boolean {
+inline fun Boolean.ifTrue(action: () -> Unit): Boolean {
     if (this)
         action.invoke()
     return this
 }
 
-inline fun Boolean.ifFalse(action: () -> Unit):Boolean {
+inline fun <R> Boolean.ifTrueLet(action: () -> R): R? {
+    return if (this)
+        action.invoke()
+    else
+        null
+}
+
+inline fun Boolean.ifFalse(action: () -> Unit): Boolean {
     if (!this)
         action.invoke()
     return this
+}
+
+inline fun <R> Boolean.ifFalseLet(action: () -> R): R? {
+    return if (!this)
+        action.invoke()
+    else
+        null
 }
 
 
