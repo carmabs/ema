@@ -1,6 +1,7 @@
 package com.carmabs.ema.core.extension
 
 import com.carmabs.ema.core.constants.STRING_EMPTY
+import com.carmabs.ema.core.model.EmaText
 
 /**
  * Created by Carlos Mateo Benito on 2019-11-24.
@@ -22,6 +23,10 @@ fun String?.checkNullOrEmpty(defaultValue: String = STRING_EMPTY): String {
 
 fun String.getFormattedString(vararg data: Any?): String {
     return String.format(this, *data)
+}
+
+fun String.toEmaText(): EmaText {
+    return EmaText.text(this)
 }
 
 fun String.replaceLast(delimiter: Char, newString: String): String {
