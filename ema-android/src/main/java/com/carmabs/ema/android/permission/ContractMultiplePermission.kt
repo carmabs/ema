@@ -2,6 +2,9 @@ package com.carmabs.ema.android.permission
 
 import androidx.activity.result.ActivityResultLauncher
 import com.carmabs.ema.core.manager.PermissionState
+import com.carmabs.ema.core.model.emaFlowSingleEvent
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
 
 /**
  * Created by Carlos Mateo Benito on 2022-08-12.
@@ -14,23 +17,22 @@ import com.carmabs.ema.core.manager.PermissionState
  */
 internal class ContractMultiplePermission : ContractPermission() {
 
-    private var listener: ((Map<String, PermissionState>) -> Unit)? = null
+    private var flow = emaFlowSingleEvent<Map<String, PermissionState>>()
 
     val contract = { permissionsResult: Map<String, Boolean> ->
         val resultMap = hashMapOf<String, PermissionState>()
         permissionsResult.iterator().forEach { (key, value) ->
             resultMap[key] = value.toState(shouldShowRequestPermissionRationale(key))
         }
-        listener?.invoke(resultMap)
+        flow.tryEmit(resultMap)
         Unit
     }
 
-    fun launch(
+    suspend fun launch(
         permissionRequest: ActivityResultLauncher<Array<String>>,
-        resultListener: (Map<String, PermissionState>) -> Unit,
         vararg permissions: String
-    ) {
-        listener = resultListener
+    ) : (Map<String, PermissionState>) {
         permissionRequest.launch(permissions.map { it }.toTypedArray())
+        return flow.first()
     }
 }

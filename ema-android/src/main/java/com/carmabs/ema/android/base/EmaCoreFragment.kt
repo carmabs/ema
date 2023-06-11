@@ -44,6 +44,9 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
 
     final override val scope: Scope by fragmentScope()
 
+    val viewScope: CoroutineScope
+        get() = viewLifecycleOwner.lifecycleScope
+
     private var viewJob: MutableList<Job>? = null
 
     private val extraViewJobs: MutableList<Job> by lazy {
@@ -156,7 +159,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
         //could be launched.
         //On restoreInstanceState is called between onStart and onResume, on re-initialization, so binding the views here, guarantees the state of
         //savedInstances has been restored
-        if(viewJob == null){
+        if (viewJob == null) {
             viewJob = onBindView(getScope(), vm)
         }
         super.onResume()

@@ -9,24 +9,23 @@ package com.carmabs.ema.core.manager
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-interface PermissionManager {
+interface EmaPermissionManager {
 
-    fun requestPermission(permission: String, resultListener: (PermissionState) -> Unit)
+    suspend fun requestPermission(permission: String): PermissionState
 
-    fun requestMultiplePermission(
-        vararg permission: String,
-        resultListener: (Map<String, PermissionState>) -> Unit
-    )
+    suspend fun requestMultiplePermission(
+        vararg permission: String
+    ): (Map<String, PermissionState>)
 
     fun isPermissionGranted(permission: String): PermissionState
 
     fun areAllPermissionsGranted(vararg permission: String): Boolean
 
-    fun shouldShowRequestPermissionRationale(permission:String): Boolean
+    fun shouldShowRequestPermissionRationale(permission: String): Boolean
 
-    fun requestCoarseLocationPermission(resultListener: (PermissionState) -> Unit)
+    suspend fun requestCoarseLocationPermission():PermissionState
 
-    fun requestFineLocationPermission(resultListener: (PermissionState) -> Unit)
+    suspend fun requestFineLocationPermission():PermissionState
 
     fun isLocationFineGranted(): PermissionState
 
