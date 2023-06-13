@@ -13,13 +13,10 @@ import com.carmabs.ema.core.state.EmaEmptyState
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyDestination>() {
+object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyDestination>(EmaEmptyState) {
 
     override val updateOnInitialization: Boolean
         get() = false
 
-    override suspend fun onCreateState(initializer: EmaInitializer?): EmaEmptyState {
-        return EmaEmptyState
-    }
-
+    override fun onStateCreated(initializer: EmaInitializer?) = Unit
 }

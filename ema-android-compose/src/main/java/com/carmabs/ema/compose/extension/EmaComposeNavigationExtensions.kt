@@ -52,7 +52,6 @@ fun NavController.navigate(
 }
 
 fun <S : EmaDataState, D : EmaDestination, A : EmaAction> NavGraphBuilder.createComposableScreen(
-    defaultState: S,
     screenContent: EmaComposableScreenContent<S, A>,
     navigator: @Composable ((NavBackStackEntry) -> EmaNavigator<D>),
     routeId: String = screenContent::class.routeId(),
@@ -63,7 +62,6 @@ fun <S : EmaDataState, D : EmaDestination, A : EmaAction> NavGraphBuilder.create
         val vm = EmaScreenProvider().provideComposableViewModel(androidViewModel = androidViewModel.invoke())
         EmaComposableScreen(
             initializer = overrideInitializer ?: getAndReleaseInitializer(routeId),
-            defaultState = defaultState,
             navigator = navigator.invoke(navBack),
             vm = (vm as EmaViewModel<S, D>),
             actions = (vm as? EmaActionDispatcher<A>)
@@ -74,7 +72,6 @@ fun <S : EmaDataState, D : EmaDestination, A : EmaAction> NavGraphBuilder.create
 }
 
 fun <S : EmaDataState, A : EmaAction> NavGraphBuilder.createComposableScreen(
-    defaultState: S,
     screenContent: EmaComposableScreenContent<S, A>,
     navController: NavController,
     routeId: String = screenContent::class.routeId(),
@@ -85,7 +82,6 @@ fun <S : EmaDataState, A : EmaAction> NavGraphBuilder.createComposableScreen(
         val vm = EmaScreenProvider().provideComposableViewModel(androidViewModel = androidViewModel.invoke())
         EmaComposableScreen(
             initializer = overrideInitializer ?: getAndReleaseInitializer(routeId),
-            defaultState = defaultState,
             navigator = EmaEmptyNavigator(
                 LocalContext.current.findActivity(),
                 navController

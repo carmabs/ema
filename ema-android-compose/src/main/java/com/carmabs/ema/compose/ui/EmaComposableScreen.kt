@@ -25,7 +25,6 @@ import kotlin.reflect.jvm.javaMethod
 @Composable
 fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaAction> EmaComposableScreen(
     initializer: EmaInitializer? = null,
-    defaultState: S,
     vm: VM,
     actions:EmaActionDispatcher<A>,
     navigator: EmaNavigator<D>,
@@ -76,7 +75,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
     }
 
     val state = vm.getObservableState()
-        .collectAsState(initial = EmaState.Normal(defaultState)).value
+        .collectAsState(initial = vm.initialState).value
 
     LaunchedEffect(key1 = Unit) {
         vm.getNavigationState().collect { destination ->

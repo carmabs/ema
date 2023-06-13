@@ -25,7 +25,10 @@ import kotlin.coroutines.CoroutineContext
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: CoroutineScope = EmaMainScope()) {
+abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
+    val initialDataState: S,
+    defaultScope: CoroutineScope = EmaMainScope()
+) {
 
 
     /**
@@ -77,11 +80,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
     )
 
     /**
-     * The state of the view.
-     */
-    internal lateinit var state: EmaState<S>
-
-    /**
      * Determine if viewmodel is first time resumed
      *
      */
@@ -112,48 +110,35 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * @param startedFinishListener: (() -> Unit) listener when starting has been finished
      */
     fun onStart(initializer: EmaInitializer? = null, startedFinishListener: (() -> Unit)? = null) {
-        if (!this::state.isInitialized) {
-            scope.launch {
-                normalContentData = onCreateState(initializer)
-                if (!normalContentData.checkIsValidStateDataClass()) {
-                    throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
-                }
-                state = EmaState.Normal(normalContentData)
-                hasBeenInitialized = true
-                pendingEvents.forEach {
-                    it.invoke()
-                }
-                onResultListenerSetup()
-                if (updateOnInitialization)
-                    observableState.tryEmit(state)
-                onStateCreated()
-                pendingEvents.clear()
-                onViewStarted()
-                startedFinishListener?.invoke()
+        if (!hasBeenInitialized) {
+            if (!normalContentData.checkIsValidStateDataClass()) {
+                throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
             }
+            hasBeenInitialized = true
+            onResultListenerSetup()
+            if (updateOnInitialization)
+                observableState.tryEmit(state)
+            onStateCreated(initializer)
+            onViewStarted()
+            startedFinishListener?.invoke()
         } else {
             //We call this to update the data if it has been not be emitted
             // if last time was updated by updateDataState
             observableState.tryEmit(state)
             onViewStarted()
-            startedFinishListener?.invoke()
         }
     }
 
     /**
-     * Called when view is created by first time, it means, it is added to the stack
+     * Call on first time view model is initialized
      */
-    protected abstract suspend fun onCreateState(initializer: EmaInitializer? = null): S
-
-    protected open suspend fun onStateCreated() = Unit
+    abstract fun onStateCreated(initializer: EmaInitializer? = null)
 
     /**
      * Called when view is shown in foreground
      */
     fun onResumeView() {
-        useAfterStateIsCreated {
-            onViewResumed()
-        }
+        onViewResumed()
         firstTimeResumed = false
     }
 
@@ -161,25 +146,11 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * Called when view is hidden in background
      */
     fun onPauseView() {
-        useAfterStateIsCreated {
-            onViewPaused()
-        }
+        onViewPaused()
     }
 
     fun onStopView() {
-        useAfterStateIsCreated {
-            onViewStopped()
-        }
-    }
-
-    /**
-     * Warranty the call is called only after state is created
-     */
-    private fun useAfterStateIsCreated(action: () -> Unit) {
-        if (hasBeenInitialized)
-            action()
-        else
-            pendingEvents.add(action)
+        onViewStopped()
     }
 
     /**
@@ -301,7 +272,14 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
     /**
      * Normal state content of the view
      */
-    private lateinit var normalContentData: S
+    private var normalContentData: S = initialDataState
+
+    val initialState = EmaState.Normal(initialDataState)
+    /**
+     * The state of the view.
+     */
+    internal var state: EmaState<S> = initialState
+        private set
 
     private val emaResultHandler: EmaResultHandler = EmaResultHandler.getInstance()
 
@@ -388,15 +366,13 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
      * Set a result for previous view when the current one is destroyed
      */
     protected fun addResult(data: Any?, resultId: String? = null) {
-        useAfterStateIsCreated {
-            emaResultHandler.addResult(
-                EmaResultModel(
-                    code = this::class.resultId(resultId).id,
-                    ownerId = getId(),
-                    data = data
-                )
+        emaResultHandler.addResult(
+            EmaResultModel(
+                code = this::class.resultId(resultId).id,
+                ownerId = getId(),
+                data = data
             )
-        }
+        )
     }
 
     /**
@@ -407,15 +383,13 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
         resultId: ResultId,
         receiver: (Any?) -> Unit
     ) {
-        useAfterStateIsCreated {
-            emaResultHandler.addResultReceiver(
-                EmaReceiverModel(
-                    resultCode = resultId.id,
-                    ownerId = getId(),
-                    function = receiver
-                )
+        emaResultHandler.addResultReceiver(
+            EmaReceiverModel(
+                resultCode = resultId.id,
+                ownerId = getId(),
+                function = receiver
             )
-        }
+        )
     }
 
     /**
@@ -426,9 +400,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(defaultScope: 
         emaResultHandler.notifyResults(getId())
         emaResultHandler.removeResultListener(getId())
         scope.cancel()
-        useAfterStateIsCreated {
-            onDestroy()
-        }
+        onDestroy()
     }
 
     fun getId(): String {

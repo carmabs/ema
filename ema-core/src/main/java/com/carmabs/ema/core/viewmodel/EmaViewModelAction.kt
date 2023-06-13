@@ -18,4 +18,7 @@ import kotlinx.coroutines.CoroutineScope
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-abstract class EmaViewModelAction<A:EmaAction,S:EmaDataState,D:EmaDestination>(scope: CoroutineScope = EmaMainScope()): EmaViewModel<S,D>(scope),EmaActionDispatcher<A>
+abstract class EmaViewModelAction<S : EmaDataState, D : EmaDestination, A : EmaAction>(
+    initialDataState: S,
+    scope: CoroutineScope = EmaMainScope()
+) : EmaViewModel<S, D>(initialDataState, scope), EmaActionDispatcher<A>

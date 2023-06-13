@@ -31,7 +31,6 @@ class ProfileActivity : ComponentActivity() {
             ) {
                 createComposableScreen(
                     overrideInitializer = getInitializer(),
-                    defaultState = ProfileOnBoardingState(),
                     navigator = {
                         ProfileOnBoardingNavigator(
                             this@ProfileActivity,
@@ -43,7 +42,6 @@ class ProfileActivity : ComponentActivity() {
                     androidViewModel = { ProfileOnBoardingAndroidViewModel(injectDirectRemembered()) }
                 )
                 createComposableScreen(
-                    defaultState = ProfileCreationState(),
                     screenContent = ProfileCreationScreenContent(),
                     androidViewModel = { ProfileCreationAndroidViewModel(injectDirectRemembered()) },
                     navController = navController
