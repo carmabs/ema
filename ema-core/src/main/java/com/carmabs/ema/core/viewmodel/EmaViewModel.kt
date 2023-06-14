@@ -126,6 +126,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
             // if last time was updated by updateDataState
             observableState.tryEmit(state)
             onViewStarted()
+            startedFinishListener?.invoke()
         }
     }
 
@@ -208,7 +209,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * Method used to notify to the observer for a single event that will be notified only once time.
      * It a new observer is attached, it will not be notified
      */
-    protected open fun notifySingleEvent(extraData: EmaExtraData) {
+    protected fun notifySingleEvent(extraData: EmaExtraData) {
         singleObservableState.tryEmit(extraData)
     }
 
@@ -216,7 +217,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * Method use to notify a navigation event
      * @param navigation The object that represent the destination of the navigation
      */
-    protected open fun navigate(navigation: D) {
+    protected fun navigate(navigation: D) {
         navigation.resetNavigated()
         navigationState.tryEmit(navigation)
     }
@@ -224,7 +225,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
     /**
      * Method use to notify a navigation back event
      */
-    protected open fun navigateBack() {
+    protected fun navigateBack() {
         navigationState.tryEmit(null)
     }
 
@@ -310,7 +311,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * Update the current state and update the normal view state by default
      * @param changeStateFunction create the new state
      */
-    protected open fun updateToNormalState(changeStateFunction: S.() -> S) {
+    protected fun updateToNormalState(changeStateFunction: S.() -> S) {
         normalContentData = changeStateFunction.invoke(normalContentData)
         state = EmaState.Normal(normalContentData)
         updateToNormalState()
@@ -320,7 +321,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * Used for trigger an update on the view
      * Use the EmaState -> Normal
      */
-    protected open fun updateToNormalState() {
+    protected fun updateToNormalState() {
         updateView(EmaState.Normal(normalContentData))
     }
 
@@ -328,7 +329,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * Update the data of current state without notify it to the view.
      * @param changeStateFunction create the new state
      */
-    protected open fun updateDataState(changeStateFunction: S.() -> S) {
+    protected fun updateDataState(changeStateFunction: S.() -> S) {
         normalContentData = changeStateFunction.invoke(normalContentData)
         state = updateData(normalContentData)
     }
@@ -355,7 +356,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * Use the EmaState -> Alternative
      * @param data with updateOverlayedState information
      */
-    protected open fun updateToOverlappedState(data: EmaExtraData? = null) {
+    protected fun updateToOverlappedState(data: EmaExtraData? = null) {
         val overlappedData: EmaState.Overlapped<S> = data?.let {
             EmaState.Overlapped(normalContentData, dataOverlapped = it)
         } ?: EmaState.Overlapped(normalContentData)
