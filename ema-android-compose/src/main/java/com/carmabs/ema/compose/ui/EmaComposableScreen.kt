@@ -26,7 +26,7 @@ import kotlin.reflect.jvm.javaMethod
 fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaAction> EmaComposableScreen(
     initializer: EmaInitializer? = null,
     vm: VM,
-    actions:EmaActionDispatcher<A>,
+    actions: EmaActionDispatcher<A>,
     navigator: EmaNavigator<D>,
     screenContent: EmaComposableScreenContent<S, A>
 ) {
@@ -44,25 +44,31 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
                 Lifecycle.Event.ON_CREATE -> {
                     Log.d(TAG, "On create")
                 }
+
                 Lifecycle.Event.ON_START -> {
                     Log.d(TAG, "On start")
                     vm.onStart(initializer)
                 }
+
                 Lifecycle.Event.ON_RESUME -> {
                     Log.d(TAG, "On resume")
                     vm.onResumeView()
                 }
+
                 Lifecycle.Event.ON_PAUSE -> {
                     Log.d(TAG, "On pause")
                     vm.onPauseView()
                 }
+
                 Lifecycle.Event.ON_STOP -> {
                     Log.d(TAG, "On stop")
                     vm.onStopView()
                 }
+
                 Lifecycle.Event.ON_DESTROY -> {
                     Log.d(TAG, "On destroy")
                 }
+
                 Lifecycle.Event.ON_ANY -> {
                     Log.d(TAG, "On any")
                 }
@@ -89,20 +95,25 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
         }
     }
 
-    when (state) {
-        is EmaState.Normal -> {
-            screenContent.onStateNormal(state.data, actions)
-        }
-        is EmaState.Overlapped -> {
-            screenContent.onStateNormal(state.data, actions)
-            screenContent.onStateOverlapped(state.dataOverlapped, actions)
-        }
-    }
-
+    screenContent.onStateNormal(state.data, actions)
+    drawOverlappedState(screenContent, actions, (state as? EmaState.Overlapped)?.dataOverlapped)
 
     val event = vm.getSingleObservableState().collectAsState(initial = EmaExtraData())
     val context = LocalContext.current
     LaunchedEffect(key1 = event.value) {
-        screenContent.onSingleEvent(context,event.value, actions)
+        screenContent.onSingleEvent(context, event.value, actions)
+    }
+}
+
+//We call this with a composable function to avoid changing the tree composer and this way avoid
+//new composition of internal onNormal/onOverlapped composable states
+@Composable
+private fun <S : EmaDataState, A : EmaAction> drawOverlappedState(
+    screenContent: EmaComposableScreenContent<S, A>,
+    actions: EmaActionDispatcher<A>,
+    extraData: EmaExtraData?
+) {
+    extraData?.also {
+        screenContent.onStateOverlapped(extra = it, actions = actions)
     }
 }
