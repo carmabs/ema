@@ -49,6 +49,27 @@ class AndroidEmaPermissionManager : EmaPermissionManager {
         fun isPermissionGranted(context: Context, permission: String): Boolean {
             return ContextCompat.checkSelfPermission(context, permission) == PERMISSION_GRANTED
         }
+
+        fun isLocationCoarseGranted(context: Context): Boolean {
+            return ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PERMISSION_GRANTED
+        }
+
+        fun isLocationFineGranted(context: Context): Boolean {
+            val finePermission = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PERMISSION_GRANTED
+
+            val coarsePermission = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PERMISSION_GRANTED
+
+            return coarsePermission && finePermission
+        }
     }
 
     constructor(
@@ -169,6 +190,7 @@ class AndroidEmaPermissionManager : EmaPermissionManager {
         return map.areAllPermissionsStateGranted().toState()
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private suspend fun requestBackgroundLocationPermissionApi29(): PermissionState {
         val map = requestAndroidMultiplePermission(
             Manifest.permission.ACCESS_BACKGROUND_LOCATION,
@@ -186,7 +208,7 @@ class AndroidEmaPermissionManager : EmaPermissionManager {
         val scope = coroutineContext.toScope()
         val state = requestFineLocationPermission()
         return if (state == PermissionState.GRANTED) {
-            suspendCoroutine<PermissionState> { emitter ->
+            suspendCoroutine { emitter ->
                 val permissionBackground = isLocationBackgroundGranted()
                 if (permissionBackground == PermissionState.NOT_GRANTED_SHOULD_EXPLAIN) {
                     val alertDialog = when (dialog) {
@@ -382,26 +404,15 @@ class AndroidEmaPermissionManager : EmaPermissionManager {
     }
 
     override fun isLocationCoarseGranted(): PermissionState {
-        val granted = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PERMISSION_GRANTED
-
-        return granted.toState(shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION))
+        return isLocationCoarseGranted(context).toState(
+            shouldShowRequestPermissionRationale(
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 
     override fun isLocationFineGranted(): PermissionState {
-        val finePermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PERMISSION_GRANTED
-
-        val coarsePermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PERMISSION_GRANTED
-
-        return if (coarsePermission && finePermission) {
+        return if (Companion.isLocationFineGranted(context)) {
             PermissionState.GRANTED
         } else {
             if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) || shouldShowRequestPermissionRationale(
@@ -430,6 +441,7 @@ class AndroidEmaPermissionManager : EmaPermissionManager {
         return isLocationFineGranted()
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun isLocationBackgroundGrantedApi29(): PermissionState {
         val locationGranted = isLocationFineGranted()
         return if (locationGranted != PermissionState.GRANTED)
@@ -455,7 +467,9 @@ class AndroidEmaPermissionManager : EmaPermissionManager {
         return permissionsGranted
     }
 
-    override fun shouldShowRequestPermissionRationale(permission: String): Boolean {
+    override fun shouldShowRequestPermissionRationale(
+        permission: String
+    ): Boolean {
         return fragment?.shouldShowRequestPermissionRationale(permission)
             ?: let {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
