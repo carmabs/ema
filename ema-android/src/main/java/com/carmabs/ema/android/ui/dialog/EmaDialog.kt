@@ -60,11 +60,6 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
     @CallSuper
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
-        val savedData =
-            (savedInstanceState?.getSerializableCompat(KEY_DIALOG_DATA) as? java.io.Serializable) as? T
-        savedData?.also {
-            data = it
-        }
         dialog.setOnShowListener(this)
         dialog.setOnKeyListener { _, keyCode, event ->
             dialogListener?.let {
@@ -146,11 +141,6 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
             ft.add(this@EmaDialog, tag)
             ft.commit()
         }
-    }
-
-    @CallSuper
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(KEY_DIALOG_DATA, data)
     }
 
     protected abstract fun createInitialState(): T

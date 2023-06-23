@@ -33,7 +33,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @author <a href=“mailto:cmateo.benito@atsistemas.com”>Carlos Mateo Benito</a>
  */
-class AndroidEmaPermissionManager : EmaPermissionManager {
+class EmaAndroidPermissionManager : EmaPermissionManager {
 
     private var fragment: Fragment? = null
     private var activity: ComponentActivity? = null

@@ -10,14 +10,6 @@ import com.carmabs.ema.core.initializer.EmaInitializer
  */
 
 abstract class EmaDestination {
-
-    var initializer:EmaInitializer?=null
-    private set
-    fun <T:EmaDestination>setInitializer(initializer: EmaInitializer):T{
-        this.initializer = initializer
-        return this as T
-    }
-
     var isNavigated: Boolean = false
         private set
 
