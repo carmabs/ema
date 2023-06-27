@@ -235,6 +235,8 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
         }
     }
 
+
+
     override fun onEmaStateOverlapped(extra: EmaExtraData) = Unit
 
     override fun onSingleEvent(extra: EmaExtraData) = Unit
@@ -252,6 +254,9 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
     )
     final override fun onBackPressed() {
         super.onBackPressed()
+        overridePopTransitionAnimations()?.also {
+            overridePendingTransition(it.enterTransition ?: INT_ZERO, it.exitTransition ?: INT_ZERO)
+        }
     }
 
     protected open fun overridePopTransitionAnimations(): EmaPopActivityTransitionAnimations? = null
