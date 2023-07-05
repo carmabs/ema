@@ -31,62 +31,61 @@ abstract class EmaAndroidDialogProvider constructor(
                 updateDialogData(this, dialogData)
             }
         } ?: also {
-            if (dialog == null) {
-                dialog = generateDialog(dialogData) as EmaDialog<*, EmaDialogData>
-            }
-            dialog?.let { dialog ->
-                updateDialogData(dialog, dialogData)
-                //Because fragment manager works asynchronously,
-                // check it to avoid that fragment has been added exception
-                fragmentManager.executePendingTransactions()
-                if (!dialog.isVisible && !dialog.isAdded) {
-                    dialog.show(fragmentManager, tag)
+            val dialogToUpdate = dialog ?: let {
+                val newDialog = (generateDialog(dialogData) as EmaDialog<*, EmaDialogData>)
+                if (!newDialog.isVisible && !newDialog.isAdded) {
+                    newDialog.show(
+                        fragmentManager,
+                        tag
+                    )
                 }
-
+                newDialog
             }
+            updateDialogData(dialogToUpdate,dialogData)
+            dialog = dialogToUpdate
+    }
+}
+
+private fun updateDialogData(
+    dialog: EmaDialog<*, EmaDialogData>,
+    dialogData: EmaDialogData?
+) {
+    dialog.dialogListener = dialogListener
+    dialogData?.also {
+        dialog.updateData {
+            it
         }
     }
+}
 
-    private fun updateDialogData(
-        dialog: EmaDialog<*, EmaDialogData>,
-        dialogData: EmaDialogData?
-    ) {
-        dialog.dialogListener = dialogListener
-        dialogData?.also {
-            dialog.updateData {
-                it
-            }
+override fun hide() {
+    //It guarantees that fragment is totally destroyed when it is hidden. Otherwise, the fragment could be saved
+    //internally and create duplications on fragment recreations.
+    dialog?.let {
+        if (!it.isHidden) {
+            Log.d(tag, "Alternative dialog totally hidden")
+            it.dismissAllowingStateLoss()
         }
-    }
-
-    override fun hide() {
-        //It guarantees that fragment is totally destroyed when it is hidden. Otherwise, the fragment could be saved
-        //internally and create duplications on fragment recreations.
-        dialog?.let {
-            if (!it.isHidden) {
-                Log.d(tag, "Alternative dialog totally hidden")
-                it.dismissAllowingStateLoss()
-            }
-            fragmentManager.beginTransaction().remove(it).commitNowAllowingStateLoss()
-        }
-
-
-        dialog = null
+        fragmentManager.beginTransaction().remove(it).commitNowAllowingStateLoss()
     }
 
 
-    override val isVisible: Boolean
-        get() = fragmentManager.findFragmentByTag(tag)?.isVisible ?: false
+    dialog = null
+}
 
-    override var dialogListener: EmaDialogListener? = null
-        set(value) {
-            field = value
-            dialog?.dialogListener = value
-        }
 
-    private val tag by lazy {
-        dialogTag ?: javaClass.name.toString()
+override val isVisible: Boolean
+    get() = fragmentManager.findFragmentByTag(tag)?.isVisible ?: false
+
+override var dialogListener: EmaDialogListener? = null
+    set(value) {
+        field = value
+        dialog?.dialogListener = value
     }
+
+private val tag by lazy {
+    dialogTag ?: javaClass.name.toString()
+}
 
 
 }
