@@ -22,7 +22,7 @@ abstract class EmaUseCase<I, O>(
     /**
      * Dispatcher used for useCase execution
      */
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    open val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : UseCase<I, O> {
 
     /**
