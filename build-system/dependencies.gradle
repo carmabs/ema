@@ -2,7 +2,8 @@ rootProject.ext {
 
     //Libraries
 
-    navigationVersion = "2.6.0-alpha04"
+    navigationVersion = "2.6.0-alpha06"
+
     navigationComposeVersion = "2.5.3"
 
     lifecycleExtensionsVersion = "2.2.0"
@@ -88,6 +89,7 @@ rootProject.ext {
             tooling       : "androidx.compose.ui:ui-tooling",
             toolingPreview: "androidx.compose.ui:ui-tooling-preview",
             activity      : "androidx.activity:activity-compose",
+            lifecycle     : "androidx.lifecycle:lifecycle-runtime-compose",
             viewmodel     : "androidx.lifecycle:lifecycle-viewmodel-compose",
             navigation    : "androidx.navigation:navigation-compose:$navigationComposeVersion",
     ]

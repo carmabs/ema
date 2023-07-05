@@ -10,6 +10,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.initializer.EmaInitializer
@@ -19,6 +21,7 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
+import kotlinx.coroutines.flow.collect
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaMethod
 
@@ -81,24 +84,27 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
     }
 
     val state = vm.getObservableState()
-        .collectAsState(initial = vm.initialState).value
+        .collectAsStateWithLifecycle(initialValue = vm.initialState, lifecycle = lifecycle).value
 
     LaunchedEffect(key1 = Unit) {
-        vm.getNavigationState().collect { destination ->
-            destination?.also { dest ->
-                if (!dest.isNavigated)
-                    navigator.navigate(dest)
-                Class.forName(dest.javaClass.name).kotlin.functions.find { it.name == "setNavigated" }?.javaMethod?.invoke(
-                    dest
-                )
-            } ?: navigator.navigateBack()
-        }
+        vm.getNavigationState()
+            .flowWithLifecycle(lifecycle)
+            .collect { destination ->
+                destination?.also { dest ->
+                    if (!dest.isNavigated)
+                        navigator.navigate(dest)
+                    Class.forName(dest.javaClass.name).kotlin.functions.find { it.name == "setNavigated" }?.javaMethod?.invoke(
+                        dest
+                    )
+                } ?: navigator.navigateBack()
+            }
     }
 
     screenContent.onStateNormal(state.data, actions)
     drawOverlappedState(screenContent, actions, (state as? EmaState.Overlapped)?.dataOverlapped)
 
-    val event = vm.getSingleObservableState().collectAsState(initial = EmaExtraData())
+    val event = vm.getSingleObservableState()
+        .collectAsStateWithLifecycle(initialValue = EmaExtraData(), lifecycle = lifecycle)
     val context = LocalContext.current
     LaunchedEffect(key1 = event.value) {
         screenContent.onSingleEvent(context, event.value, actions)
