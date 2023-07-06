@@ -12,6 +12,7 @@ dependencies {
     api emaCoreDependencies.kotlin
     api emaCoreDependencies.coroutines
     implementation emaCoreDependencies.reflect
+    implementation emaTestingDependencies.junit
 }
 
 

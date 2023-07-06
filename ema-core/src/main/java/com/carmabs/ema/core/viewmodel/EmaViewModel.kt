@@ -26,7 +26,7 @@ import kotlin.coroutines.CoroutineContext
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
 abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
-    val initialDataState: S,
+    initialDataState: S,
     defaultScope: CoroutineScope = EmaMainScope()
 ) {
 

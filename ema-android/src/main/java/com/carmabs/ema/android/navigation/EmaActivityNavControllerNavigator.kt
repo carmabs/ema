@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import com.carmabs.ema.android.extension.toBundle
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaDestination
 
@@ -30,7 +31,7 @@ abstract class EmaActivityNavControllerNavigator<D : EmaDestination>(
 
     internal fun setup(initializer: EmaInitializer?) {
         navController.setGraph(graphId, initializer?.let {
-            setInitializer(it)
+            it.toBundle()
         } ?: activity.intent.extras)
     }
 

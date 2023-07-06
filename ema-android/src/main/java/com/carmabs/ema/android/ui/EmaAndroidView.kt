@@ -23,7 +23,7 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
 interface EmaAndroidView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> :
     EmaView<S, VM, D> {
 
-    val androidViewModelSeed: EmaAndroidViewModel
+    val androidViewModelSeed: EmaAndroidViewModel<S,D>
 
     fun initializeViewModel(
         activity: ComponentActivity,

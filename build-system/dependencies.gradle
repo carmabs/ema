@@ -58,7 +58,7 @@ rootProject.ext {
             reflect   : 'org.jetbrains.kotlin:kotlin-reflect:' + project.reflectVersion
     ]
 
-    emaTesting = [
+    emaTestingDependencies = [
             espresso   : "androidx.test.espresso:espresso-core:" + project.espressoVersion,
             core       : "androidx.test:core:" + project.coreVersion,
             coreKotlin : "androidx.test:core-ktx:" + project.coreVersion,

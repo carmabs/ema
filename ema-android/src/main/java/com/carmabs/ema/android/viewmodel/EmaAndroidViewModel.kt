@@ -18,7 +18,7 @@ import kotlin.reflect.jvm.javaMethod
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-abstract class EmaAndroidViewModel(val emaViewModel:EmaViewModel<*,*>) :
+abstract class EmaAndroidViewModel<S:EmaDataState,D:EmaDestination>(val emaViewModel:EmaViewModel<S,D>) :
     ViewModel() {
 
     init {

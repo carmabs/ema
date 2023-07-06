@@ -5,23 +5,19 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.flowWithLifecycle
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaDestination
-import com.carmabs.ema.core.navigator.EmaNavigator
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import kotlinx.coroutines.flow.collect
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaMethod
 
@@ -30,13 +26,14 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
     initializer: EmaInitializer? = null,
     vm: VM,
     actions: EmaActionDispatcher<A>,
-    navigator: EmaNavigator<D>,
-    screenContent: EmaComposableScreenContent<S, A>
+    screenContent: EmaComposableScreenContent<S, A>,
+    onNavigationEvent: (D) -> Boolean,
+    onNavigationBackEvent: () -> Boolean
 ) {
     vm.onBackHardwarePressedListener?.also {
         BackHandler(true) {
             if (it.invoke())
-                navigator.navigateBack()
+                onNavigationBackEvent.invoke()
         }
     }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -86,40 +83,40 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
     val state = vm.getObservableState()
         .collectAsStateWithLifecycle(initialValue = vm.initialState, lifecycle = lifecycle).value
 
+
     LaunchedEffect(key1 = Unit) {
-        vm.getNavigationState()
-            .flowWithLifecycle(lifecycle)
-            .collect { destination ->
-                destination?.also { dest ->
-                    if (!dest.isNavigated)
-                        navigator.navigate(dest)
-                    Class.forName(dest.javaClass.name).kotlin.functions.find { it.name == "setNavigated" }?.javaMethod?.invoke(
-                        dest
-                    )
-                } ?: navigator.navigateBack()
-            }
+        vm.getNavigationState().collect { destination ->
+            destination?.also { dest ->
+                if (!dest.isNavigated) {
+                    val navigated = onNavigationEvent(dest)
+                    if (navigated) {
+                        Class.forName(dest.javaClass.name).kotlin.functions.find { it.name == "setNavigated" }?.javaMethod?.invoke(
+                            dest
+                        )
+                    }
+                }
+            } ?: onNavigationBackEvent.invoke()
+        }
     }
 
     screenContent.onStateNormal(state.data, actions)
-    drawOverlappedState(screenContent, actions, (state as? EmaState.Overlapped)?.dataOverlapped)
+    OverlappedComposable((state as? EmaState.Overlapped), screenContent, actions)
 
-    val event = vm.getSingleObservableState()
-        .collectAsStateWithLifecycle(initialValue = EmaExtraData(), lifecycle = lifecycle)
+
+    val event = vm.getSingleObservableState().collectAsStateWithLifecycle(initialValue = EmaExtraData(), lifecycle = lifecycle).value
     val context = LocalContext.current
-    LaunchedEffect(key1 = event.value) {
-        screenContent.onSingleEvent(context, event.value, actions)
+    LaunchedEffect(key1 = event) {
+        screenContent.onSingleEvent(context, event, actions)
     }
 }
 
-//We call this with a composable function to avoid changing the tree composer and this way avoid
-//new composition of internal onNormal/onOverlapped composable states
 @Composable
-private fun <S : EmaDataState, A : EmaAction> drawOverlappedState(
+private fun <S : EmaDataState, A : EmaAction> OverlappedComposable(
+    overlappedState: EmaState.Overlapped<S>? = null,
     screenContent: EmaComposableScreenContent<S, A>,
-    actions: EmaActionDispatcher<A>,
-    extraData: EmaExtraData?
+    actions: EmaActionDispatcher<A>
 ) {
-    extraData?.also {
-        screenContent.onStateOverlapped(extra = it, actions = actions)
+    overlappedState?.also {
+        screenContent.onStateOverlapped(extra = overlappedState.dataOverlapped, actions = actions)
     }
 }

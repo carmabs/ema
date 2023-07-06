@@ -1,17 +1,17 @@
-package com.carmabs.ema.android.navigation
+package com.carmabs.ema.compose.navigation
 
 import android.app.Activity
 import androidx.navigation.NavController
-import com.carmabs.ema.core.navigator.EmaEmptyDestination
+import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.navigator.EmaNavigator
 
 
-class EmaEmptyNavigator constructor(
+class EmaComposableNavigatorEmpty<D : EmaDestination>(
     private val activity: Activity,
     private val navController: NavController
-) : EmaNavigator<EmaEmptyDestination> {
+) : EmaNavigator<D> {
 
-    override fun navigate(destination: EmaEmptyDestination) = false
+    override fun navigate(destination: D): Boolean = false
 
     override fun navigateBack(): Boolean {
         val hasMoreBackScreens = navController.popBackStack()
