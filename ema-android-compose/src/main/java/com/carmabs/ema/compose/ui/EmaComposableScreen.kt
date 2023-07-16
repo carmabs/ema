@@ -5,11 +5,14 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
+import com.carmabs.ema.compose.action.toImmutable
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.initializer.EmaInitializer
@@ -30,6 +33,10 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
     onNavigationEvent: (D) -> Boolean,
     onNavigationBackEvent: () -> Boolean
 ) {
+    val immutableActions = remember {
+        actions.toImmutable()
+    }
+
     vm.onBackHardwarePressedListener?.also {
         BackHandler(true) {
             if (it.invoke())
@@ -99,14 +106,14 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
         }
     }
 
-    screenContent.onStateNormal(state.data, actions)
-    OverlappedComposable((state as? EmaState.Overlapped), screenContent, actions)
+    screenContent.onStateNormal(state.data, immutableActions)
+    OverlappedComposable((state as? EmaState.Overlapped), screenContent, immutableActions)
 
 
     val event = vm.getSingleObservableState().collectAsStateWithLifecycle(initialValue = EmaExtraData(), lifecycle = lifecycle).value
     val context = LocalContext.current
     LaunchedEffect(key1 = event) {
-        screenContent.onSingleEvent(context, event, actions)
+        screenContent.onSingleEvent(context, event, immutableActions)
     }
 }
 
@@ -114,7 +121,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
 private fun <S : EmaDataState, A : EmaAction> OverlappedComposable(
     overlappedState: EmaState.Overlapped<S>? = null,
     screenContent: EmaComposableScreenContent<S, A>,
-    actions: EmaActionDispatcher<A>
+    actions: EmaImmutableActionDispatcher<A>
 ) {
     overlappedState?.also {
         screenContent.onStateOverlapped(extra = overlappedState.dataOverlapped, actions = actions)

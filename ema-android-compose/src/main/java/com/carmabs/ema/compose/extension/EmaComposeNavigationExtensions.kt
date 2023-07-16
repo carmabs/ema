@@ -8,6 +8,7 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.Navigator
 import androidx.navigation.compose.composable
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
+import com.carmabs.ema.compose.action.toImmutable
 import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.compose.ui.EmaComposableScreen
 import com.carmabs.ema.compose.ui.EmaComposableScreenContent
@@ -58,7 +59,8 @@ fun <S : EmaDataState, D : EmaDestination, A : EmaAction, VM : EmaAndroidViewMod
         val vm =
             EmaScreenProvider().provideComposableViewModel(androidViewModel = androidViewModel.invoke())
         val vmActions = (vm as? EmaViewModelAction<S, D, A>)
-            ?: throw java.lang.IllegalStateException("${vm::class} must implement EmaActionDispatcher the proper action")
+                ?: throw java.lang.IllegalStateException("${vm::class} must implement EmaActionDispatcher the proper action")
+
 
         onViewModelInstance?.invoke(vmActions)
         EmaComposableScreen(
@@ -66,7 +68,7 @@ fun <S : EmaDataState, D : EmaDestination, A : EmaAction, VM : EmaAndroidViewMod
             onNavigationEvent = onNavigationEvent,
             onNavigationBackEvent = onNavigationBackEvent,
             vm = vmActions,
-            actions = vmActions,
+            actions = vmActions.toImmutable(),
             screenContent = screenContent
         )
     }
