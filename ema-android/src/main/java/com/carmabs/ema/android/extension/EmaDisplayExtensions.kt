@@ -1,6 +1,7 @@
 package com.carmabs.ema.android.extension
 
 import android.content.Context
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
 import android.util.DisplayMetrics
@@ -86,3 +87,9 @@ fun Context.getStatusBarHeight(): Int {
     } else
         INT_ZERO
 }
+
+val Configuration.screenHeightPx
+    get() = run { screenHeightDp.toFloat() * densityDpi / 160f }
+
+val Configuration.screenWidthPx
+    get() = run { screenWidthDp.toFloat() * densityDpi / 160f }
