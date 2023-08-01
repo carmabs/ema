@@ -64,5 +64,5 @@ fun Float.pxToDp(): Dp {
 
 @Composable
 fun Dp.toPx(): Float {
-   return LocalDensity.current.run { 16.dp.toPx() }
+   return LocalDensity.current.run { toPx() }
 }
