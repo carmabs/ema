@@ -1,6 +1,10 @@
 package com.carmabs.ema.compose.extension
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -9,6 +13,7 @@ import androidx.navigation.Navigator
 import androidx.navigation.compose.composable
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.compose.action.toImmutable
+import com.carmabs.ema.compose.navigation.EmaComposableTransitions
 import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.compose.ui.EmaComposableScreen
 import com.carmabs.ema.compose.ui.EmaComposableScreenContent
@@ -53,13 +58,20 @@ fun <S : EmaDataState, D : EmaDestination, A : EmaAction, VM : EmaAndroidViewMod
     routeId: String = screenContent::class.routeId(),
     overrideInitializer: EmaInitializer? = null,
     androidViewModel: @Composable () -> VM,
-    onViewModelInstance: (@Composable (EmaViewModelAction<S, D, A>) -> Unit)? = null
+    onViewModelInstance: (@Composable (EmaViewModelAction<S, D, A>) -> Unit)? = null,
+    emaComposableTransitions: EmaComposableTransitions = EmaComposableTransitions()
 ) {
-    composable(routeId) { navBack ->
+    composable(
+        routeId,
+        enterTransition = emaComposableTransitions.enterTransition,
+        exitTransition = emaComposableTransitions.exitTransition,
+        popEnterTransition = emaComposableTransitions.popEnterTransition,
+        popExitTransition = emaComposableTransitions.popExitTransition
+    ) { navBack ->
         val vm =
             EmaScreenProvider().provideComposableViewModel(androidViewModel = androidViewModel.invoke())
         val vmActions = (vm as? EmaViewModelAction<S, D, A>)
-                ?: throw java.lang.IllegalStateException("${vm::class} must implement EmaActionDispatcher the proper action")
+            ?: throw java.lang.IllegalStateException("${vm::class} must implement EmaActionDispatcher the proper action")
 
 
         onViewModelInstance?.invoke(vmActions)

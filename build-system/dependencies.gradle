@@ -4,7 +4,7 @@ rootProject.ext {
 
     navigationVersion = "2.6.0-alpha06"
 
-    navigationComposeVersion = "2.5.3"
+    navigationComposeVersion = "2.7.1"
 
     lifecycleExtensionsVersion = "2.2.0"
 
