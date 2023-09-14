@@ -24,7 +24,7 @@ import kotlin.coroutines.CoroutineContext
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 
-class EmaUseCaseResult<T> internal constructor(
+class EmaFunctionResultHandler<T> internal constructor(
     scope: CoroutineScope,
     dispatcher:CoroutineContext,
     onAction: suspend CoroutineScope.() -> T

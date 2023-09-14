@@ -11,8 +11,13 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
+import com.carmabs.ema.compose.action.EmaImmutableActionDispatcherEmpty
 import com.carmabs.ema.compose.action.toImmutable
+import com.carmabs.ema.compose.extension.asViewModelAction
+import com.carmabs.ema.compose.extension.skipForPreview
+import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.initializer.EmaInitializer
@@ -30,13 +35,88 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
     vm: VM,
     actions: EmaActionDispatcher<A>,
     screenContent: EmaComposableScreenContent<S, A>,
-    onNavigationEvent: (D) -> Boolean,
-    onNavigationBackEvent: () -> Boolean
+    onNavigationEvent: (D) -> Unit,
+    onNavigationBackEvent: () -> Unit,
+    previewRenderState: S? = null
 ) {
-    val immutableActions = remember {
-        actions.toImmutable()
-    }
+    skipForPreview(
+        previewComposable = {
+            previewRenderState?.also { previewState ->
+                screenContent.onStateNormal(
+                    state = previewState,
+                    actions = EmaImmutableActionDispatcherEmpty()
+                )
+            }
 
+        }
+    ) {
+        val immutableActions = remember {
+            actions.toImmutable()
+        }
+
+        renderScreen(
+            initializer,
+            screenContent,
+            vm,
+            immutableActions,
+            onNavigationEvent,
+            onNavigationBackEvent
+        )
+    }
+}
+
+@Composable
+fun <S : EmaDataState, D : EmaDestination, A : EmaAction> EmaComposableScreen(
+    initializer: EmaInitializer? = null,
+    vm: () -> EmaAndroidViewModel<S, D>,
+    screenContent: EmaComposableScreenContent<S, A>,
+    onNavigationEvent: (D) -> Unit,
+    onNavigationBackEvent: () -> Unit,
+    previewRenderState: S? = null
+) {
+    skipForPreview(
+        previewComposable = {
+            previewRenderState?.also { previewState ->
+                screenContent.onStateNormal(
+                    state = previewState,
+                    actions = EmaImmutableActionDispatcherEmpty()
+                )
+            }
+
+        }
+    ) {
+        val androidVm = EmaScreenProvider.provideComposableViewModel(androidViewModel = remember {
+            vm.invoke()
+        })
+
+        val vmAction = remember {
+            androidVm.asViewModelAction<S, D, A>()
+        }
+
+        val immutableActions = remember {
+            vmAction.toImmutable()
+        }
+
+        renderScreen(
+            initializer,
+            screenContent,
+            vmAction,
+            immutableActions,
+            onNavigationEvent,
+            onNavigationBackEvent
+        )
+    }
+}
+
+@Composable
+private fun <A : EmaAction, D : EmaDestination, S : EmaDataState> renderScreen(
+    initializer: EmaInitializer?,
+    screenContent: EmaComposableScreenContent<S, A>,
+    vm: EmaViewModel<S, D>,
+    immutableActions: EmaImmutableActionDispatcher<A>,
+    onNavigationEvent: (D) -> Unit,
+    onNavigationBackEvent: () -> Unit
+) {
     vm.onBackHardwarePressedListener?.also {
         BackHandler(true) {
             if (it.invoke())
@@ -95,12 +175,10 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
         vm.getNavigationState().collect { destination ->
             destination?.also { dest ->
                 if (!dest.isNavigated) {
-                    val navigated = onNavigationEvent(dest)
-                    if (navigated) {
-                        Class.forName(dest.javaClass.name).kotlin.functions.find { it.name == "setNavigated" }?.javaMethod?.invoke(
-                            dest
-                        )
-                    }
+                    onNavigationEvent(dest)
+                    Class.forName(dest.javaClass.name).kotlin.functions.find { it.name == "setNavigated" }?.javaMethod?.invoke(
+                        dest
+                    )
                 }
             } ?: onNavigationBackEvent.invoke()
         }
@@ -110,7 +188,8 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
     OverlappedComposable((state as? EmaState.Overlapped), screenContent, immutableActions)
 
 
-    val event = vm.getSingleObservableState().collectAsStateWithLifecycle(initialValue = EmaExtraData(), lifecycle = lifecycle).value
+    val event = vm.getSingleObservableState()
+        .collectAsStateWithLifecycle(initialValue = EmaExtraData(), lifecycle = lifecycle).value
     val context = LocalContext.current
     LaunchedEffect(key1 = event) {
         screenContent.onSingleEvent(context, event, immutableActions)

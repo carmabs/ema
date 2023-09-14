@@ -5,7 +5,7 @@ import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.extension.ResultId
 import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.model.EmaUseCaseResult
+import com.carmabs.ema.core.model.EmaFunctionResultHandler
 import com.carmabs.ema.core.model.emaFlowSingleEvent
 import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.state.EmaDataState
@@ -243,8 +243,8 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
     protected fun <T> executeUseCase(
         dispatcher: CoroutineContext = this.scope.coroutineContext,
         action: suspend CoroutineScope.() -> T
-    ): EmaUseCaseResult<T> {
-        return EmaUseCaseResult(scope, dispatcher, action)
+    ): EmaFunctionResultHandler<T> {
+        return EmaFunctionResultHandler(scope, dispatcher, action)
     }
 
     /**

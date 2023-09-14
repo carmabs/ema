@@ -1,10 +1,6 @@
 package com.carmabs.ema.compose.extension
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -53,8 +49,8 @@ fun NavController.navigate(
 
 fun <S : EmaDataState, D : EmaDestination, A : EmaAction, VM : EmaAndroidViewModel<S, D>> NavGraphBuilder.createComposableScreen(
     screenContent: EmaComposableScreenContent<S, A>,
-    onNavigationEvent: (D) -> Boolean,
-    onNavigationBackEvent: () -> Boolean,
+    onNavigationEvent: (D) -> Unit,
+    onNavigationBackEvent: () -> Unit,
     routeId: String = screenContent::class.routeId(),
     overrideInitializer: EmaInitializer? = null,
     androidViewModel: @Composable () -> VM,
@@ -68,11 +64,8 @@ fun <S : EmaDataState, D : EmaDestination, A : EmaAction, VM : EmaAndroidViewMod
         popEnterTransition = emaComposableTransitions.popEnterTransition,
         popExitTransition = emaComposableTransitions.popExitTransition
     ) { navBack ->
-        val vm =
-            EmaScreenProvider().provideComposableViewModel(androidViewModel = androidViewModel.invoke())
-        val vmActions = (vm as? EmaViewModelAction<S, D, A>)
-            ?: throw java.lang.IllegalStateException("${vm::class} must implement EmaActionDispatcher the proper action")
-
+        val vm = EmaScreenProvider.provideComposableViewModel(androidViewModel = androidViewModel.invoke())
+        val vmActions = vm.asViewModelAction<S,D,A>()
 
         onViewModelInstance?.invoke(vmActions)
         EmaComposableScreen(

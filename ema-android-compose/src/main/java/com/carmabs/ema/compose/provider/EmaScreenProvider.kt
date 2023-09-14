@@ -8,7 +8,7 @@ import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 
-class EmaScreenProvider {
+object EmaScreenProvider {
 
     @Composable
     fun <S:EmaDataState,D:EmaDestination>provideComposableViewModel(androidViewModel:EmaAndroidViewModel<S,D>):EmaViewModel<S,D>{
