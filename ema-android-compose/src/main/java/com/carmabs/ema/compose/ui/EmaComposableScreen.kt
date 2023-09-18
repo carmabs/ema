@@ -21,13 +21,14 @@ import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationDirection
+import com.carmabs.ema.core.navigator.onNavigation
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.javaMethod
 
 @Composable
 fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaAction> EmaComposableScreen(
@@ -170,17 +171,19 @@ private fun <A : EmaAction, D : EmaDestination, S : EmaDataState> renderScreen(
     val state = vm.getObservableState()
         .collectAsStateWithLifecycle(initialValue = vm.initialState, lifecycle = lifecycle).value
 
-
     LaunchedEffect(key1 = Unit) {
-        vm.getNavigationState().collect { destination ->
-            destination?.also { dest ->
-                if (!dest.isNavigated) {
-                    onNavigationEvent(dest)
-                    Class.forName(dest.javaClass.name).kotlin.functions.find { it.name == "setNavigated" }?.javaMethod?.invoke(
-                        dest
-                    )
+        vm.getNavigationState().collect { event ->
+            event.onNavigation { eventData->
+                when(eventData){
+                    is EmaNavigationDirection.Back -> {
+                        onNavigationBackEvent.invoke()
+                    }
+                    is EmaNavigationDirection.Forward -> {
+                        onNavigationEvent(eventData.navigationEvent as D)
+                    }
                 }
-            } ?: onNavigationBackEvent.invoke()
+                vm.notifyOnNavigated()
+            }
         }
     }
 
@@ -192,7 +195,10 @@ private fun <A : EmaAction, D : EmaDestination, S : EmaDataState> renderScreen(
         .collectAsStateWithLifecycle(initialValue = EmaExtraData(), lifecycle = lifecycle).value
     val context = LocalContext.current
     LaunchedEffect(key1 = event) {
-        screenContent.onSingleEvent(context, event, immutableActions)
+        if (event is EmaEvent.Launched) {
+            screenContent.onSingleEvent(context, event.data, immutableActions)
+            vm.consumeSingleEvent()
+        }
     }
 }
 

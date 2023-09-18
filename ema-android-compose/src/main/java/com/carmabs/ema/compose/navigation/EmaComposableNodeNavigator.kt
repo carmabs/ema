@@ -31,23 +31,16 @@ abstract class EmaComposableNodeNavigator<D : EmaDestination>(
 
     private var previousNavigationNode: EmaNavigationNode<D>? = null
 
-    fun navigate(navigationNode: EmaNavigationNode<D>) {
-        if(navigationNode.id != previousNavigationNode?.id) {
+    fun navigate(navigationNode: EmaNavigationNode<D>,onNavigated:((D)->Unit)?=null) {
+        if (navigationNode.id != previousNavigationNode?.id) {
             val destination = navigationNode.value
             if (previousNavigationNode?.hasPreviousNode(node = navigationNode) == true) {
-                navigateBack()
                 previousNavigationNode = navigationNode
-            }
-            else {
-                if (!destination.isNavigated) {
-                    val navigated = onNavigation(destination)
-                    if (navigated) {
-                        Class.forName(destination.javaClass.name).kotlin.functions.find { it.name == "setNavigated" }?.javaMethod?.invoke(
-                            destination
-                        )
-                    }
-                    previousNavigationNode = navigationNode
-                }
+                navigateBack()
+            } else {
+                previousNavigationNode = navigationNode
+                onNavigation(destination)
+                onNavigated?.invoke(destination)
             }
         }
     }

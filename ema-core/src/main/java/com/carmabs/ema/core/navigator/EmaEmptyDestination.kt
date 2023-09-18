@@ -7,4 +7,4 @@ package com.carmabs.ema.core.navigator
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
-class EmaEmptyDestination internal constructor(): EmaDestination()
+object EmaEmptyDestination : EmaDestination

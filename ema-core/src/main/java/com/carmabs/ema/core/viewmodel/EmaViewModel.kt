@@ -5,9 +5,11 @@ import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.extension.ResultId
 import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.model.EmaFunctionResultHandler
-import com.carmabs.ema.core.model.emaFlowSingleEvent
 import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationDirection
+import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
@@ -15,8 +17,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
@@ -30,6 +32,10 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
     defaultScope: CoroutineScope = EmaMainScope()
 ) {
 
+
+    companion object {
+        const val EXTRA_EVENT_NAVIGATION = "EXTRA_EVENT_NAVIGATION"
+    }
 
     /**
      * The scope where coroutines will be launched by default.
@@ -66,7 +72,10 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * object that can contain any type of object. It will be used for
      * events that only has to be notified once to its observers, e.g: A toast message.
      */
-    private val singleObservableState: MutableSharedFlow<EmaExtraData> = emaFlowSingleEvent()
+    private val observableSingleEvent: MutableSharedFlow<EmaEvent> = MutableSharedFlow(
+        replay = INT_ONE,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
     /**
      * Observable state that launch event every time a value is set. [D] value be will a [EmaDestination]
@@ -74,7 +83,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * events that only has to be notified once to its observers and is used to notify the navigation
      * events
      */
-    private val navigationState: MutableSharedFlow<D?> = MutableSharedFlow(
+    private val navigationState: MutableSharedFlow<EmaNavigationDirectionEvent> = MutableSharedFlow(
         replay = INT_ONE,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
@@ -178,7 +187,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
     /**
      * Get observable state as LiveDaya to avoid state setting from the view
      */
-    fun getObservableState(): SharedFlow<EmaState<S>> = observableState
+    fun getObservableState(): Flow<EmaState<S>> = observableState
 
     /**
      * Get current state of view
@@ -188,12 +197,12 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
     /**
      * Get navigation state as LiveData to avoid state setting from the view
      */
-    fun getNavigationState(): SharedFlow<D?> = navigationState
+    fun getNavigationState(): Flow<EmaNavigationDirectionEvent> = navigationState
 
     /**
      * Get single state as LiveData to avoid state setting from the view
      */
-    fun getSingleObservableState(): SharedFlow<EmaExtraData> = singleObservableState
+    fun getSingleObservableState(): Flow<EmaEvent> = observableSingleEvent
 
 
     /**
@@ -209,8 +218,12 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * Method used to notify to the observer for a single event that will be notified only once time.
      * It a new observer is attached, it will not be notified
      */
-    protected fun notifySingleEvent(extraData: EmaExtraData) {
-        singleObservableState.tryEmit(extraData)
+    protected open fun notifySingleEvent(extraData: EmaExtraData) {
+        observableSingleEvent.tryEmit(EmaEvent.Launched(extraData))
+    }
+
+    fun consumeSingleEvent() {
+        observableSingleEvent.tryEmit(EmaEvent.Consumed)
     }
 
     /**
@@ -218,15 +231,19 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
      * @param navigation The object that represent the destination of the navigation
      */
     protected fun navigate(navigation: D) {
-        navigation.resetNavigated()
-        navigationState.tryEmit(navigation)
+        navigationState.tryEmit(EmaNavigationDirectionEvent.Launched(EmaNavigationDirection.Forward(navigation)))
     }
 
     /**
      * Method use to notify a navigation back event
      */
     protected fun navigateBack() {
-        navigationState.tryEmit(null)
+        navigationState.tryEmit(EmaNavigationDirectionEvent.Launched(EmaNavigationDirection.Back))
+
+    }
+
+    fun notifyOnNavigated() {
+        navigationState.tryEmit(EmaNavigationDirectionEvent.OnNavigated)
     }
 
     /**
@@ -275,6 +292,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
     private var normalContentData: S = initialDataState
 
     val initialState = EmaState.Normal(initialDataState)
+
     /**
      * The state of the view.
      */
