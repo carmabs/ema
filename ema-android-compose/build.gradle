@@ -53,6 +53,7 @@ dependencies {
 
     api platform(emaComposeDependencies.bom)
     api emaComposeDependencies.ui
+    api emaComposeDependencies.ripple
     api emaComposeDependencies.tooling
     api emaComposeDependencies.toolingPreview
     api emaComposeDependencies.activity

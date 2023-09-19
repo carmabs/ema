@@ -86,6 +86,7 @@ rootProject.ext {
             bom           : 'androidx.compose:compose-bom:+',
             koin          : "io.insert-koin:koin-androidx-compose:$koinVersion",
             ui            : "androidx.compose.ui:ui",
+            ripple        : "androidx.compose.material:material-ripple-android",
             tooling       : "androidx.compose.ui:ui-tooling",
             toolingPreview: "androidx.compose.ui:ui-tooling-preview",
             activity      : "androidx.activity:activity-compose",

@@ -3,7 +3,6 @@ package com.carmabs.ema.android.permission
 import androidx.activity.result.ActivityResultLauncher
 import com.carmabs.ema.core.manager.PermissionState
 import com.carmabs.ema.core.model.emaFlowSingleEvent
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 
 /**
@@ -15,7 +14,10 @@ import kotlinx.coroutines.flow.first
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-internal class ContractMultiplePermission : ContractPermission() {
+class EmaContractMultiplePermission(shouldShowRequestPermissionRationaleFunction: (String) -> Boolean) :
+    EmaContractPermission(
+        shouldShowRequestPermissionRationaleFunction
+    ) {
 
     private var flow = emaFlowSingleEvent<Map<String, PermissionState>>()
 
@@ -31,7 +33,7 @@ internal class ContractMultiplePermission : ContractPermission() {
     suspend fun launch(
         permissionRequest: ActivityResultLauncher<Array<String>>,
         vararg permissions: String
-    ) : (Map<String, PermissionState>) {
+    ): (Map<String, PermissionState>) {
         permissionRequest.launch(permissions.map { it }.toTypedArray())
         return flow.first()
     }

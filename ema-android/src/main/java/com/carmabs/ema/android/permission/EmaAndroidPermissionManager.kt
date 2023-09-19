@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.fragment.app.Fragment
 import com.carmabs.ema.android.R
+import com.carmabs.ema.android.extension.findActivity
 import com.carmabs.ema.core.extension.toScope
 import com.carmabs.ema.core.manager.EmaPermissionManager
 import com.carmabs.ema.core.manager.PermissionState
@@ -35,15 +36,12 @@ import kotlin.coroutines.suspendCoroutine
  */
 class EmaAndroidPermissionManager : EmaPermissionManager {
 
-    private var fragment: Fragment? = null
-    private var activity: ComponentActivity? = null
     private val permissionSingleRequest: ActivityResultLauncher<String>
     private val permissionMultipleRequest: ActivityResultLauncher<Array<String>>
-    private val contractSinglePermission = ContractSinglePermission()
-    private val contractMultiplePermission = ContractMultiplePermission()
-    private val context: Context by lazy {
-        fragment?.requireContext() ?: activity!!
-    }
+    private val contractSinglePermission: EmaContractSinglePermission
+    private val contractMultiplePermission: EmaContractMultiplePermission
+    private val context: Context
+    private val shouldShowRequestPermissionRationaleFunction: (String) -> Boolean
 
     companion object {
         fun isPermissionGranted(context: Context, permission: String): Boolean {
@@ -75,9 +73,13 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
     constructor(
         fragment: Fragment
     ) {
-        this.fragment = fragment
-        contractSinglePermission.fragment = fragment
-        contractMultiplePermission.fragment = fragment
+        this.context = fragment.requireContext()
+        this.shouldShowRequestPermissionRationaleFunction =
+            { fragment.shouldShowRequestPermissionRationale(it) }
+        this.contractSinglePermission =
+            EmaContractSinglePermission(shouldShowRequestPermissionRationaleFunction)
+        this.contractMultiplePermission =
+            EmaContractMultiplePermission(shouldShowRequestPermissionRationaleFunction)
         permissionMultipleRequest = fragment.registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
             contractMultiplePermission.contract
@@ -86,21 +88,41 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
         permissionSingleRequest = fragment.registerForActivityResult(
             ActivityResultContracts.RequestPermission(), contractSinglePermission.contract
         )
+    }
 
+    constructor(
+        context: Context,
+        activitySinglePermissionResultLauncher: ActivityResultLauncher<String>,
+        activityMultiplePermissionResultLauncher: ActivityResultLauncher<Array<String>>,
+        contractSinglePermission: EmaContractSinglePermission,
+        contractMultiplePermission: EmaContractMultiplePermission
+    ) {
+        this.context = context
+        this.contractSinglePermission = contractSinglePermission
+        this.contractMultiplePermission = contractMultiplePermission
+        permissionMultipleRequest = activityMultiplePermissionResultLauncher
+        permissionSingleRequest = activitySinglePermissionResultLauncher
+        shouldShowRequestPermissionRationaleFunction = {
+            context.findActivity().shouldShowRequestPermissionRationale(it)
+        }
     }
 
     constructor(
         activity: ComponentActivity
     ) {
-        this.activity = activity
-        contractSinglePermission.activity = activity
-        contractMultiplePermission.activity = activity
+        this.context = activity
+        this.shouldShowRequestPermissionRationaleFunction =
+            { activity.shouldShowRequestPermissionRationale(it) }
+        this.contractSinglePermission =
+            EmaContractSinglePermission(shouldShowRequestPermissionRationaleFunction)
+        this.contractMultiplePermission =
+            EmaContractMultiplePermission(shouldShowRequestPermissionRationaleFunction)
         permissionMultipleRequest = activity.registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
-            contractMultiplePermission.contract
+            this.contractMultiplePermission.contract
         )
         permissionSingleRequest = activity.registerForActivityResult(
-            ActivityResultContracts.RequestPermission(), contractSinglePermission.contract
+            ActivityResultContracts.RequestPermission(), this.contractSinglePermission.contract
         )
     }
 
@@ -470,13 +492,7 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
     override fun shouldShowRequestPermissionRationale(
         permission: String
     ): Boolean {
-        return fragment?.shouldShowRequestPermissionRationale(permission)
-            ?: let {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    activity?.shouldShowRequestPermissionRationale(permission)
-                } else
-                    false
-            } ?: false
+        return shouldShowRequestPermissionRationaleFunction.invoke(permission)
     }
 
     private fun checkPermissionInManifest(vararg permissions: String) {

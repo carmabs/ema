@@ -1,10 +1,8 @@
 package com.carmabs.ema.android.permission
 
 import androidx.activity.result.ActivityResultLauncher
-import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.manager.PermissionState
 import com.carmabs.ema.core.model.emaFlowSingleEvent
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 
 /**
@@ -16,7 +14,9 @@ import kotlinx.coroutines.flow.first
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-internal class ContractSinglePermission : ContractPermission() {
+class EmaContractSinglePermission(shouldShowRequestPermissionRationaleFunction: (String) -> Boolean) : EmaContractPermission(
+    shouldShowRequestPermissionRationaleFunction
+) {
 
     private var permissionId: String? = null
     private var flow = emaFlowSingleEvent<PermissionState>()
