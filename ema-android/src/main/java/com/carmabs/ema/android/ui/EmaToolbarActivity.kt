@@ -2,16 +2,14 @@ package com.carmabs.ema.android.ui
 
 import android.animation.Animator
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.View
-import androidx.annotation.CallSuper
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.viewbinding.ViewBinding
 import com.carmabs.ema.android.extension.checkVisibility
 import com.carmabs.ema.core.constants.FLOAT_ONE
 import com.carmabs.ema.core.constants.FLOAT_ZERO
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.google.android.material.appbar.AppBarLayout
@@ -23,7 +21,7 @@ import com.google.android.material.appbar.AppBarLayout
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
-abstract class EmaToolbarActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> :
+abstract class EmaToolbarActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> :
     EmaActivity<B, S, VM, D>() {
 
     /**

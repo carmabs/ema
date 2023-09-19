@@ -22,7 +22,7 @@ import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaEvent
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirection
 import com.carmabs.ema.core.navigator.onNavigation
 import com.carmabs.ema.core.state.EmaDataState
@@ -31,7 +31,7 @@ import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 
 @Composable
-fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaAction> EmaComposableScreen(
+fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : EmaAction> EmaComposableScreen(
     initializer: EmaInitializer? = null,
     vm: VM,
     actions: EmaActionDispatcher<A>,
@@ -67,7 +67,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaActio
 }
 
 @Composable
-fun <S : EmaDataState, D : EmaDestination, A : EmaAction> EmaComposableScreen(
+fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction> EmaComposableScreen(
     initializer: EmaInitializer? = null,
     vm: () -> EmaAndroidViewModel<S, D>,
     screenContent: EmaComposableScreenContent<S, A>,
@@ -110,7 +110,7 @@ fun <S : EmaDataState, D : EmaDestination, A : EmaAction> EmaComposableScreen(
 }
 
 @Composable
-private fun <A : EmaAction, D : EmaDestination, S : EmaDataState> renderScreen(
+private fun <A : EmaAction, D : EmaNavigationEvent, S : EmaDataState> renderScreen(
     initializer: EmaInitializer?,
     screenContent: EmaComposableScreenContent<S, A>,
     vm: EmaViewModel<S, D>,

@@ -3,11 +3,10 @@ package com.carmabs.ema.android.delegates
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.viewbinding.ViewBinding
 import com.carmabs.ema.android.ui.EmaAndroidView
 import com.carmabs.ema.android.ui.EmaFragment
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
@@ -23,7 +22,7 @@ import kotlin.reflect.KProperty
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 @Suppress("ClassName")
-class emaViewModelSharedDelegate<S : EmaDataState, VM : EmaAndroidViewModel<S, D>, D : EmaDestination>(
+class emaViewModelSharedDelegate<S : EmaDataState, VM : EmaAndroidViewModel<S, D>, D : EmaNavigationEvent>(
     private val viewModelSeed: () -> VM,
     private val observerFunction: ((attachedState: EmaState<S>) -> Unit)? = null,
 

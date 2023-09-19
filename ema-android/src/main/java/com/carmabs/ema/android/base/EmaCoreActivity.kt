@@ -17,7 +17,7 @@ import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
 import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
@@ -37,7 +37,7 @@ import org.koin.core.scope.Scope
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
-abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> :
+abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> :
     AppCompatActivity(), EmaAndroidView<S, VM, D>, AndroidScopeComponent {
 
     final override val scope: Scope by activityScope()

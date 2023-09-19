@@ -4,7 +4,7 @@ import android.app.Activity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 
 /**
  * Created by Carlos Mateo Benito on 29/7/22.
@@ -18,7 +18,7 @@ import com.carmabs.ema.core.navigator.EmaDestination
  *  Navigator to handle navigation through navController in a Fragment
  * Created by: Carlos Mateo Benito on 29/07/22.
  */
-abstract class EmaFragmentNavControllerNavigator<D : EmaDestination>(
+abstract class EmaFragmentNavControllerNavigator<D : EmaNavigationEvent>(
     private val fragment:Fragment
 ) : EmaNavControllerNavigator<D> {
 

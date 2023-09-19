@@ -1,7 +1,7 @@
 package com.carmabs.ema.android.navigation
 
 import android.app.Activity
-import com.carmabs.ema.core.navigator.EmaEmptyDestination
+import com.carmabs.ema.core.navigator.EmaEmptyNavigationEvent
 
 /**
  * Created by Carlos Mateo Benito on 29/7/22.
@@ -20,6 +20,6 @@ class EmaActivityNavControllerHost(
     activity: Activity,
     navHostId: Int,
     graphId: Int
-) : EmaActivityNavControllerNavigator<EmaEmptyDestination>(activity, navHostId, graphId) {
-    override fun navigate(destination: EmaEmptyDestination) = false
+) : EmaActivityNavControllerNavigator<EmaEmptyNavigationEvent>(activity, navHostId, graphId) {
+    override fun navigate(destination: EmaEmptyNavigationEvent) = false
 }

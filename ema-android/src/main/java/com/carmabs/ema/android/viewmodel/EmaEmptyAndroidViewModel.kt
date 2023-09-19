@@ -1,6 +1,6 @@
 package com.carmabs.ema.android.viewmodel
 
-import com.carmabs.ema.core.navigator.EmaEmptyDestination
+import com.carmabs.ema.core.navigator.EmaEmptyNavigationEvent
 import com.carmabs.ema.core.state.EmaEmptyState
 import com.carmabs.ema.core.viewmodel.EmaEmptyViewModel
 
@@ -13,4 +13,4 @@ import com.carmabs.ema.core.viewmodel.EmaEmptyViewModel
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-object EmaEmptyAndroidViewModel : EmaAndroidViewModel<EmaEmptyState,EmaEmptyDestination>(EmaEmptyViewModel)
+object EmaEmptyAndroidViewModel : EmaAndroidViewModel<EmaEmptyState,EmaEmptyNavigationEvent>(EmaEmptyViewModel)

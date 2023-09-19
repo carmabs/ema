@@ -1,19 +1,16 @@
 package com.carmabs.ema.compose.navigation
 
 import android.app.Activity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.carmabs.ema.compose.extension.findComponentActivity
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigationNode
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.javaMethod
 
 @Composable
-fun <D : EmaDestination> rememberEmaNodeNavigator(
+fun <D : EmaNavigationEvent> rememberEmaNodeNavigator(
     navHostController: NavHostController,
     navigatorProvider: (Activity, NavHostController) -> EmaComposableNodeNavigator<D>
 ): EmaComposableNodeNavigator<D> {
@@ -24,7 +21,7 @@ fun <D : EmaDestination> rememberEmaNodeNavigator(
     return navigator
 }
 
-abstract class EmaComposableNodeNavigator<D : EmaDestination>(
+abstract class EmaComposableNodeNavigator<D : EmaNavigationEvent>(
     activity: Activity,
     navController: NavHostController,
     closeActivityWhenBackstackIsEmpty: Boolean = true

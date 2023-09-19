@@ -9,7 +9,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.carmabs.ema.android.extension.toBundle
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 
 /**
  * Created by Carlos Mateo Benito on 29/7/22.
@@ -23,7 +23,7 @@ import com.carmabs.ema.core.navigator.EmaDestination
  * Navigator to handle navigation through navController in an Activity
  * Created by: Carlos Mateo Benito on 29/07/22.
  */
-abstract class EmaActivityNavControllerNavigator<D : EmaDestination>(
+abstract class EmaActivityNavControllerNavigator<D : EmaNavigationEvent>(
     override val activity: Activity,
     @IdRes private val navHostId: Int,
     @NavigationRes private val graphId: Int

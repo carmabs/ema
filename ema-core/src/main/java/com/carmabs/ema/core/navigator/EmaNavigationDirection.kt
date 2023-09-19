@@ -11,12 +11,12 @@ package com.carmabs.ema.core.navigator
  */
 sealed interface EmaNavigationDirection {
 
-    data class Forward internal constructor(val navigationEvent: EmaDestination) : EmaNavigationDirection
+    data class Forward internal constructor(val navigationEvent: EmaNavigationEvent) : EmaNavigationDirection
 
     object Back : EmaNavigationDirection
 }
 
-inline fun EmaNavigationDirection.onForward(action: (EmaDestination) -> Unit) {
+inline fun EmaNavigationDirection.onForward(action: (EmaNavigationEvent) -> Unit) {
     if (this is EmaNavigationDirection.Forward) {
         action.invoke(navigationEvent)
     }

@@ -3,7 +3,7 @@ package com.carmabs.ema.core.viewmodel
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.concurrency.EmaMainScope
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import kotlinx.coroutines.CoroutineScope
 
@@ -18,7 +18,7 @@ import kotlinx.coroutines.CoroutineScope
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-abstract class EmaViewModelAction<S : EmaDataState, D : EmaDestination, A : EmaAction>(
+abstract class EmaViewModelAction<S : EmaDataState, D : EmaNavigationEvent, A : EmaAction>(
     initialDataState: S,
     scope: CoroutineScope = EmaMainScope()
 ) : EmaViewModel<S, D>(initialDataState, scope), EmaActionDispatcher<A>

@@ -2,7 +2,7 @@ package com.carmabs.ema.testing.android.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.navigator.EmaEmptyDestination
+import com.carmabs.ema.core.navigator.EmaEmptyNavigationEvent
 import com.carmabs.ema.core.state.EmaEmptyState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.carmabs.ema.testing.core.EmaTest
@@ -40,7 +40,7 @@ class ViewModelTest : EmaTest() {
         }
     }
 
-    private inner class TestViewModel : EmaViewModel<EmaEmptyState, EmaEmptyDestination>() {
+    private inner class TestViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent>() {
 
 
         override suspend fun onCreateState(initializer: EmaInitializer?): EmaEmptyState {

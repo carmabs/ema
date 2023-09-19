@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import com.carmabs.ema.android.base.EmaCoreFragment
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
@@ -20,7 +20,7 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaComposableFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
+abstract class EmaComposableFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent>
     : EmaCoreFragment<S, VM, D>() {
 
     protected var isFirstNormalExecution: Boolean = true

@@ -1,7 +1,7 @@
 package com.carmabs.ema.core.viewmodel
 
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.navigator.EmaEmptyDestination
+import com.carmabs.ema.core.navigator.EmaEmptyNavigationEvent
 import com.carmabs.ema.core.state.EmaEmptyState
 
 /**
@@ -13,7 +13,7 @@ import com.carmabs.ema.core.state.EmaEmptyState
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyDestination>(EmaEmptyState) {
+object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent>(EmaEmptyState) {
 
     override val updateOnInitialization: Boolean
         get() = false

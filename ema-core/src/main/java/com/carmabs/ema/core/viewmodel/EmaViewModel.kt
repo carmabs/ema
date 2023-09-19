@@ -7,7 +7,7 @@ import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.model.EmaFunctionResultHandler
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirection
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.state.EmaDataState
@@ -27,7 +27,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
+abstract class EmaViewModel<S : EmaDataState, D : EmaNavigationEvent>(
     initialDataState: S,
     defaultScope: CoroutineScope = EmaMainScope()
 ) {
@@ -80,7 +80,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaDestination>(
     )
 
     /**
-     * Observable state that launch event every time a value is set. [D] value be will a [EmaDestination]
+     * Observable state that launch event every time a value is set. [D] value be will a [EmaNavigationEvent]
      * object that represent the destination. This observable will be used for
      * events that only has to be notified once to its observers and is used to notify the navigation
      * events

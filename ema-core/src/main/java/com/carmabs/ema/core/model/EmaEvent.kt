@@ -1,6 +1,5 @@
 package com.carmabs.ema.core.model
 
-import com.carmabs.ema.core.navigator.EmaDestination
 import com.carmabs.ema.core.state.EmaExtraData
 
 /**

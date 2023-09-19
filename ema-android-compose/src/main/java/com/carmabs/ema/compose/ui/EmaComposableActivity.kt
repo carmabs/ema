@@ -5,7 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import com.carmabs.ema.android.base.EmaCoreActivity
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
@@ -17,7 +17,7 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
+abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent>
     : EmaCoreActivity<S, VM, D>() {
 
     protected var isFirstNormalExecution: Boolean = true
