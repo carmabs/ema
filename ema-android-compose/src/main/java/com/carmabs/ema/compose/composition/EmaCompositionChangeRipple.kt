@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 @Composable
-fun CompositionChangeRipple(defaultColor: Color,rippleAlpha:Color = Color.Transparent,content:@Composable ()->Unit) {
+fun EmaCompositionChangeRipple(defaultColor: Color, rippleAlpha:Color = Color.Transparent, content:@Composable ()->Unit) {
     CompositionLocalProvider(
         LocalRippleTheme provides CustomRippleTheme(
             defaultColor = defaultColor,

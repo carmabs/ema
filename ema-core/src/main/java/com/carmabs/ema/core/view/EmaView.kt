@@ -1,8 +1,13 @@
 package com.carmabs.ema.core.view
 
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.model.EmaEvent
+import com.carmabs.ema.core.model.onLaunched
+import com.carmabs.ema.core.navigator.EmaNavigationDirection
+import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigator
+import com.carmabs.ema.core.navigator.onNavigation
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
@@ -77,6 +82,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
                             )
                         )
                     }
+
                     is EmaState.Normal -> {
                         onEmaStateTransition(
                             EmaStateTransition.OverlappedToNormal(
@@ -94,6 +100,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
             is EmaState.Overlapped -> {
                 onEmaStateOverlapped(state.dataOverlapped)
             }
+
             else -> {
                 //DO NOTHING
             }
@@ -178,22 +185,33 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
 
     /**
      * Called when view model trigger an only once notified event
-     * @param data for extra information
+     * @param event for extra information
      */
-    fun onSingleData(data: EmaExtraData) {
-        onSingleEvent(data)
+    fun onSingleData(event : EmaEvent) {
+        event.onLaunched {
+            onSingleEvent(it)
+            viewModelSeed.consumeSingleEvent()
+        }
+
     }
 
     /**
-     * Called when view model trigger an only once notified event for navigation
+     * Called when view model trigger a navigation event for navigation
      * @param navigation state with information about the destination
      */
-    fun onNavigation(navigation: D?) {
-        navigation?.let {
-            if (!it.isNavigated)
-                navigate(navigation)
-            it.setNavigated()
-        } ?: navigateBack()
+    fun onNavigation(navigation: EmaNavigationDirectionEvent) {
+        navigation.onNavigation {
+            when (val direction = it) {
+                EmaNavigationDirection.Back -> {
+                    navigateBack()
+                }
+
+                is EmaNavigationDirection.Forward -> {
+                    navigate(direction.navigationEvent as D)
+                }
+            }
+            viewModelSeed.notifyOnNavigated()
+        }
     }
 
     /**
@@ -216,11 +234,11 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
 
     /**
      * Called when view model trigger a navigation event
-     * @param state with info about destination
+     * @param navigationEvent for the navigation event data
      */
-    @Suppress("UNCHECKED_CAST")
-    fun navigate(state: D) {
-        navigator?.navigate(state) ?: throwNavigationException()
+
+    fun navigate(navigationEvent: D) {
+        navigator?.navigate(navigationEvent) ?: throwNavigationException()
     }
 
     @Throws

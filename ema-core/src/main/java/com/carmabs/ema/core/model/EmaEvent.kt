@@ -11,9 +11,9 @@ import com.carmabs.ema.core.state.EmaExtraData
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-sealed interface EmaEvent {
-    data class Launched(val data: EmaExtraData) : EmaEvent
-    object Consumed : EmaEvent
+sealed class EmaEvent {
+    data class Launched(val data: EmaExtraData = EmaExtraData()) : EmaEvent()
+    object Consumed : EmaEvent()
 
     fun isConsumed(): Boolean {
         return this is Consumed

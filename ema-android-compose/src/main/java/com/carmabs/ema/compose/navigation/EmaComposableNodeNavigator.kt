@@ -23,9 +23,8 @@ fun <D : EmaNavigationEvent> rememberEmaNodeNavigator(
 
 abstract class EmaComposableNodeNavigator<D : EmaNavigationEvent>(
     activity: Activity,
-    navController: NavHostController,
-    closeActivityWhenBackstackIsEmpty: Boolean = true
-) : EmaComposableNavigator<D>(activity, navController, closeActivityWhenBackstackIsEmpty) {
+    navController: NavHostController
+) : EmaComposableNavigator(activity, navController) {
 
     private var previousNavigationNode: EmaNavigationNode<D>? = null
 

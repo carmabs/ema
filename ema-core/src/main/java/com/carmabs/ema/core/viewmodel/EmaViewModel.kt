@@ -77,8 +77,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaNavigationEvent>(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    )
-
     /**
      * Observable state that launch event every time a value is set. [D] value be will a [EmaNavigationEvent]
      * object that represent the destination. This observable will be used for
