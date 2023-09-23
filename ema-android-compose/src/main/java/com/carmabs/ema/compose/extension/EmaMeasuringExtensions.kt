@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import com.carmabs.ema.core.constants.INT_ZERO
 
 /**
  * Created by Carlos Mateo Benito on 17/9/23
@@ -20,13 +21,13 @@ fun EmaMeasureViewWidth(
     content: @Composable (measuredWidth: Dp, viewMeasured: @Composable () -> Unit) -> Unit,
 ) {
     SubcomposeLayout { constraints ->
-        val measuredWidth = subcompose("viewToMeasure", viewToMeasure)[0]
+        val measuredWidth = subcompose("viewToMeasure", viewToMeasure)[INT_ZERO]
             .measure(Constraints()).width.toDp()
         val contentPlaceable = subcompose("content") {
             content(measuredWidth, viewToMeasure)
-        }[0].measure(constraints)
+        }[INT_ZERO].measure(constraints)
         layout(contentPlaceable.width, contentPlaceable.height) {
-            contentPlaceable.place(0, 0)
+            contentPlaceable.place(INT_ZERO, INT_ZERO)
         }
     }
 }

@@ -56,12 +56,20 @@ fun ComponentActivity.addOnBackPressedListener(listener: () -> Boolean) {
     }
 
 }
-
 fun Context.findActivity(): Activity {
     var context = this
     while (context is ContextWrapper) {
         if (context is Activity) return context
         context = context.baseContext
     }
-    throw IllegalStateException("This class is not contained in an activity")
+    throw IllegalStateException("This class is not contained in an Activity")
+}
+
+fun Context.findComponentActivity(): ComponentActivity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is ComponentActivity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("This class is not contained in a ComponentActivity")
 }

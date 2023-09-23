@@ -40,7 +40,7 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
     private val permissionMultipleRequest: ActivityResultLauncher<Array<String>>
     private val contractSinglePermission: EmaContractSinglePermission
     private val contractMultiplePermission: EmaContractMultiplePermission
-    private val context: Context
+    private val context: ()->Context
     private val shouldShowRequestPermissionRationaleFunction: (String) -> Boolean
 
     companion object {
@@ -73,7 +73,7 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
     constructor(
         fragment: Fragment
     ) {
-        this.context = fragment.requireContext()
+        this.context =  { fragment.requireContext() }
         this.shouldShowRequestPermissionRationaleFunction =
             { fragment.shouldShowRequestPermissionRationale(it) }
         this.contractSinglePermission =
@@ -97,7 +97,7 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
         contractSinglePermission: EmaContractSinglePermission,
         contractMultiplePermission: EmaContractMultiplePermission
     ) {
-        this.context = context
+        this.context = { context }
         this.contractSinglePermission = contractSinglePermission
         this.contractMultiplePermission = contractMultiplePermission
         permissionMultipleRequest = activityMultiplePermissionResultLauncher
@@ -107,10 +107,10 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
         }
     }
 
-    constructor(
+    private constructor(
         activity: ComponentActivity
     ) {
-        this.context = activity
+        this.context = { activity }
         this.shouldShowRequestPermissionRationaleFunction =
             { activity.shouldShowRequestPermissionRationale(it) }
         this.contractSinglePermission =
@@ -258,7 +258,7 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
                         is InfoDialogType.Default -> {
                             val title: String = dialog.title
                             val message: String = dialog.message
-                            AlertDialog.Builder(context)
+                            AlertDialog.Builder(context())
                                 .setPositiveButton(R.string.ema_permission_manager_accept) { dialog, _ ->
                                     dialog.dismiss()
                                     scope.launch {
@@ -421,12 +421,12 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
 
     override fun isPermissionGranted(permission: String): PermissionState {
         val granted =
-            ContextCompat.checkSelfPermission(context, permission) == PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(context(), permission) == PERMISSION_GRANTED
         return granted.toState(shouldShowRequestPermissionRationale(permission))
     }
 
     override fun isLocationCoarseGranted(): PermissionState {
-        return isLocationCoarseGranted(context).toState(
+        return isLocationCoarseGranted(context()).toState(
             shouldShowRequestPermissionRationale(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
@@ -434,7 +434,7 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
     }
 
     override fun isLocationFineGranted(): PermissionState {
-        return if (Companion.isLocationFineGranted(context)) {
+        return if (Companion.isLocationFineGranted(context())) {
             PermissionState.GRANTED
         } else {
             if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) || shouldShowRequestPermissionRationale(
@@ -470,7 +470,7 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
             locationGranted
         else {
             val backgroundGranted = ContextCompat.checkSelfPermission(
-                context,
+                context(),
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
             ) == PERMISSION_GRANTED
 
@@ -496,8 +496,8 @@ class EmaAndroidPermissionManager : EmaPermissionManager {
     }
 
     private fun checkPermissionInManifest(vararg permissions: String) {
-        val manifestPermissions = context.packageManager.getPackageInfo(
-            context.packageName,
+        val manifestPermissions = context().packageManager.getPackageInfo(
+            context().packageName,
             PackageManager.GET_PERMISSIONS
         ).requestedPermissions
         permissions.forEach {

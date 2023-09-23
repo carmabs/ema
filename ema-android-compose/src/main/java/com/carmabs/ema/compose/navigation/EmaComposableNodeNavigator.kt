@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import com.carmabs.ema.compose.extension.activity
 import com.carmabs.ema.compose.extension.findComponentActivity
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigationNode
@@ -14,7 +15,7 @@ fun <D : EmaNavigationEvent> rememberEmaNodeNavigator(
     navHostController: NavHostController,
     navigatorProvider: (Activity, NavHostController) -> EmaComposableNodeNavigator<D>
 ): EmaComposableNodeNavigator<D> {
-    val activity = LocalContext.current.findComponentActivity()
+    val activity = LocalContext.activity
     val navigator = remember {
         navigatorProvider.invoke(activity, navHostController)
     }

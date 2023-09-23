@@ -23,3 +23,6 @@ fun skipForPreview(
         previewComposable?.invoke()
     }
 }
+
+@Composable
+fun isInPreview()  = LocalInspectionMode.current

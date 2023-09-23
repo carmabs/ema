@@ -3,6 +3,11 @@ package com.carmabs.ema.compose.extension
 import android.content.Context
 import android.content.ContextWrapper
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalContext
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Created by Carlos Mateo Benito on 12/5/23
@@ -13,11 +18,19 @@ import androidx.activity.ComponentActivity
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-fun Context.findComponentActivity(): ComponentActivity {
-    var context = this
-    while (context is ContextWrapper) {
-        if (context is ComponentActivity) return context
-        context = context.baseContext
+
+val ProvidableCompositionLocal<Context>.activity: ComponentActivity
+    @Composable get() {
+        val context = current
+        val activity = remember {
+            var contextSearch = context
+            while (contextSearch is ContextWrapper) {
+                if (contextSearch is ComponentActivity) {
+                    return@remember context as ComponentActivity
+                }
+                contextSearch = contextSearch.baseContext
+            }
+            throw IllegalStateException("No component Activity container found for this composable")
+        }
+        return activity
     }
-    throw IllegalStateException("no activity")
-}
