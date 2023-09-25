@@ -6,7 +6,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.carmabs.ema.compose.extension.activity
-import com.carmabs.ema.compose.extension.findComponentActivity
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigationNode
 

@@ -15,6 +15,7 @@ import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcherEmpty
 import com.carmabs.ema.compose.action.toImmutable
+import com.carmabs.ema.compose.extension.asActionDispatcher
 import com.carmabs.ema.compose.extension.asViewModelAction
 import com.carmabs.ema.compose.extension.skipForPreview
 import com.carmabs.ema.compose.provider.EmaScreenProvider
@@ -29,6 +30,7 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
+import java.lang.IllegalStateException
 
 @Composable
 fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : EmaAction> EmaComposableScreen(
@@ -86,22 +88,18 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction> EmaComposableScree
 
         }
     ) {
-        val androidVm = EmaScreenProvider.provideComposableViewModel(androidViewModel = remember {
+        val viewModel = EmaScreenProvider.provideComposableViewModel(androidViewModel = remember {
             vm.invoke()
         })
 
-        val vmAction = remember {
-            androidVm.asViewModelAction<S, D, A>()
-        }
-
         val immutableActions = remember {
-            vmAction.toImmutable()
+            viewModel.asActionDispatcher<A>().toImmutable()
         }
 
         renderScreen(
             initializer,
             screenContent,
-            vmAction,
+            viewModel,
             immutableActions,
             onNavigationEvent,
             onNavigationBackEvent

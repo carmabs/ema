@@ -5,16 +5,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.carmabs.ema.android.permission.EmaContractMultiplePermission
 import com.carmabs.ema.android.permission.EmaAndroidPermissionManager
+import com.carmabs.ema.android.permission.EmaContractMultiplePermission
 import com.carmabs.ema.android.permission.EmaContractSinglePermission
-import com.carmabs.ema.compose.extension.findComponentActivity
+import com.carmabs.ema.compose.extension.activity
 import com.carmabs.ema.compose.extension.isInPreview
-import com.carmabs.ema.compose.extension.skipForPreview
 import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.manager.EmaPermissionManager
 import com.carmabs.ema.core.manager.PermissionState
-import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
 
 /**
  * Created by Carlos Mateo Benito on 15/9/23.
@@ -32,7 +30,7 @@ fun rememberEmaPermissionManager(): EmaPermissionManager {
     else {
         val context = LocalContext.current
 
-        val activity = LocalContext.findComponentActivity()
+        val activity = LocalContext.activity
 
         val singleContract = remember {
             EmaContractSinglePermission {

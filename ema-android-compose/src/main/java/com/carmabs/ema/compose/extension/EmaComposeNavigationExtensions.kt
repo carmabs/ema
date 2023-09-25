@@ -18,6 +18,7 @@ import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
+import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.carmabs.ema.core.viewmodel.EmaViewModelAction
 import kotlin.collections.set
 
@@ -54,7 +55,7 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction, VM : EmaAndroidVie
     routeId: String = screenContent::class.routeId(),
     overrideInitializer: EmaInitializer? = null,
     androidViewModel: @Composable () -> VM,
-    onViewModelInstance: (@Composable (EmaViewModelAction<S, D, A>) -> Unit)? = null,
+    onViewModelInstance: (@Composable (EmaViewModel<S, D>) -> Unit)? = null,
     emaComposableTransitions: EmaComposableTransitions = EmaComposableTransitions()
 ) {
     composable(
@@ -64,16 +65,16 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction, VM : EmaAndroidVie
         popEnterTransition = emaComposableTransitions.popEnterTransition,
         popExitTransition = emaComposableTransitions.popExitTransition
     ) { navBack ->
-        val vm = EmaScreenProvider.provideComposableViewModel(androidViewModel = androidViewModel.invoke())
-        val vmActions = vm.asViewModelAction<S,D,A>()
+        val viewModel = EmaScreenProvider.provideComposableViewModel(androidViewModel = androidViewModel.invoke())
+        val vmActions = viewModel.asActionDispatcher<A>().toImmutable()
 
-        onViewModelInstance?.invoke(vmActions)
+        onViewModelInstance?.invoke(viewModel)
         EmaComposableScreen(
             initializer = overrideInitializer ?: getAndReleaseInitializer(routeId),
             onNavigationEvent = onNavigationEvent,
             onNavigationBackEvent = onNavigationBackEvent,
-            vm = vmActions,
-            actions = vmActions.toImmutable(),
+            vm = viewModel,
+            actions = vmActions,
             screenContent = screenContent
         )
     }
