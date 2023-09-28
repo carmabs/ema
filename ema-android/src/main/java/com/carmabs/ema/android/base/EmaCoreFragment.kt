@@ -205,7 +205,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
 
         observerFunction?.also {
             val job = coroutineScope.launch {
-                viewModel.emaViewModel.getObservableState().collect {
+                viewModel.emaViewModel.subscribeStateUpdates().collect {
                     observerFunction.invoke(it)
                 }
             }

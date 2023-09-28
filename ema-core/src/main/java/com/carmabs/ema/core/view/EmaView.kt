@@ -287,7 +287,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
 
     fun onBindState(coroutineScope: CoroutineScope, viewModel: VM): Job {
         return coroutineScope.launch {
-            viewModel.getObservableState().collectLatest {
+            viewModel.subscribeStateUpdates().collectLatest {
                 onDataUpdated(it)
             }
         }
@@ -295,7 +295,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
 
     fun onBindNavigation(coroutineScope: CoroutineScope, viewModel: VM): Job {
         return coroutineScope.launch {
-            viewModel.getNavigationState().collectLatest {
+            viewModel.subscribeToNavigationEvents().collectLatest {
                 onNavigation(it)
             }
         }
@@ -303,7 +303,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
 
     fun onBindSingle(coroutineScope: CoroutineScope, viewModel: VM): Job {
         return coroutineScope.launch {
-            viewModel.getSingleObservableState().collect {
+            viewModel.subscribeToSingleEvents().collect {
                 onSingleData(it)
             }
         }

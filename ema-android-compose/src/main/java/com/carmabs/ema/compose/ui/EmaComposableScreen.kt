@@ -16,7 +16,6 @@ import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcherEmpty
 import com.carmabs.ema.compose.action.toImmutable
 import com.carmabs.ema.compose.extension.asActionDispatcher
-import com.carmabs.ema.compose.extension.asViewModelAction
 import com.carmabs.ema.compose.extension.skipForPreview
 import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.core.action.EmaAction
@@ -30,7 +29,6 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import java.lang.IllegalStateException
 
 @Composable
 fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : EmaAction> EmaComposableScreen(
@@ -166,11 +164,11 @@ private fun <A : EmaAction, D : EmaNavigationEvent, S : EmaDataState> renderScre
         }
     }
 
-    val state = vm.getObservableState()
+    val state = vm.subscribeStateUpdates()
         .collectAsStateWithLifecycle(initialValue = vm.initialState, lifecycle = lifecycle).value
 
     LaunchedEffect(key1 = Unit) {
-        vm.getNavigationState().collect { event ->
+        vm.subscribeToNavigationEvents().collect { event ->
             event.onNavigation { eventData->
                 when(eventData){
                     is EmaNavigationDirection.Back -> {
@@ -189,7 +187,7 @@ private fun <A : EmaAction, D : EmaNavigationEvent, S : EmaDataState> renderScre
     OverlappedComposable((state as? EmaState.Overlapped), screenContent, immutableActions)
 
 
-    val event = vm.getSingleObservableState()
+    val event = vm.subscribeToSingleEvents()
         .collectAsStateWithLifecycle(initialValue = EmaExtraData(), lifecycle = lifecycle).value
     val context = LocalContext.current
     LaunchedEffect(key1 = event) {

@@ -31,7 +31,7 @@ abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, D>, 
         isFirstNormalExecution = true
         isFirstOverlayedExecution = true
         setContent {
-                val state = vm.getObservableState()
+                val state = vm.subscribeStateUpdates()
                     .collectAsState(initial = EmaState.Normal(object : EmaDataState {} as S))
                 when (val emaState = state.value) {
                     is EmaState.Normal<S> -> {

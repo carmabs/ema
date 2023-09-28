@@ -32,11 +32,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaNavigationEvent>(
     defaultScope: CoroutineScope = EmaMainScope()
 ) {
 
-
-    companion object {
-        const val EXTRA_EVENT_NAVIGATION = "EXTRA_EVENT_NAVIGATION"
-    }
-
     /**
      * The scope where coroutines will be launched by default.
      */
@@ -46,9 +41,6 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaNavigationEvent>(
     internal fun setScope(scope: CoroutineScope) {
         this.scope = scope
     }
-
-
-    private val pendingEvents = mutableListOf<() -> Unit>()
 
     /**
      * Observable state that launch event every time a value is set. This value will be the state
@@ -187,7 +179,7 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaNavigationEvent>(
     /**
      * Get observable state as LiveDaya to avoid state setting from the view
      */
-    fun getObservableState(): Flow<EmaState<S>> = observableState
+    fun subscribeStateUpdates(): Flow<EmaState<S>> = observableState
 
     /**
      * Get current state of view
@@ -197,12 +189,12 @@ abstract class EmaViewModel<S : EmaDataState, D : EmaNavigationEvent>(
     /**
      * Get navigation state as LiveData to avoid state setting from the view
      */
-    fun getNavigationState(): Flow<EmaNavigationDirectionEvent> = navigationState
+    fun subscribeToNavigationEvents(): Flow<EmaNavigationDirectionEvent> = navigationState
 
     /**
      * Get single state as LiveData to avoid state setting from the view
      */
-    fun getSingleObservableState(): Flow<EmaEvent> = observableSingleEvent
+    fun subscribeToSingleEvents(): Flow<EmaEvent> = observableSingleEvent
 
 
     /**
