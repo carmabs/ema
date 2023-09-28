@@ -13,7 +13,7 @@ import com.carmabs.ema.core.state.EmaEmptyState
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent>(EmaEmptyState) {
+object EmaEmptyViewModel : EmaViewModelBasic<EmaEmptyState, EmaEmptyNavigationEvent>(EmaEmptyState) {
 
     override val updateOnInitialization: Boolean
         get() = false

@@ -1,6 +1,6 @@
 package com.carmabs.ema.compose.action
 
-import com.carmabs.ema.core.action.EmaAction
+import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcherEmpty
 
 /**
@@ -12,4 +12,4 @@ import com.carmabs.ema.core.action.EmaActionDispatcherEmpty
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-fun <A : EmaAction>EmaImmutableActionDispatcherEmpty() = EmaActionDispatcherEmpty<A>().toImmutable()
+fun <A : FeatureEmaAction>EmaImmutableActionDispatcherEmpty() = EmaActionDispatcherEmpty<A>().toImmutable()

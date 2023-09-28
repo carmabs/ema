@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaMethod
 
@@ -18,7 +18,7 @@ import kotlin.reflect.jvm.javaMethod
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-abstract class EmaAndroidViewModel<S:EmaDataState,D:EmaNavigationEvent>(val emaViewModel:EmaViewModel<S,D>) :
+abstract class EmaAndroidViewModel<S:EmaDataState,D:EmaNavigationEvent>(val emaViewModel:EmaViewModelBasic<S,D>) :
     ViewModel() {
 
     init {

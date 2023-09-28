@@ -1,12 +1,11 @@
 package com.carmabs.ema.core.viewmodel
 
-import com.carmabs.ema.core.action.EmaAction
+import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.model.emaFlowSingleEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.state.EmaState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
@@ -21,10 +20,10 @@ import kotlinx.coroutines.flow.Flow
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-abstract class EmaViewModelAction<S : EmaDataState, D : EmaNavigationEvent, A : EmaAction>(
+abstract class EmaViewModelAction<S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction>(
     initialDataState: S,
     scope: CoroutineScope = EmaMainScope()
-) : EmaViewModel<S, D>(initialDataState, scope), EmaActionDispatcher<A>{
+) : EmaViewModelBasic<S, D>(initialDataState, scope), EmaActionDispatcher<A>{
 
     private val observableAction = emaFlowSingleEvent<A>()
 

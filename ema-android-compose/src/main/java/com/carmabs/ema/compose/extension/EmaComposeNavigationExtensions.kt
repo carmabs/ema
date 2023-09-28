@@ -13,13 +13,12 @@ import com.carmabs.ema.compose.navigation.EmaComposableTransitions
 import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.compose.ui.EmaComposableScreen
 import com.carmabs.ema.compose.ui.EmaComposableScreenContent
-import com.carmabs.ema.core.action.EmaAction
+import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.EmaViewModel
-import com.carmabs.ema.core.viewmodel.EmaViewModelAction
+import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
 import kotlin.collections.set
 
 
@@ -48,14 +47,14 @@ fun NavController.navigate(
     navigate(route, navOptions, navigatorExtras)
 }
 
-fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction, VM : EmaAndroidViewModel<S, D>> NavGraphBuilder.createComposableScreen(
+fun <S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction, VM : EmaAndroidViewModel<S, D>> NavGraphBuilder.createComposableScreen(
     screenContent: EmaComposableScreenContent<S, A>,
     onNavigationEvent: (D) -> Unit,
     onNavigationBackEvent: () -> Unit,
     routeId: String = screenContent::class.routeId(),
     overrideInitializer: EmaInitializer? = null,
     androidViewModel: @Composable () -> VM,
-    onViewModelInstance: (@Composable (EmaViewModel<S, D>) -> Unit)? = null,
+    onViewModelInstance: (@Composable (EmaViewModelBasic<S, D>) -> Unit)? = null,
     emaComposableTransitions: EmaComposableTransitions = EmaComposableTransitions()
 ) {
     composable(

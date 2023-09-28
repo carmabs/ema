@@ -26,7 +26,7 @@ fun EmaInitializer?.toBundle():Bundle?{
  */
 fun Bundle.getInitializer(): EmaInitializer? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getSerializable(EmaInitializer.KEY,EmaInitializer::class.java)
+        getSerializable(EmaInitializer.KEY, EmaInitializer::class.java)
     } else {
         getSerializable(EmaInitializer.KEY) as? EmaInitializer
     }

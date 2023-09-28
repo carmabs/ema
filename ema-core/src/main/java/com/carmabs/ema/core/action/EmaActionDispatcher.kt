@@ -11,6 +11,6 @@ package com.carmabs.ema.core.action
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-interface EmaActionDispatcher<A : EmaAction> {
+interface EmaActionDispatcher<in A : FeatureEmaAction> {
     fun onAction(action: A)
 }

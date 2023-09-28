@@ -12,6 +12,6 @@ package com.carmabs.ema.core.action
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class EmaActionDispatcherEmpty<A : EmaAction>: EmaActionDispatcher<A> {
+class EmaActionDispatcherEmpty<A : FeatureEmaAction>: EmaActionDispatcher<A> {
     override fun onAction(action: A) = Unit
 }

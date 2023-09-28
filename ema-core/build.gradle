@@ -6,6 +6,7 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 compileKotlin {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+    kotlinOptions.freeCompilerArgs = ["-Xcontext-receivers"]
 }
 
 dependencies {

@@ -1,7 +1,7 @@
 package com.carmabs.ema.compose.action
 
 import androidx.compose.runtime.Immutable
-import com.carmabs.ema.core.action.EmaAction
+import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 
 /**
@@ -19,9 +19,9 @@ import com.carmabs.ema.core.action.EmaActionDispatcher
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 @Immutable
-interface EmaImmutableActionDispatcher<A : EmaAction> : EmaActionDispatcher<A>
+interface EmaImmutableActionDispatcher<A : FeatureEmaAction> : EmaActionDispatcher<A>
 
-fun <A : EmaAction> EmaActionDispatcher<A>.toImmutable():EmaImmutableActionDispatcher<A> {
+fun <A : FeatureEmaAction> EmaActionDispatcher<A>.toImmutable():EmaImmutableActionDispatcher<A> {
     return object :EmaImmutableActionDispatcher<A>{
         override fun onAction(action: A) {
             this@toImmutable.onAction(action)

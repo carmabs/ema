@@ -11,7 +11,7 @@ import com.carmabs.ema.core.constants.FLOAT_ONE
 import com.carmabs.ema.core.constants.FLOAT_ZERO
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
 import com.google.android.material.appbar.AppBarLayout
 
 /**
@@ -21,7 +21,7 @@ import com.google.android.material.appbar.AppBarLayout
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
-abstract class EmaToolbarActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> :
+abstract class EmaToolbarActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModelBasic<S, D>, D : EmaNavigationEvent> :
     EmaActivity<B, S, VM, D>() {
 
     /**

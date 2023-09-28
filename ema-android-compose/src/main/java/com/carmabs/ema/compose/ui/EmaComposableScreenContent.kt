@@ -3,12 +3,12 @@ package com.carmabs.ema.compose.ui
 import android.content.Context
 import androidx.compose.runtime.Composable
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
-import com.carmabs.ema.core.action.EmaAction
+import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 
 
-interface EmaComposableScreenContent<S : EmaDataState, A : EmaAction> {
+interface EmaComposableScreenContent<S : EmaDataState, A : FeatureEmaAction> {
 
     @Composable
     fun onStateOverlapped(extra: EmaExtraData, actions: EmaImmutableActionDispatcher<A>) = Unit

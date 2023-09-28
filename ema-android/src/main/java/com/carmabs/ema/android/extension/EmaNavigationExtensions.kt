@@ -7,7 +7,7 @@ import com.carmabs.ema.core.initializer.EmaInitializer
 
 fun NavController.navigate(
     id: Int,
-    initializer:EmaInitializer?,
+    initializer: EmaInitializer?,
     navOptions: NavOptions? = null,
     navExtras: Navigator.Extras? = null
 ) {

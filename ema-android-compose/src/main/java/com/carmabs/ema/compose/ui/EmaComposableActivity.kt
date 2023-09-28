@@ -9,7 +9,7 @@ import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
-import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
 
 
 /**
@@ -17,7 +17,7 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent>
+abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModelBasic<S, D>, D : EmaNavigationEvent>
     : EmaCoreActivity<S, VM, D>() {
 
     protected var isFirstNormalExecution: Boolean = true
