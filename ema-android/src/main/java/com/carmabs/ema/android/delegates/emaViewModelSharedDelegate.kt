@@ -9,7 +9,7 @@ import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaState
-import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
+import com.carmabs.ema.core.viewmodel.EmaViewModel
 import kotlin.reflect.KProperty
 
 /**
@@ -28,7 +28,7 @@ class emaViewModelSharedDelegate<S : EmaDataState, VM : EmaAndroidViewModel<S, D
 
     ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): VM {
-        val emaView = (thisRef as? EmaAndroidView<S, EmaViewModelBasic<S,D>, D>)
+        val emaView = (thisRef as? EmaAndroidView<S, EmaViewModel<S,D>, D>)
             ?: throw IllegalAccessException(
                 "You must use this delegate " +
                         "in an object that inherits from EmaView"
@@ -41,7 +41,7 @@ class emaViewModelSharedDelegate<S : EmaDataState, VM : EmaAndroidViewModel<S, D
         }
 
         return when (emaView) {
-            is EmaFragment<*, S,EmaViewModelBasic<S,D>, D> -> {
+            is EmaFragment<*, S,EmaViewModel<S,D>, D> -> {
                 emaView.addExtraViewModel(
                     viewModelSeed.invoke(),
                     emaView,

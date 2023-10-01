@@ -1,7 +1,6 @@
 package com.carmabs.ema.core.extension
 
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
 import kotlin.reflect.KClass
 
 fun <T:EmaViewModel<*,*>> KClass<T>.resultId(id:String?=null): ResultId {

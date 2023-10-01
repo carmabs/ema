@@ -12,7 +12,7 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.state.EmaStateTransition
-import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
+import com.carmabs.ema.core.viewmodel.EmaViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -24,12 +24,12 @@ import kotlin.reflect.KProperty
 /**
  * View to handle VM view logic states through [EmaState].
  * The user must provide in the constructor by template:
- *  - The view model class [EmaViewModelBasic] is going to use the view
+ *  - The view model class [EmaViewModel] is going to use the view
  *  - The navigation state class [EmaNavigationEvent] will handle the navigation
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-interface EmaView<S : EmaDataState, VM : EmaViewModelBasic<S, D>, D : EmaNavigationEvent> {
+interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> {
 
     /**
      * Scope for flow updates
@@ -37,7 +37,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModelBasic<S, D>, D : EmaNavigat
     val coroutineScope: CoroutineScope
 
     /**
-     * The view mdeol seed [EmaViewModelBasic] for the view
+     * The view mdeol seed [EmaViewModel] for the view
      */
     val viewModelSeed: VM
 
@@ -210,7 +210,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModelBasic<S, D>, D : EmaNavigat
                     navigate(direction.navigationEvent as D)
                 }
             }
-            viewModelSeed.notifyOnNavigated()
+            viewModelSeed.consumeNavigation()
         }
     }
 

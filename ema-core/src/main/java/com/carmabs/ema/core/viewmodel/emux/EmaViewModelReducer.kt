@@ -230,6 +230,8 @@ abstract class EmaViewModelReducer<S : EmaDataState, A : FeatureEmaAction, D : E
         )
     }
 
+    final override val onBackHardwarePressedListener: (() -> Boolean)? = null
+
     /**
      * Method called when the ViewModel is destroyed. It cancels all background pending tasks.
      * Check call name for EmaAndroidView. It uses reflection to call this internal method
@@ -290,7 +292,5 @@ class S :
         TODO("Not yet implemented")
     }
 
-    override val onBackHardwarePressedListener: (() -> Boolean)?
-        get() = super.onBackHardwarePressedListener
 }
 

@@ -41,8 +41,6 @@ interface EmaViewModel<S : EmaDataState, D : EmaNavigationEvent>{
      */
     fun subscribeToSingleEvents(): Flow<EmaEvent>
 
-
-
     fun consumeSingleEvent()
 
     fun consumeNavigation()

@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaEmptyNavigationEvent
 import com.carmabs.ema.core.state.EmaEmptyState
-import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
+import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.carmabs.ema.testing.core.EmaTest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -40,7 +40,7 @@ class ViewModelTest : EmaTest() {
         }
     }
 
-    private inner class TestViewModel : EmaViewModelBasic<EmaEmptyState, EmaEmptyNavigationEvent>() {
+    private inner class TestViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent>() {
 
 
         override suspend fun onCreateState(initializer: EmaInitializer?): EmaEmptyState {

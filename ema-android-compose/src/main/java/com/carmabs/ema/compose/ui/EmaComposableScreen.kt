@@ -18,20 +18,20 @@ import com.carmabs.ema.compose.action.toImmutable
 import com.carmabs.ema.compose.extension.asActionDispatcher
 import com.carmabs.ema.compose.extension.skipForPreview
 import com.carmabs.ema.compose.provider.EmaScreenProvider
-import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
+import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaEvent
-import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirection
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.onNavigation
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
-import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
+import com.carmabs.ema.core.viewmodel.EmaViewModel
 
 @Composable
-fun <S : EmaDataState, VM : EmaViewModelBasic<S, D>, D : EmaNavigationEvent, A : FeatureEmaAction> EmaComposableScreen(
+fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : FeatureEmaAction> EmaComposableScreen(
     initializer: EmaInitializer? = null,
     vm: VM,
     actions: EmaActionDispatcher<A>,
@@ -109,7 +109,7 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction> EmaComposab
 private fun <A : FeatureEmaAction, D : EmaNavigationEvent, S : EmaDataState> renderScreen(
     initializer: EmaInitializer?,
     screenContent: EmaComposableScreenContent<S, A>,
-    vm: EmaViewModelBasic<S, D>,
+    vm: EmaViewModel<S, D>,
     immutableActions: EmaImmutableActionDispatcher<A>,
     onNavigationEvent: (D) -> Unit,
     onNavigationBackEvent: () -> Unit
@@ -178,7 +178,7 @@ private fun <A : FeatureEmaAction, D : EmaNavigationEvent, S : EmaDataState> ren
                         onNavigationEvent(eventData.navigationEvent as D)
                     }
                 }
-                vm.notifyOnNavigated()
+                vm.consumeNavigation()
             }
         }
     }

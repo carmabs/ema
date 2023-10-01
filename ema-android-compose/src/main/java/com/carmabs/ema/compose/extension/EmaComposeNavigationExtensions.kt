@@ -18,7 +18,7 @@ import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
+import com.carmabs.ema.core.viewmodel.EmaViewModel
 import kotlin.collections.set
 
 
@@ -54,7 +54,7 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction, VM : EmaAnd
     routeId: String = screenContent::class.routeId(),
     overrideInitializer: EmaInitializer? = null,
     androidViewModel: @Composable () -> VM,
-    onViewModelInstance: (@Composable (EmaViewModelBasic<S, D>) -> Unit)? = null,
+    onViewModelInstance: (@Composable (EmaViewModel<S, D>) -> Unit)? = null,
     emaComposableTransitions: EmaComposableTransitions = EmaComposableTransitions()
 ) {
     composable(

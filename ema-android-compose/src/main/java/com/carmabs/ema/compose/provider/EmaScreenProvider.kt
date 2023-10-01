@@ -6,12 +6,12 @@ import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
+import com.carmabs.ema.core.viewmodel.EmaViewModel
 
 object EmaScreenProvider {
 
     @Composable
-    fun <S:EmaDataState,D:EmaNavigationEvent>provideComposableViewModel(androidViewModel:EmaAndroidViewModel<S,D>):EmaViewModelBasic<S,D>{
+    fun <S:EmaDataState,D:EmaNavigationEvent>provideComposableViewModel(androidViewModel:EmaAndroidViewModel<S,D>):EmaViewModel<S,D>{
         return viewModel(
             androidViewModel::class.java,
             factory = EmaViewModelFactory(androidViewModel)

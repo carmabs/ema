@@ -35,11 +35,11 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
     /**
      * The scope where coroutines will be launched by default.
      */
-    protected var scope: CoroutineScope = defaultScope
+    protected var viewModelScope: CoroutineScope = defaultScope
 
 
     override fun setScope(scope: CoroutineScope) {
-        this.scope = scope
+        this.viewModelScope = scope
     }
 
     /**
@@ -250,10 +250,10 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
      * - job returns the job where the action function has been executed
      */
     protected fun <T> executeUseCase(
-        dispatcher: CoroutineContext = this.scope.coroutineContext,
+        dispatcher: CoroutineContext = this.viewModelScope.coroutineContext,
         action: suspend CoroutineScope.() -> T
     ): EmaFunctionResultHandler<T> {
-        return EmaFunctionResultHandler(scope, dispatcher, action)
+        return EmaFunctionResultHandler(viewModelScope, dispatcher, action)
     }
 
     /**
@@ -264,10 +264,10 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
      * @return the job that can handle the lifecycle of the background task
      */
     protected fun runSuspend(
-        dispatcher: CoroutineContext = scope.coroutineContext,
+        dispatcher: CoroutineContext = viewModelScope.coroutineContext,
         block: suspend CoroutineScope.() -> Unit
     ): Job {
-        return scope.launch(
+        return viewModelScope.launch(
             dispatcher,
             block = block
         )
@@ -409,7 +409,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
     internal fun onCleared() {
         emaResultHandler.notifyResults(id)
         emaResultHandler.removeResultListener(id)
-        scope.cancel()
+        viewModelScope.cancel()
         onDestroy()
     }
 }

@@ -24,7 +24,6 @@ class EmaMiddlewareStore<S : EmaDataState>(
     }
 
     fun applyMiddleware(action: EmaAction, nextAction: (EmaAction) -> Unit) {
-
         middlewares.fold(nextAction) { previousAction, middle ->
             val middlewareScope = EmaMiddlewareScope(scope) {
                 previousAction
