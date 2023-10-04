@@ -1,13 +1,20 @@
 package com.carmabs.ema.core.viewmodel.emux
 
+import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.model.EmaEvent
+import com.carmabs.ema.core.model.emaFlowSingleEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirection
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
+import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.viewmodel.EmaResultHandler
 import com.carmabs.ema.core.viewmodel.EmaResultModel
+import com.carmabs.ema.core.viewmodel.emux.middleware.common.MiddlewareScope
+import com.carmabs.ema.core.viewmodel.emux.middleware.common.MiddlewareScopeDsl
+import com.carmabs.ema.core.viewmodel.emux.middleware.common.SideEffectScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
@@ -19,11 +26,12 @@ import kotlinx.coroutines.flow.MutableSharedFlow
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class EmaViewModelScope<in D : EmaNavigationEvent> internal constructor(
+class EmaViewModelScope<S : EmaDataState, in D : EmaNavigationEvent> internal constructor(
     private val resultHandler: EmaResultHandler,
-    private val viewModelId:String,
+    private val viewModelId: String,
     private val navigationState: MutableSharedFlow<EmaNavigationDirectionEvent>,
-    private val observableSingleEvent: MutableSharedFlow<EmaEvent>
+    private val observableSingleEvent: MutableSharedFlow<EmaEvent>,
+    private val middlewareScope: MiddlewareScope<S>
 ) {
     /**
      * Method use to notify a navigation event
@@ -37,6 +45,10 @@ class EmaViewModelScope<in D : EmaNavigationEvent> internal constructor(
                 )
             )
         )
+    }
+
+    fun sideEffect(sideEffectAction: @MiddlewareScopeDsl suspend  (SideEffectScope<S>).(CoroutineScope) -> Unit) {
+        middlewareScope.sideEffect(sideEffectAction)
     }
 
     fun addResult(data: Any?, resultId: String? = null) {

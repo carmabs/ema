@@ -1,5 +1,6 @@
 package com.carmabs.ema.core.viewmodel.emux
 
+import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.action.ResultEmaAction
@@ -7,8 +8,8 @@ import com.carmabs.ema.core.action.ViewEmaAction
 import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.extension.ResultId
-import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.initializer.EmaInitializerEmpty
 import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
@@ -17,11 +18,11 @@ import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaResultHandler
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import com.carmabs.ema.core.viewmodel.emux.middleware.EmaMiddlewareScope
-import com.carmabs.ema.core.viewmodel.emux.middleware.EmaNext
-import com.carmabs.ema.core.viewmodel.emux.middleware.InitializerEmaMiddleware
-import com.carmabs.ema.core.viewmodel.emux.middleware.ResultEventEmaMiddleware
-import com.carmabs.ema.core.viewmodel.emux.middleware.ViewModelEmaMiddleware
+import com.carmabs.ema.core.viewmodel.emux.middleware.log.EmaLoggerMiddleware
+import com.carmabs.ema.core.viewmodel.emux.middleware.common.MiddlewareScope
+import com.carmabs.ema.core.viewmodel.emux.middleware.initializer.InitializerEmaMiddleware
+import com.carmabs.ema.core.viewmodel.emux.middleware.result.ResultEventEmaMiddleware
+import com.carmabs.ema.core.viewmodel.emux.middleware.viewmodel.ViewModelEmaMiddleware
 import com.carmabs.ema.core.viewmodel.emux.reducer.EmaFeatureReducerScope
 import com.carmabs.ema.core.viewmodel.emux.reducer.FeatureEmaReducer
 import com.carmabs.ema.core.viewmodel.emux.store.EmaStore
@@ -59,43 +60,7 @@ abstract class EmaViewModelReducer<S : EmaDataState, A : FeatureEmaAction, D : E
 
     private var currentState: EmaState<S> = initialState
 
-    private val store = EmaStore(initialDataState, scope) {
-        addMiddleware(InitializerEmaMiddleware { initializer ->
-            onInitializer(initializer)
-        })
-        addMiddleware(
-            ViewModelEmaMiddleware<S,D,A>(
-                resultHandler = emaResultHandler,
-                viewModelId = id,
-                navigationState = navigationState,
-                observableSingleEvent = observableSingleEvent
-            ) { action ->
-                onSideEffect(action)
-            })
-        addReducer(
-            FeatureEmaReducer<S, A>(
-                initialState = initialState,
-                reducerAction = { state, action ->
-                    state.reduceAction(action)
-                }) {
-                currentState = it
-            }
-        )
-        setup()
-    }
-
-
     private val emaResultHandler: EmaResultHandler = EmaResultHandler.getInstance()
-
-    /**
-     * Observable state that launch event every time a value is set. This value will be a [EmaExtraData]
-     * object that can contain any type of object. It will be used for
-     * events that only has to be notified once to its observers, e.g: A toast message.
-     */
-    private val observableSingleEvent: MutableSharedFlow<EmaEvent> = MutableSharedFlow(
-        replay = INT_ONE,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
 
     /**
      * Observable state that launch event every time a value is set. [D] value be will a [EmaNavigationEvent]
@@ -112,9 +77,55 @@ abstract class EmaViewModelReducer<S : EmaDataState, A : FeatureEmaAction, D : E
 
     private val observableAction = channelAction.receiveAsFlow()
 
-    private val observableState: Flow<EmaState<S>> = store.observableState.map {
-        EmaState.Normal(it)
+
+    /**
+     * Observable state that launch event every time a value is set. This value will be a [EmaExtraData]
+     * object that can contain any type of object. It will be used for
+     * events that only has to be notified once to its observers, e.g: A toast message.
+     */
+    private val observableSingleEvent: MutableSharedFlow<EmaEvent> = MutableSharedFlow(
+        replay = INT_ONE,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
+    private val reducerSetupScope = EmaStoreSetupScope<S>()
+
+    private val store by lazy {
+
+        EmaStore(initialDataState, scope) {
+            addMiddleware(EmaLoggerMiddleware())
+            addMiddleware(InitializerEmaMiddleware { initializer ->
+                onInitializer(initializer)
+            })
+            addMiddleware(
+                ViewModelEmaMiddleware<S, D, A>(
+                    resultHandler = emaResultHandler,
+                    viewModelId = id,
+                    navigationState = navigationState,
+                    observableSingleEvent = observableSingleEvent
+                ) {
+                     onSideEffect(it)
+                }
+            )
+            addReducer(
+                FeatureEmaReducer<S, A>(
+                    initialState = initialState,
+                    reducerAction = { state, action ->
+                            reduceAction(state,action)
+                    }) {
+                    currentState = it
+                }
+            )
+            setup()
+        }
     }
+
+    private val observableState: Flow<EmaState<S>> by lazy {
+        store.observableState.map {
+            EmaState.Normal(it)
+        }
+    }
+
 
     /**
      * Determine if viewmodel is first time resumed
@@ -130,16 +141,13 @@ abstract class EmaViewModelReducer<S : EmaDataState, A : FeatureEmaAction, D : E
         private set
 
 
-    private val reducerSetupScope = EmaStoreSetupScope<S>()
-
     final override fun onAction(action: A) {
         store.dispatch(action)
     }
 
-    protected open fun EmaStoreSetupScope<S>.setup() = Unit
+    protected abstract fun EmaStoreSetupScope<S>.setup()
 
-    context (EmaFeatureReducerScope<S>)
-    abstract fun S.reduceAction(action: A): S
+    protected abstract fun EmaFeatureReducerScope<S>.reduceAction(state:S,action: A): S
 
     /**
      * Methods called the first time ViewModel is created
@@ -152,28 +160,26 @@ abstract class EmaViewModelReducer<S : EmaDataState, A : FeatureEmaAction, D : E
                 throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
             }
             hasBeenInitialized = true
-            initializer?.also {
-                store.dispatch(initializer)
-            }
-            startedFinishListener?.invoke()
+            store.dispatch(initializer ?: EmaInitializerEmpty)
         } else {
             //We call this to update the data if it has been not be emitted
             // if last time was updated by updateDataState
-            startedFinishListener?.invoke()
+
         }
+        store.dispatch(ViewEmaAction.Started)
+        startedFinishListener?.invoke()
     }
 
     /**
      * Call on first time view model is initialized
      */
-    abstract fun EmaMiddlewareScope.onInitializer(
+    protected abstract fun MiddlewareScope<S>.onInitializer(
         initializer: EmaInitializer
-    ): EmaNext
+    ): EmaAction
 
-    context (EmaMiddlewareScope)
-    abstract fun EmaViewModelScope<D>.onSideEffect(
+    protected abstract fun EmaViewModelScope<S,D>.onSideEffect(
         action: A
-    ): EmaNext
+    ): EmaAction
 
     /**
      * Called when view is shown in foreground
@@ -199,6 +205,10 @@ abstract class EmaViewModelReducer<S : EmaDataState, A : FeatureEmaAction, D : E
      */
     final override fun subscribeStateUpdates(): Flow<EmaState<S>> = observableState
 
+
+    fun subscribeToActions(): Flow<A> = observableAction.map { it as A }
+
+
     /**
      * Get navigation state as LiveData to avoid state setting from the view
      */
@@ -218,10 +228,10 @@ abstract class EmaViewModelReducer<S : EmaDataState, A : FeatureEmaAction, D : E
         navigationState.tryEmit(EmaNavigationDirectionEvent.OnNavigated)
     }
 
-    protected fun <S : EmaDataState, A : FeatureEmaAction, D : EmaNavigationEvent> EmaViewModelReducer<S, A, D>.ResultEventEmaMiddleware(
+    protected fun ResultEventEmaMiddleware(
         id: ResultId,
-        onResultAction: EmaMiddlewareScope.(resultAction: ResultEmaAction) -> EmaNext
-    ): ResultEventEmaMiddleware<S, D> {
+        onResultAction: MiddlewareScope<S>.(resultAction: ResultEmaAction) -> EmaAction
+    ): ResultEventEmaMiddleware<S> {
         return ResultEventEmaMiddleware(
             store = store,
             resultId = id,
@@ -243,54 +253,3 @@ abstract class EmaViewModelReducer<S : EmaDataState, A : FeatureEmaAction, D : E
     }
 
 }
-
-sealed interface EmaSampleAction : FeatureEmaAction {
-    data class Sample(val a: String) : EmaSampleAction
-}
-
-sealed interface EmaNavigatorAction : EmaNavigationEvent {
-
-    data class Nav(val a: String) : EmaNavigatorAction
-}
-
-data class SampleDataState(
-    val s: String = ""
-) : EmaDataState {
-    companion object {
-        val DEFAULT = SampleDataState("")
-    }
-}
-
-class S :
-    EmaViewModelReducer<SampleDataState, EmaSampleAction, EmaNavigatorAction>(
-        SampleDataState.DEFAULT
-    ) {
-
-    override fun EmaStoreSetupScope<SampleDataState>.setup() {
-        addMiddleware(ResultEventEmaMiddleware(EmaViewModelReducer::class.resultId()){
-            next(it)
-        })
-    }
-
-    override fun EmaMiddlewareScope.onInitializer(initializer: EmaInitializer): EmaNext {
-        TODO("Not yet implemented")
-    }
-
-    context(EmaFeatureReducerScope<SampleDataState>)
-    override fun SampleDataState.reduceAction(
-        action: EmaSampleAction
-    ): SampleDataState {
-        return this
-    }
-
-
-
-    context(EmaMiddlewareScope)
-    override fun EmaViewModelScope<EmaNavigatorAction>.onSideEffect(
-        action: EmaSampleAction
-    ): EmaNext {
-        TODO("Not yet implemented")
-    }
-
-}
-

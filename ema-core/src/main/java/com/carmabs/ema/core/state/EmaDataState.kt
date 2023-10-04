@@ -1,5 +1,7 @@
 package com.carmabs.ema.core.state
 
+import java.text.BreakIterator
+
 /**
  * Interface which all state view classes must use to be handled by the library
  *
@@ -12,3 +14,5 @@ package com.carmabs.ema.core.state
 interface EmaDataState {
     fun checkIsValidStateDataClass() = this is EmaEmptyState || this::class.isData
 }
+
+

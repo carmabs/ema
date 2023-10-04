@@ -17,3 +17,5 @@ interface EmaInitializer : EmaAction, Serializable {
         const val KEY = "EmaInitializer"
     }
 }
+
+object EmaInitializerEmpty : EmaInitializer

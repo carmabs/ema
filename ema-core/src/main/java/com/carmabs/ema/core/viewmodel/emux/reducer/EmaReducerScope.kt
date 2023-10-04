@@ -1,6 +1,5 @@
 package com.carmabs.ema.core.viewmodel.emux.reducer
 
-import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
@@ -17,7 +16,6 @@ import com.carmabs.ema.core.state.EmaState
 class EmaFeatureReducerScope<S : EmaDataState>(
     val initialState: EmaState<S>
 ) {
-
     internal var state: EmaState<S> = initialState
         private set
 

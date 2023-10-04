@@ -1,7 +1,7 @@
 package com.carmabs.ema.core.viewmodel.emux.store
 
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.emux.middleware.EmaMiddleware
+import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaMiddleware
 import com.carmabs.ema.core.viewmodel.emux.reducer.EmaReducer
 
 /**

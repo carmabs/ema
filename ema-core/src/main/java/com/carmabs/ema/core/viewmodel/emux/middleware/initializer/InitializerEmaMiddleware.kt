@@ -1,9 +1,12 @@
-package com.carmabs.ema.core.viewmodel.emux.middleware
+package com.carmabs.ema.core.viewmodel.emux.middleware.initializer
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.emux.store.EmaStore
+import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaMiddleware
+import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaNextMiddleware
+import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaNextMiddlewareResult
+import com.carmabs.ema.core.viewmodel.emux.middleware.common.MiddlewareScope
 
 /**
  * Created by Carlos Mateo Benito on 1/10/23.
@@ -15,23 +18,22 @@ import com.carmabs.ema.core.viewmodel.emux.store.EmaStore
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 class InitializerEmaMiddleware<S : EmaDataState>(
-    private val onInitializerAction: EmaMiddlewareScope.(initializer: EmaInitializer) -> EmaNext
+    private val onInitializerAction: MiddlewareScope<S>.(initializer: EmaInitializer) -> EmaAction
 ) : EmaMiddleware<S> {
-    context(EmaMiddlewareScope)
+    context(MiddlewareScope<S>)
     override fun invoke(
-        store: EmaStore<S>,
         action: EmaAction,
-    ): EmaNext {
+        next: EmaNextMiddleware
+    ): EmaNextMiddlewareResult {
         return when (action) {
             is EmaInitializer -> {
-                {
+               next(
                     onInitializerAction.invoke(
-                        this@EmaMiddlewareScope,
+                        this@MiddlewareScope,
                         action
                     )
-                }
+                )
             }
-
             else ->
                 next(action)
         }
