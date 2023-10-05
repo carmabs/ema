@@ -1,4 +1,4 @@
-package com.carmabs.ema.core.viewmodel.emux.middleware.common
+package com.carmabs.emax.middleware.common
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.state.EmaDataState
@@ -12,7 +12,7 @@ import com.carmabs.ema.core.state.EmaDataState
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-interface EmaMiddleware<S : EmaDataState> {
+interface EmaxMiddleware<S : EmaDataState> {
 
     context (MiddlewareScope<S>)
     operator fun invoke(

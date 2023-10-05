@@ -1,4 +1,4 @@
-package com.carmabs.ema.core.viewmodel.emux.reducer
+package com.carmabs.emax.reducer
 
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
@@ -13,7 +13,7 @@ import com.carmabs.ema.core.state.EmaState
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class EmaFeatureReducerScope<S : EmaDataState>(
+class EmaFeatureReducerScope<S : EmaDataState> internal constructor(
     val initialState: EmaState<S>
 ) {
     internal var state: EmaState<S> = initialState

@@ -28,7 +28,11 @@ object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent> 
 
     }
 
-    override fun onStart(initializer: EmaInitializer?, startedFinishListener: (() -> Unit)?) {
+    override fun onCreated(initializer: EmaInitializer?) {
+
+    }
+
+    override fun onStartView() {
 
     }
 

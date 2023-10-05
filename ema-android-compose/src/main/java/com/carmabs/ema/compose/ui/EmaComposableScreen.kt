@@ -16,6 +16,7 @@ import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcherEmpty
 import com.carmabs.ema.compose.action.toImmutable
 import com.carmabs.ema.compose.extension.asActionDispatcher
+import com.carmabs.ema.compose.extension.asViewModelAction
 import com.carmabs.ema.compose.extension.skipForPreview
 import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.core.action.EmaActionDispatcher
@@ -29,6 +30,7 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
+import kotlinx.coroutines.flow.collect
 
 @Composable
 fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : FeatureEmaAction> EmaComposableScreen(
@@ -38,6 +40,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : Feat
     screenContent: EmaComposableScreenContent<S, A>,
     onNavigationEvent: (D) -> Unit,
     onNavigationBackEvent: () -> Unit,
+    actionSubscriber: ((A) -> Unit)? = null,
     previewRenderState: S? = null
 ) {
     skipForPreview(
@@ -61,7 +64,8 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : Feat
             vm,
             immutableActions,
             onNavigationEvent,
-            onNavigationBackEvent
+            onNavigationBackEvent,
+            actionSubscriber
         )
     }
 }
@@ -73,6 +77,7 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction> EmaComposab
     screenContent: EmaComposableScreenContent<S, A>,
     onNavigationEvent: (D) -> Unit,
     onNavigationBackEvent: () -> Unit,
+    actionsSubscriber: ((A) -> Unit)? = null,
     previewRenderState: S? = null
 ) {
     skipForPreview(
@@ -100,7 +105,8 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction> EmaComposab
             viewModel,
             immutableActions,
             onNavigationEvent,
-            onNavigationBackEvent
+            onNavigationBackEvent,
+            actionsSubscriber
         )
     }
 }
@@ -112,8 +118,9 @@ private fun <A : FeatureEmaAction, D : EmaNavigationEvent, S : EmaDataState> ren
     vm: EmaViewModel<S, D>,
     immutableActions: EmaImmutableActionDispatcher<A>,
     onNavigationEvent: (D) -> Unit,
-    onNavigationBackEvent: () -> Unit
-) {
+    onNavigationBackEvent: () -> Unit,
+    actionSubscriber: ((A) -> Unit)? = null,
+    ) {
     vm.onBackHardwarePressedListener?.also {
         BackHandler(true) {
             if (it.invoke())
@@ -127,11 +134,12 @@ private fun <A : FeatureEmaAction, D : EmaNavigationEvent, S : EmaDataState> ren
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {
                     Log.d(TAG, "On create")
+                    vm.onCreated(initializer)
                 }
 
                 Lifecycle.Event.ON_START -> {
                     Log.d(TAG, "On start")
-                    vm.onStart(initializer)
+                    vm.onStartView()
                 }
 
                 Lifecycle.Event.ON_RESUME -> {
@@ -160,6 +168,8 @@ private fun <A : FeatureEmaAction, D : EmaNavigationEvent, S : EmaDataState> ren
         }
         lifecycle.addObserver(observer)
         onDispose {
+            vm.onPauseView()
+            vm.onStopView()
             lifecycle.removeObserver(observer)
         }
     }
@@ -169,11 +179,12 @@ private fun <A : FeatureEmaAction, D : EmaNavigationEvent, S : EmaDataState> ren
 
     LaunchedEffect(key1 = Unit) {
         vm.subscribeToNavigationEvents().collect { event ->
-            event.onNavigation { eventData->
-                when(eventData){
+            event.onNavigation { eventData ->
+                when (eventData) {
                     is EmaNavigationDirection.Back -> {
                         onNavigationBackEvent.invoke()
                     }
+
                     is EmaNavigationDirection.Forward -> {
                         onNavigationEvent(eventData.navigationEvent as D)
                     }
@@ -194,6 +205,14 @@ private fun <A : FeatureEmaAction, D : EmaNavigationEvent, S : EmaDataState> ren
         if (event is EmaEvent.Launched) {
             screenContent.onSingleEvent(context, event.data, immutableActions)
             vm.consumeSingleEvent()
+        }
+    }
+
+    actionSubscriber?.also {
+        LaunchedEffect(key1 = Unit) {
+            vm.asActionDispatcher<A>().subscribeToActions().collect{
+                actionSubscriber(it)
+            }
         }
     }
 }

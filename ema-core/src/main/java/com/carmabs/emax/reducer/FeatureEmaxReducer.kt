@@ -1,4 +1,4 @@
-package com.carmabs.ema.core.viewmodel.emux.reducer
+package com.carmabs.emax.reducer
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.FeatureEmaAction
@@ -14,11 +14,11 @@ import com.carmabs.ema.core.state.EmaState
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class FeatureEmaReducer<S : EmaDataState, A : FeatureEmaAction>(
+class FeatureEmaxReducer<S : EmaDataState, A : FeatureEmaAction> internal constructor(
     initialState: EmaState<S>,
     private val reducerAction: EmaFeatureReducerScope<S>.(S, A) -> S,
     private val onStateUpdate: (EmaState<S>) -> Unit
-) : EmaReducer<S> {
+) : EmaxReducer<S> {
 
     private val featureReducerScope = EmaFeatureReducerScope(initialState)
     override fun reduce(state: S, action: EmaAction): S {

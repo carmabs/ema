@@ -1,8 +1,8 @@
-package com.carmabs.ema.core.viewmodel.emux.store
+package com.carmabs.emax.store
 
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaMiddleware
-import com.carmabs.ema.core.viewmodel.emux.reducer.EmaReducer
+import com.carmabs.emax.middleware.common.EmaxMiddleware
+import com.carmabs.emax.reducer.EmaxReducer
 
 /**
  * Created by Carlos Mateo Benito on 29/9/23.
@@ -13,14 +13,14 @@ import com.carmabs.ema.core.viewmodel.emux.reducer.EmaReducer
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class EmaStoreSetupScope<S : EmaDataState> internal constructor() {
+class EmaxStoreSetupScope<S : EmaDataState> internal constructor() {
 
-    internal var reducersList: List<EmaReducer<S>> = emptyList()
+    internal var reducersList: List<EmaxReducer<S>> = emptyList()
         private set
-    internal var middlewareList: List<EmaMiddleware<S>> = emptyList()
+    internal var middlewareList: List<EmaxMiddleware<S>> = emptyList()
         private set
 
-    fun addMiddleware(vararg middleware: EmaMiddleware<S>) {
+    fun addMiddleware(vararg middleware: EmaxMiddleware<S>) {
         val mMiddlewareList = middlewareList.toMutableList()
         middleware.forEach {
             mMiddlewareList.add(it)
@@ -28,7 +28,7 @@ class EmaStoreSetupScope<S : EmaDataState> internal constructor() {
         middlewareList = mMiddlewareList.toList()
     }
 
-    fun addReducer(vararg reducer: EmaReducer<S>) {
+    fun addReducer(vararg reducer: EmaxReducer<S>) {
         val mReducerList = reducersList.toMutableList()
         reducer.forEach {
             mReducerList.add(it)

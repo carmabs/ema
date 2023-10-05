@@ -1,5 +1,7 @@
 package com.carmabs.ema.core.action
 
+import kotlinx.coroutines.flow.Flow
+
 /**
  * Created by Carlos Mateo Benito on 14/04/2023.
  *
@@ -11,6 +13,8 @@ package com.carmabs.ema.core.action
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-interface EmaActionDispatcher<in A : FeatureEmaAction> {
+interface EmaActionDispatcher<A : FeatureEmaAction> {
     fun onAction(action: A)
+
+    fun subscribeToActions(): Flow<A>
 }

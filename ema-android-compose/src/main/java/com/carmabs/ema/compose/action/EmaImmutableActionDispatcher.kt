@@ -3,6 +3,7 @@ package com.carmabs.ema.compose.action
 import androidx.compose.runtime.Immutable
 import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Created by Carlos Mateo Benito on 16/7/23.
@@ -25,6 +26,10 @@ fun <A : FeatureEmaAction> EmaActionDispatcher<A>.toImmutable():EmaImmutableActi
     return object :EmaImmutableActionDispatcher<A>{
         override fun onAction(action: A) {
             this@toImmutable.onAction(action)
+        }
+
+        override fun subscribeToActions(): Flow<A> {
+           return this@toImmutable.subscribeToActions()
         }
     }
 }

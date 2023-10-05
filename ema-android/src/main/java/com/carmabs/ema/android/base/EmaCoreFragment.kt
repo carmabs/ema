@@ -135,6 +135,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
         vm.onBackHardwarePressedListener?.also {
             addOnBackPressedListener(it)
         }
+        onCreate(viewModelSeed)
 
     }
 

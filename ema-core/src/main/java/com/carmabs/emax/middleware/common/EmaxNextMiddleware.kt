@@ -1,4 +1,4 @@
-package com.carmabs.ema.core.viewmodel.emux.middleware.common
+package com.carmabs.emax.middleware.common
 
 import com.carmabs.ema.core.action.EmaAction
 

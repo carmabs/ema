@@ -1,10 +1,10 @@
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaMiddleware
+import com.carmabs.emax.middleware.common.EmaxMiddleware
 import com.carmabs.ema.core.viewmodel.emux.middleware.SideEffectScope
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaMiddlewareStore
+import com.carmabs.emax.middleware.common.EmaxMiddlewareStore
 import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaNext
-import com.carmabs.ema.core.viewmodel.emux.store.EmaStore
+import com.carmabs.emax.store.EmaxStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.junit.Test
@@ -24,17 +24,17 @@ class MiddlewareTest {
 
     val scope = CoroutineScope(Dispatchers.Unconfined)
 
-    private val store = EmaStore<TestState>(
+    private val store = EmaxStore<TestState>(
         TestState(""),
         scope
     ) {
 
     }
 
-    private class TestMiddleware : EmaMiddleware<TestState> {
+    private class TestMiddleware : EmaxMiddleware<TestState> {
         context(SideEffectScope)
         override fun invoke(
-            store: EmaStore<TestState>,
+            store: EmaxStore<TestState>,
             action: EmaAction
         ): EmaNext {
             return next(action)
@@ -42,7 +42,7 @@ class MiddlewareTest {
 
     }
 
-    private val middlewareStore = EmaMiddlewareStore(
+    private val middlewareStore = EmaxMiddlewareStore(
         store, scope,
         listOf()
     )

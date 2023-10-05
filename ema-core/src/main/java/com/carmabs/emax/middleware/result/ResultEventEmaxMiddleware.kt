@@ -1,4 +1,4 @@
-package com.carmabs.ema.core.viewmodel.emux.middleware.result
+package com.carmabs.emax.middleware.result
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.ResultEmaAction
@@ -6,11 +6,11 @@ import com.carmabs.ema.core.extension.ResultId
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaReceiverModel
 import com.carmabs.ema.core.viewmodel.EmaResultHandler
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaMiddleware
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaNextMiddleware
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaNextMiddlewareResult
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.MiddlewareScope
-import com.carmabs.ema.core.viewmodel.emux.store.EmaStore
+import com.carmabs.emax.middleware.common.EmaxMiddleware
+import com.carmabs.emax.middleware.common.EmaNextMiddleware
+import com.carmabs.emax.middleware.common.EmaNextMiddlewareResult
+import com.carmabs.emax.middleware.common.MiddlewareScope
+import com.carmabs.emax.store.EmaxStore
 
 /**
  * Created by Carlos Mateo Benito on 1/10/23.
@@ -22,12 +22,12 @@ import com.carmabs.ema.core.viewmodel.emux.store.EmaStore
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 
-class ResultEventEmaMiddleware<S : EmaDataState> internal constructor(
-    private val store: EmaStore<S>,
+class ResultEventEmaxMiddleware<S : EmaDataState> internal constructor(
+    private val store: EmaxStore<S>,
     resultId: ResultId,
     ownerId: String,
     private val onResultAction: MiddlewareScope<S>.(resultAction: ResultEmaAction) -> EmaAction
-) : EmaMiddleware<S> {
+) : EmaxMiddleware<S> {
 
     private val resultHandler: EmaResultHandler = EmaResultHandler.getInstance()
 

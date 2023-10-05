@@ -1,4 +1,4 @@
-package com.carmabs.ema.core.viewmodel.emux.reducer
+package com.carmabs.emax.reducer
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.state.EmaDataState
@@ -12,6 +12,6 @@ import com.carmabs.ema.core.state.EmaDataState
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-interface EmaReducer<S : EmaDataState> {
+interface EmaxReducer<S : EmaDataState> {
     fun reduce(state: S, action: EmaAction): S
 }

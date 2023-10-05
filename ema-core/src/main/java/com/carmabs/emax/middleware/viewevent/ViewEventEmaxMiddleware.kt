@@ -1,12 +1,12 @@
-package com.carmabs.ema.core.viewmodel.emux.middleware.viewevent
+package com.carmabs.emax.middleware.viewevent
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.ViewEmaAction
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaMiddleware
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaNextMiddleware
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaNextMiddlewareResult
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.MiddlewareScope
+import com.carmabs.emax.middleware.common.EmaxMiddleware
+import com.carmabs.emax.middleware.common.EmaNextMiddleware
+import com.carmabs.emax.middleware.common.EmaNextMiddlewareResult
+import com.carmabs.emax.middleware.common.MiddlewareScope
 
 /**
  * Created by Carlos Mateo Benito on 1/10/23.
@@ -17,9 +17,9 @@ import com.carmabs.ema.core.viewmodel.emux.middleware.common.MiddlewareScope
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class ViewEventEmaMiddleware<S : EmaDataState>(
+class ViewEventEmaxMiddleware<S : EmaDataState> (
     private val onViewAction: MiddlewareScope<S>.(viewAction: ViewEmaAction) -> EmaAction
-) : EmaMiddleware<S> {
+) : EmaxMiddleware<S> {
     context(MiddlewareScope<S>)
     override fun invoke(
         action: EmaAction,

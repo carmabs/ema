@@ -1,18 +1,17 @@
-package com.carmabs.ema.core.viewmodel.emux.store
+package com.carmabs.emax.store
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaMiddlewareStore
+import com.carmabs.emax.middleware.common.EmaxMiddlewareStore
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * Created by Carlos Mateo Benito on 29/9/23.
@@ -23,25 +22,22 @@ import kotlinx.coroutines.flow.shareIn
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class EmaStore<S : EmaDataState>(
+class EmaxStore<S : EmaDataState>(
     initialState: S,
     scope: CoroutineScope,
-    setup: EmaStoreSetupScope<S>.() -> Unit
+    setup: EmaxStoreSetupScope<S>.() -> Unit
 ) {
-    private val storeSetupScope = EmaStoreSetupScope<S>()
+    private val storeSetupScope = EmaxStoreSetupScope<S>()
 
     init {
         storeSetupScope.setup()
     }
 
     var state: S = initialState
-        private set(value)  {
-            field = value
-            //observableState.tryEmit(value)
-        }
+        private set
 
-    private val middleWareStore: EmaMiddlewareStore<S> =
-        EmaMiddlewareStore(this, scope, storeSetupScope.middlewareList)
+    private val middleWareStore: EmaxMiddlewareStore<S> =
+        EmaxMiddlewareStore(this, scope, storeSetupScope.middlewareList)
 
     private val channelAction = Channel<EmaAction>()
 
@@ -49,17 +45,21 @@ class EmaStore<S : EmaDataState>(
 
     val observableState: Flow<S> = observableAction
         .map { action ->
-            storeSetupScope.reducersList.fold(state) { previousState, reducer ->
+            (storeSetupScope.reducersList.fold(state) { previousState, reducer ->
                 reducer.reduce(previousState, action)
+            }).also {
+                state = it
             }
         }
-        .shareIn(scope, SharingStarted.Eagerly, replay = INT_ONE)
+        .stateIn(scope, SharingStarted.Eagerly,state)
 
     //MutableSharedFlow(1,0, onBufferOverflow = BufferOverflow.DROP_OLDEST) /*
 
     fun dispatch(action: EmaAction) {
-        val middlewareAction = middleWareStore.applyMiddleware(action)
-        channelAction.trySend(middlewareAction)
+        middleWareStore.applyMiddleware(action){
+            channelAction.trySend(it)
+        }
+
 
     }
 }

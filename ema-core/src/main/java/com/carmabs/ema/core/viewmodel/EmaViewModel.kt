@@ -14,18 +14,20 @@ import kotlinx.coroutines.flow.Flow
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-interface EmaViewModel<S : EmaDataState, D : EmaNavigationEvent>{
+interface EmaViewModel<S : EmaDataState, D : EmaNavigationEvent> {
 
 
-    val initialState:EmaState<S>
+    val initialState: EmaState<S>
 
-   fun setScope(scope: CoroutineScope)
+    fun setScope(scope: CoroutineScope)
 
-    fun onStart(initializer: EmaInitializer? = null, startedFinishListener: (() -> Unit)? = null)
+    fun onCreated(initializer: EmaInitializer? = null)
 
-   fun onResumeView()
+    fun onStartView()
 
-   fun onPauseView()
+    fun onResumeView()
+
+    fun onPauseView()
 
     fun onStopView()
 

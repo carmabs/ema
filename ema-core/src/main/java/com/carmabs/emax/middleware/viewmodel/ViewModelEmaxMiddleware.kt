@@ -1,4 +1,4 @@
-package com.carmabs.ema.core.viewmodel.emux.middleware.viewmodel
+package com.carmabs.emax.middleware.viewmodel
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.FeatureEmaAction
@@ -7,11 +7,11 @@ import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaResultHandler
-import com.carmabs.ema.core.viewmodel.emux.EmaViewModelScope
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaMiddleware
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaNextMiddleware
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.EmaNextMiddlewareResult
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.MiddlewareScope
+import com.carmabs.emax.EmaxViewModelScope
+import com.carmabs.emax.middleware.common.EmaxMiddleware
+import com.carmabs.emax.middleware.common.EmaNextMiddleware
+import com.carmabs.emax.middleware.common.EmaNextMiddlewareResult
+import com.carmabs.emax.middleware.common.MiddlewareScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
@@ -23,13 +23,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class ViewModelEmaMiddleware<S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction> internal constructor(
+class ViewModelEmaxMiddleware<S : EmaDataState, A : FeatureEmaAction, D : EmaNavigationEvent> internal constructor(
     private val resultHandler: EmaResultHandler,
     private val viewModelId: String,
     private val navigationState: MutableSharedFlow<EmaNavigationDirectionEvent>,
     private val observableSingleEvent: MutableSharedFlow<EmaEvent>,
-    private val onViewModelAction:  EmaViewModelScope<S,D>.(action: A) -> EmaAction
-) : EmaMiddleware<S> {
+    private val onViewModelAction: EmaxViewModelScope<S, D>.(action: A) -> A
+) : EmaxMiddleware<S> {
 
 
     context(MiddlewareScope<S>)
@@ -41,7 +41,13 @@ class ViewModelEmaMiddleware<S : EmaDataState, D : EmaNavigationEvent, A : Featu
             is FeatureEmaAction -> {
                 next(
                     (action as? A)?.let { featureAction ->
-                       val viewModelScope = EmaViewModelScope<S,D>(resultHandler, viewModelId, navigationState, observableSingleEvent,this@MiddlewareScope)
+                        val viewModelScope = EmaxViewModelScope<S, D>(
+                            resultHandler,
+                            viewModelId,
+                            navigationState,
+                            observableSingleEvent,
+                            this@MiddlewareScope
+                        )
                         onViewModelAction.invoke(
                             viewModelScope,
                             featureAction
@@ -49,6 +55,7 @@ class ViewModelEmaMiddleware<S : EmaDataState, D : EmaNavigationEvent, A : Featu
                     } ?: action
                 )
             }
+
             else ->
                 next(action)
         }

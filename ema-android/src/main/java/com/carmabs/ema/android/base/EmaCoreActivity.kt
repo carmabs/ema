@@ -50,12 +50,13 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
      */
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        super<AppCompatActivity>.onCreate(savedInstanceState)
         //Call scope to call scope to enable injection
         scope
         vm.onBackHardwarePressedListener?.also {
             addOnBackPressedListener(it)
         }
+        onCreate(viewModelSeed)
     }
 
     @CallSuper

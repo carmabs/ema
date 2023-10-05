@@ -104,13 +104,11 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
      */
     override val onBackHardwarePressedListener: (() -> Boolean)? = null
 
-
     /**
      * Methods called the first time ViewModel is created
      * @param initializer
-     * @param startedFinishListener: (() -> Unit) listener when starting has been finished
      */
-    override fun onStart(initializer: EmaInitializer?, startedFinishListener: (() -> Unit)?) {
+    final override fun onCreated(initializer: EmaInitializer?) {
         if (!hasBeenInitialized) {
             if (!normalContentData.checkIsValidStateDataClass()) {
                 throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
@@ -120,15 +118,11 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
             if (updateOnInitialization)
                 observableState.tryEmit(state)
             onStateCreated(initializer)
-            onViewStarted()
-            startedFinishListener?.invoke()
-        } else {
-            //We call this to update the data if it has been not be emitted
-            // if last time was updated by updateDataState
-            observableState.tryEmit(state)
-            onViewStarted()
-            startedFinishListener?.invoke()
         }
+    }
+
+    override fun onStartView() {
+        onViewStarted()
     }
 
     /**

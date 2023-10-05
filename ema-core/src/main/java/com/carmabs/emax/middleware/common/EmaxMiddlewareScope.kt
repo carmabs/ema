@@ -1,10 +1,12 @@
-package com.carmabs.ema.core.viewmodel.emux.middleware.common
+package com.carmabs.emax.middleware.common
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.emux.store.EmaStore
+import com.carmabs.emax.store.EmaxStore
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by Carlos Mateo Benito on 4/10/23.
@@ -20,24 +22,22 @@ import kotlinx.coroutines.launch
 annotation class MiddlewareScopeDsl
 
 @MiddlewareScopeDsl
-class MiddlewareScope<S : EmaDataState>(
-    private val store: EmaStore<S>,
+class MiddlewareScope<S : EmaDataState>internal constructor(
+    private val store: EmaxStore<S>,
     private val scope: CoroutineScope
 ) {
     val state: S
         get() = store.state
 
-    private val sideEffectScope = SideEffectScope(store)
+    private val sideEffectScope = SideEffectScope(store,scope)
 
     fun sideEffect(
-        effect: @MiddlewareScopeDsl suspend  SideEffectScope<S>.(CoroutineScope) -> Unit
-    ) {
-        scope.launch {
-            effect.invoke(sideEffectScope,this)
+        effect: @MiddlewareScopeDsl suspend  SideEffectScope<S>.() -> Unit
+    ):Job {
+        return scope.launch {
+            effect.invoke(sideEffectScope)
         }
     }
-
-
 }
 
 @DslMarker
@@ -45,9 +45,10 @@ class MiddlewareScope<S : EmaDataState>(
 annotation class SideEffectScopeDsl
 
 @SideEffectScopeDsl
-class SideEffectScope<S : EmaDataState>(
-    private val store: EmaStore<S>
-) {
+class SideEffectScope<S : EmaDataState> internal constructor(
+    private val store: EmaxStore<S>,
+    private val scope: CoroutineScope
+):CoroutineScope {
     val state: S
         get() = store.state
 
@@ -56,4 +57,7 @@ class SideEffectScope<S : EmaDataState>(
     ) {
         store.dispatch(emaAction)
     }
+
+    override val coroutineContext: CoroutineContext
+        get() = scope.coroutineContext
 }

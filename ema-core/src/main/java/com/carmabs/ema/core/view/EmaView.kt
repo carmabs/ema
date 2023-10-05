@@ -256,16 +256,26 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
 
     fun onBack(): Boolean
 
+    fun onCreate(viewModel: VM) {
+        startTrigger?.also {
+            it.triggerAction = {
+                viewModel.onCreated(initializer)
+            }
+        } ?: also {
+            viewModel.onCreated(initializer)
+        }
+    }
+
     /**
      * Called when view model is started
      */
     fun onStartView(viewModel: VM) {
         startTrigger?.also {
             it.triggerAction = {
-                viewModel.onStart(initializer)
+                viewModel.onStartView()
             }
         } ?: also {
-            viewModel.onStart(initializer)
+            viewModel.onStartView()
         }
     }
 

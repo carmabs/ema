@@ -1,9 +1,7 @@
-package com.carmabs.ema.core.viewmodel.emux
+package com.carmabs.emax
 
-import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.model.EmaEvent
-import com.carmabs.ema.core.model.emaFlowSingleEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirection
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
@@ -11,9 +9,9 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.viewmodel.EmaResultHandler
 import com.carmabs.ema.core.viewmodel.EmaResultModel
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.MiddlewareScope
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.MiddlewareScopeDsl
-import com.carmabs.ema.core.viewmodel.emux.middleware.common.SideEffectScope
+import com.carmabs.emax.middleware.common.MiddlewareScope
+import com.carmabs.emax.middleware.common.MiddlewareScopeDsl
+import com.carmabs.emax.middleware.common.SideEffectScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -26,7 +24,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class EmaViewModelScope<S : EmaDataState, in D : EmaNavigationEvent> internal constructor(
+class EmaxViewModelScope<S : EmaDataState, in D : EmaNavigationEvent> internal constructor(
     private val resultHandler: EmaResultHandler,
     private val viewModelId: String,
     private val navigationState: MutableSharedFlow<EmaNavigationDirectionEvent>,
@@ -47,14 +45,14 @@ class EmaViewModelScope<S : EmaDataState, in D : EmaNavigationEvent> internal co
         )
     }
 
-    fun sideEffect(sideEffectAction: @MiddlewareScopeDsl suspend  (SideEffectScope<S>).(CoroutineScope) -> Unit) {
+    fun sideEffect(sideEffectAction: @MiddlewareScopeDsl suspend  (SideEffectScope<S>).() -> Unit) {
         middlewareScope.sideEffect(sideEffectAction)
     }
 
     fun addResult(data: Any?, resultId: String? = null) {
         resultHandler.addResult(
             EmaResultModel(
-                code = EmaViewModelReducer::class.resultId(resultId).id,
+                code = EmaxViewModel::class.resultId(resultId).id,
                 ownerId = viewModelId,
                 data = data
             )
