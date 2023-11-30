@@ -9,11 +9,7 @@ package com.carmabs.ema.core.action
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-sealed interface EmaAction{
-
-    companion object{
-        val type: String = EmaAction::class.java.simpleName
-    }
-    val type: String
-        get() = type
+interface InitializerEmaAction : EmaAction{
+    override val type: String
+        get() = InitializerEmaAction::class.java.simpleName
 }

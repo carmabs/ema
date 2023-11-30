@@ -1,6 +1,6 @@
 package com.carmabs.ema.core.viewmodel
 
-import com.carmabs.ema.core.action.FeatureEmaAction
+import com.carmabs.ema.core.action.ViewModelEmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.model.emaFlowSingleEvent
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.Flow
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-abstract class EmaViewModelAction<S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction>(
+abstract class EmaViewModelAction<S : EmaDataState, D : EmaNavigationEvent, A : ViewModelEmaAction>(
     initialDataState: S,
     scope: CoroutineScope = EmaMainScope()
 ) : EmaViewModelBasic<S, D>(initialDataState, scope), EmaActionDispatcher<A>{

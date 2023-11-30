@@ -21,11 +21,11 @@ sealed class EmaState<T> private constructor(open val data: T) : EmaDataState {
      */
     data class Overlapped<T>(override val data: T, val dataOverlapped: EmaExtraData = EmaExtraData()) : EmaState<T>(data)
 
-}
-
-inline fun <T>EmaState<T>.copy(data: T):EmaState<T>{
-    return when(this){
-        is EmaState.Normal -> copy(data)
-        is EmaState.Overlapped -> copy(data)
+    fun <T>update(data: T):EmaState<T>{
+        return when(this){
+            is Normal -> Normal(data)
+            is Overlapped -> Overlapped(data,dataOverlapped)
+        }
     }
 }
+

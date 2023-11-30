@@ -53,8 +53,6 @@ class EmaxStore<S : EmaDataState>(
         }
         .stateIn(scope, SharingStarted.Eagerly,state)
 
-    //MutableSharedFlow(1,0, onBufferOverflow = BufferOverflow.DROP_OLDEST) /*
-
     fun dispatch(action: EmaAction) {
         middleWareStore.applyMiddleware(action){
             channelAction.trySend(it)

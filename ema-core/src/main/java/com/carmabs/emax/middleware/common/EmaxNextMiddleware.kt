@@ -15,7 +15,7 @@ typealias EmaNextMiddleware = (EmaAction) -> EmaNextMiddlewareResult
 
 sealed interface EmaNextMiddlewareResult {
     @JvmInline
-    value class NextAction internal constructor(val value: EmaAction) : EmaNextMiddlewareResult
+    value class NextAction constructor(val value: EmaAction) : EmaNextMiddlewareResult
 
     object CanceledAction : EmaNextMiddlewareResult
 }

@@ -1,15 +1,15 @@
 package com.carmabs.emax
 
 import com.carmabs.ema.core.action.EmaAction
-import com.carmabs.ema.core.action.FeatureEmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
+import com.carmabs.ema.core.action.LifecycleEmaAction
 import com.carmabs.ema.core.action.ResultEmaAction
-import com.carmabs.ema.core.action.ViewEmaAction
+import com.carmabs.ema.core.action.ViewModelEmaAction
 import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.extension.ResultId
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.initializer.EmaInitializerEmpty
+import com.carmabs.ema.core.initializer.EmptyEmaInitializer
 import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
@@ -18,14 +18,14 @@ import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaResultHandler
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import com.carmabs.emax.middleware.log.LoggerEmaxMiddleware
 import com.carmabs.emax.middleware.common.MiddlewareScope
-import com.carmabs.emax.middleware.initializer.InitializerEmaxMiddleware
+import com.carmabs.emax.middleware.log.LoggerEmaxMiddleware
 import com.carmabs.emax.middleware.result.ResultEventEmaxMiddleware
 import com.carmabs.emax.middleware.viewevent.ViewEventEmaxMiddleware
+import com.carmabs.emax.middleware.viewmodel.SideEffectEmaxViewModelBuilder
 import com.carmabs.emax.middleware.viewmodel.ViewModelEmaxMiddleware
-import com.carmabs.emax.reducer.EmaFeatureReducerScope
-import com.carmabs.emax.reducer.FeatureEmaxReducer
+import com.carmabs.emax.reducer.ActionFilterEmaxReducer
+import com.carmabs.emax.reducer.ViewModelStateEmaxReducerScope
 import com.carmabs.emax.store.EmaxStore
 import com.carmabs.emax.store.EmaxStoreSetupScope
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaxViewModel<S : EmaDataState, A : FeatureEmaAction, D : EmaNavigationEvent>(
+abstract class EmaxViewModel<S : EmaDataState, A : ViewModelEmaAction, D : EmaNavigationEvent>(
     initialDataState: S,
     defaultScope: CoroutineScope = EmaMainScope()
 ) : EmaViewModel<S, D>, EmaActionDispatcher<A> {
@@ -51,7 +51,6 @@ abstract class EmaxViewModel<S : EmaDataState, A : FeatureEmaAction, D : EmaNavi
      * The scope where coroutines will be launched by default.
      */
     private var scope: CoroutineScope = defaultScope
-        private set
 
     final override fun setScope(scope: CoroutineScope) {
         this.scope = scope
@@ -74,7 +73,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : FeatureEmaAction, D : EmaNavi
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    private val channelAction = Channel<FeatureEmaAction>()
+    private val channelAction = Channel<ViewModelEmaAction>()
 
     private val observableAction = channelAction.receiveAsFlow()
 
@@ -90,40 +89,52 @@ abstract class EmaxViewModel<S : EmaDataState, A : FeatureEmaAction, D : EmaNavi
     )
 
     private val reducerSetupScope = EmaxStoreSetupScope<S>()
+    private val reducerScope = ViewModelStateEmaxReducerScope(initialState)
 
     private val store by lazy {
-
         EmaxStore(initialDataState, scope) {
             addMiddleware(LoggerEmaxMiddleware())
-            addMiddleware(InitializerEmaxMiddleware { initializer ->
-                onInitialized(initializer)
-            })
             addMiddleware(
-                ViewEventEmaxMiddleware { action ->
-                    when (action) {
-                        ViewEmaAction.Resumed -> onViewResumed(action)
-                        ViewEmaAction.Paused -> onViewPaused(action)
-                        ViewEmaAction.Started -> onViewStarted(action)
-                        ViewEmaAction.Stopped -> onViewStopped(action)
-                    }
-                })
-            addMiddleware(
-                ViewModelEmaxMiddleware<S, A, D>(
+                ViewModelEmaxMiddleware(
                     resultHandler = emaResultHandler,
                     viewModelId = id,
                     navigationState = navigationState,
                     observableSingleEvent = observableSingleEvent
                 ) {
-                    onSideEffect(it)
+                    onInitializerSideEffectLauncher()
+                }
+            )
+            addMiddleware(
+                ViewEventEmaxMiddleware { action ->
+                    when (action) {
+                        LifecycleEmaAction.Resumed -> onViewResumed(action)
+                        LifecycleEmaAction.Paused -> onViewPaused(action)
+                        LifecycleEmaAction.Started -> onViewStarted(action)
+                        LifecycleEmaAction.Stopped -> onViewStopped(action)
+                    }
+                })
+            addMiddleware(
+                ViewModelEmaxMiddleware(
+                    resultHandler = emaResultHandler,
+                    viewModelId = id,
+                    navigationState = navigationState,
+                    observableSingleEvent = observableSingleEvent
+                ) {
+                    onActionSideEffectLauncher()
                 }
             )
             addReducer(
-                FeatureEmaxReducer<S, A>(
-                    initialState = initialState,
-                    reducerAction = { state, action ->
-                        onReduce(state, action)
-                    }) {
-                    currentState = it
+                ActionFilterEmaxReducer(EmaInitializer::class) {
+                    val newState = reducerScope.onReduceInitialization(this, it)
+                    currentState = reducerScope.state.update(newState)
+                    currentState.data
+                }
+            )
+            addReducer(
+                ActionFilterEmaxReducer(ViewModelEmaAction::class) {
+                    val newState = reducerScope.onReduce(this, it as A)
+                    currentState = reducerScope.state.update(newState)
+                    currentState.data
                 }
             )
             setup()
@@ -153,57 +164,53 @@ abstract class EmaxViewModel<S : EmaDataState, A : FeatureEmaAction, D : EmaNavi
     }
 
     protected open fun EmaxStoreSetupScope<S>.setup() = Unit
+    protected open fun ViewModelStateEmaxReducerScope<S>.onReduceInitialization(
+        state: S,
+        initializer: EmaInitializer
+    ): S = state
 
-    context (EmaFeatureReducerScope<S>)
-    protected fun S.loading(): S {
-        return overlapped(EmaExtraData())
-    }
-
-    protected abstract fun EmaFeatureReducerScope<S>.onReduce(state: S, action: A): S
+    protected abstract fun ViewModelStateEmaxReducerScope<S>.onReduce(state: S, action: A): S
 
     /**
      * Methods called the first time ViewModel is created
      * @param initializer
-     * @param startedFinishListener: (() -> Unit) listener when starting has been finished
      */
     final override fun onCreated(initializer: EmaInitializer?) {
         if (!store.state.checkIsValidStateDataClass()) {
             throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
         }
-        store.dispatch(initializer ?: EmaInitializerEmpty)
+        store.dispatch(initializer ?: EmptyEmaInitializer)
     }
+
+    protected open fun SideEffectEmaxViewModelBuilder<S, A, D>.onActionSideEffectLauncher() = Unit
 
     /**
      * Call on first time view model is initialized
      */
-    protected open fun MiddlewareScope<S>.onInitialized(
-        initializer: EmaInitializer
-    ): EmaAction = initializer
-
-    protected open fun EmaxViewModelScope<S, D>.onSideEffect(
-        action: A
-    ): A = action
+    protected open fun SideEffectEmaxViewModelBuilder<S, EmaInitializer, D>.onInitializerSideEffectLauncher() =
+        Unit
 
     final override fun onStartView() {
-        store.dispatch(ViewEmaAction.Started)
+        store.dispatch(LifecycleEmaAction.Started)
     }
+
     /**
      * Called when view is shown in foreground
      */
     final override fun onResumeView() {
         firstTimeResumed = false
-        store.dispatch(ViewEmaAction.Resumed)
+        store.dispatch(LifecycleEmaAction.Resumed)
     }
 
     /**
      * Called when view is hidden in background
      */
     final override fun onPauseView() {
-        store.dispatch(ViewEmaAction.Paused)
+        store.dispatch(LifecycleEmaAction.Paused)
     }
 
     final override fun onStopView() {
-        store.dispatch(ViewEmaAction.Stopped)
+        store.dispatch(LifecycleEmaAction.Stopped)
     }
 
     /**

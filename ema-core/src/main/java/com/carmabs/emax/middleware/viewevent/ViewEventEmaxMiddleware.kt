@@ -1,7 +1,7 @@
 package com.carmabs.emax.middleware.viewevent
 
 import com.carmabs.ema.core.action.EmaAction
-import com.carmabs.ema.core.action.ViewEmaAction
+import com.carmabs.ema.core.action.LifecycleEmaAction
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.emax.middleware.common.EmaxMiddleware
 import com.carmabs.emax.middleware.common.EmaNextMiddleware
@@ -18,7 +18,7 @@ import com.carmabs.emax.middleware.common.MiddlewareScope
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 class ViewEventEmaxMiddleware<S : EmaDataState> (
-    private val onViewAction: MiddlewareScope<S>.(viewAction: ViewEmaAction) -> EmaAction
+    private val onViewAction: MiddlewareScope<S>.(viewAction: LifecycleEmaAction) -> EmaAction
 ) : EmaxMiddleware<S> {
     context(MiddlewareScope<S>)
     override fun invoke(
@@ -26,7 +26,7 @@ class ViewEventEmaxMiddleware<S : EmaDataState> (
         next: EmaNextMiddleware
     ): EmaNextMiddlewareResult {
         return when (action) {
-            is ViewEmaAction -> {
+            is LifecycleEmaAction -> {
                 next(
                     onViewAction.invoke(
                         this@MiddlewareScope,

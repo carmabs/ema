@@ -1,6 +1,6 @@
 package com.carmabs.ema.compose.extension
 
-import com.carmabs.ema.core.action.FeatureEmaAction
+import com.carmabs.ema.core.action.ViewModelEmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
@@ -16,12 +16,12 @@ import com.carmabs.ema.core.viewmodel.EmaViewModelAction
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-fun <S:EmaDataState,D:EmaNavigationEvent,A:FeatureEmaAction>EmaViewModel<S,D>.asViewModelAction():EmaViewModelAction<S, D, A>{
+fun <S:EmaDataState,D:EmaNavigationEvent,A:ViewModelEmaAction>EmaViewModel<S,D>.asViewModelAction():EmaViewModelAction<S, D, A>{
     return (this as? EmaViewModelAction<S, D, A>)
         ?:throw java.lang.IllegalStateException("${this::class} must inherit form EmaViewModelAction class")
 }
 
-fun <A:FeatureEmaAction>EmaViewModel<*,*>.asActionDispatcher():EmaActionDispatcher<A>{
+fun <A:ViewModelEmaAction>EmaViewModel<*,*>.asActionDispatcher():EmaActionDispatcher<A>{
     return (this as? EmaActionDispatcher<A>)
         ?:throw java.lang.IllegalStateException("${this::class} must implement EmaActionDispatcher with the proper action")
 }

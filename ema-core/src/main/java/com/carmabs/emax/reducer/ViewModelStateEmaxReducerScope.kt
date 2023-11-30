@@ -13,10 +13,10 @@ import com.carmabs.ema.core.state.EmaState
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class EmaFeatureReducerScope<S : EmaDataState> internal constructor(
-    val initialState: EmaState<S>
+class ViewModelStateEmaxReducerScope<S : EmaDataState> internal constructor(
+    initialState: EmaState<S>
 ) {
-    internal var state: EmaState<S> = initialState
+    var state: EmaState<S> = initialState
         private set
 
     fun S.normal():S {

@@ -1,6 +1,6 @@
 package com.carmabs.ema.core.initializer
 
-import com.carmabs.ema.core.action.EmaAction
+import com.carmabs.ema.core.action.InitializerEmaAction
 import java.io.Serializable
 
 /**
@@ -12,10 +12,10 @@ import java.io.Serializable
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-interface EmaInitializer : EmaAction, Serializable {
+interface EmaInitializer : InitializerEmaAction, Serializable {
     companion object {
         const val KEY = "EmaInitializer"
     }
 }
 
-object EmaInitializerEmpty : EmaInitializer
+object EmptyEmaInitializer : EmaInitializer

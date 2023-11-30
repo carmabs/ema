@@ -16,11 +16,10 @@ import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcherEmpty
 import com.carmabs.ema.compose.action.toImmutable
 import com.carmabs.ema.compose.extension.asActionDispatcher
-import com.carmabs.ema.compose.extension.asViewModelAction
 import com.carmabs.ema.compose.extension.skipForPreview
 import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.core.action.EmaActionDispatcher
-import com.carmabs.ema.core.action.FeatureEmaAction
+import com.carmabs.ema.core.action.ViewModelEmaAction
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirection
@@ -30,10 +29,9 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import kotlinx.coroutines.flow.collect
 
 @Composable
-fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : FeatureEmaAction> EmaComposableScreen(
+fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : ViewModelEmaAction> EmaComposableScreen(
     initializer: EmaInitializer? = null,
     vm: VM,
     actions: EmaActionDispatcher<A>,
@@ -71,7 +69,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : Feat
 }
 
 @Composable
-fun <S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction> EmaComposableScreen(
+fun <S : EmaDataState, D : EmaNavigationEvent, A : ViewModelEmaAction> EmaComposableScreen(
     initializer: EmaInitializer? = null,
     vm: () -> EmaAndroidViewModel<S, D>,
     screenContent: EmaComposableScreenContent<S, A>,
@@ -112,7 +110,7 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction> EmaComposab
 }
 
 @Composable
-private fun <A : FeatureEmaAction, D : EmaNavigationEvent, S : EmaDataState> renderScreen(
+private fun <A : ViewModelEmaAction, D : EmaNavigationEvent, S : EmaDataState> renderScreen(
     initializer: EmaInitializer?,
     screenContent: EmaComposableScreenContent<S, A>,
     vm: EmaViewModel<S, D>,
@@ -218,7 +216,7 @@ private fun <A : FeatureEmaAction, D : EmaNavigationEvent, S : EmaDataState> ren
 }
 
 @Composable
-private fun <S : EmaDataState, A : FeatureEmaAction> OverlappedComposable(
+private fun <S : EmaDataState, A : ViewModelEmaAction> OverlappedComposable(
     overlappedState: EmaState.Overlapped<S>? = null,
     screenContent: EmaComposableScreenContent<S, A>,
     actions: EmaImmutableActionDispatcher<A>

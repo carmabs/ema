@@ -12,7 +12,6 @@ import com.carmabs.ema.core.viewmodel.EmaResultModel
 import com.carmabs.emax.middleware.common.MiddlewareScope
 import com.carmabs.emax.middleware.common.MiddlewareScopeDsl
 import com.carmabs.emax.middleware.common.SideEffectScope
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
@@ -45,7 +44,7 @@ class EmaxViewModelScope<S : EmaDataState, in D : EmaNavigationEvent> internal c
         )
     }
 
-    fun sideEffect(sideEffectAction: @MiddlewareScopeDsl suspend  (SideEffectScope<S>).() -> Unit) {
+    fun sideEffect(sideEffectAction: @MiddlewareScopeDsl suspend (SideEffectScope<S>).() -> Unit) {
         middlewareScope.sideEffect(sideEffectAction)
     }
 
@@ -57,14 +56,6 @@ class EmaxViewModelScope<S : EmaDataState, in D : EmaNavigationEvent> internal c
                 data = data
             )
         )
-    }
-
-    /**
-     * Method use to notify a navigation back event
-     */
-    fun navigateBack() {
-        navigationState.tryEmit(EmaNavigationDirectionEvent.Launched(EmaNavigationDirection.Back))
-
     }
 
     /**

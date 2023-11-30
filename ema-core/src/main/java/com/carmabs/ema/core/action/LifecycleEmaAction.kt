@@ -9,10 +9,10 @@ package com.carmabs.ema.core.action
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-sealed interface ViewEmaAction : EmaAction {
-    object Started : ViewEmaAction
-    object Resumed : ViewEmaAction
-    object Paused : ViewEmaAction
-    object Stopped : ViewEmaAction
+sealed interface LifecycleEmaAction : EmaAction {
+    object Started : LifecycleEmaAction
+    object Resumed : LifecycleEmaAction
+    object Paused : LifecycleEmaAction
+    object Stopped : LifecycleEmaAction
 
 }
