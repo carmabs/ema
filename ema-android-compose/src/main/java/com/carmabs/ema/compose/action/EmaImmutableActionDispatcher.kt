@@ -1,7 +1,7 @@
 package com.carmabs.ema.compose.action
 
 import androidx.compose.runtime.Immutable
-import com.carmabs.ema.core.action.FeatureEmaAction
+import com.carmabs.ema.core.action.ViewModelEmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import kotlinx.coroutines.flow.Flow
 
@@ -20,9 +20,9 @@ import kotlinx.coroutines.flow.Flow
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 @Immutable
-interface EmaImmutableActionDispatcher<A : FeatureEmaAction> : EmaActionDispatcher<A>
+interface EmaImmutableActionDispatcher<A : ViewModelEmaAction> : EmaActionDispatcher<A>
 
-fun <A : FeatureEmaAction> EmaActionDispatcher<A>.toImmutable():EmaImmutableActionDispatcher<A> {
+fun <A : ViewModelEmaAction> EmaActionDispatcher<A>.toImmutable():EmaImmutableActionDispatcher<A> {
     return object :EmaImmutableActionDispatcher<A>{
         override fun onAction(action: A) {
             this@toImmutable.onAction(action)

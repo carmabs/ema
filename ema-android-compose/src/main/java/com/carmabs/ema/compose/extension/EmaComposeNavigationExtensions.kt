@@ -13,7 +13,7 @@ import com.carmabs.ema.compose.navigation.EmaComposableTransitions
 import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.compose.ui.EmaComposableScreen
 import com.carmabs.ema.compose.ui.EmaComposableScreenContent
-import com.carmabs.ema.core.action.FeatureEmaAction
+import com.carmabs.ema.core.action.ViewModelEmaAction
 import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
@@ -47,7 +47,7 @@ fun NavController.navigate(
     navigate(route, navOptions, navigatorExtras)
 }
 
-fun <S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction, VM : EmaAndroidViewModel<S, D>> NavGraphBuilder.createComposableScreen(
+fun <S : EmaDataState, D : EmaNavigationEvent, A : ViewModelEmaAction, VM : EmaAndroidViewModel<S, D>> NavGraphBuilder.createComposableScreen(
     screenContent: EmaComposableScreenContent<S, A>,
     onNavigationEvent: (D) -> Unit,
     onNavigationBackEvent: () -> Unit,
@@ -55,14 +55,14 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : FeatureEmaAction, VM : EmaAnd
     overrideInitializer: EmaInitializer? = null,
     androidViewModel: @Composable () -> VM,
     onViewModelInstance: (@Composable (EmaViewModel<S, D>) -> Unit)? = null,
-    emaComposableTransitions: EmaComposableTransitions = EmaComposableTransitions()
+    transitionAnimation: EmaComposableTransitions = EmaComposableTransitions()
 ) {
     composable(
         routeId,
-        enterTransition = emaComposableTransitions.enterTransition,
-        exitTransition = emaComposableTransitions.exitTransition,
-        popEnterTransition = emaComposableTransitions.popEnterTransition,
-        popExitTransition = emaComposableTransitions.popExitTransition
+        enterTransition = transitionAnimation.enterTransition,
+        exitTransition = transitionAnimation.exitTransition,
+        popEnterTransition = transitionAnimation.popEnterTransition,
+        popExitTransition = transitionAnimation.popExitTransition
     ) { navBack ->
         val viewModel = EmaScreenProvider.provideComposableViewModel(androidViewModel = androidViewModel.invoke())
         val vmActions = viewModel.asActionDispatcher<A>().toImmutable()

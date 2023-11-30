@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.model.onLaunched
 import com.carmabs.ema.core.state.EmaExtraData
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Created by Carlos Mateo Benito on 20/9/23.
@@ -19,7 +20,7 @@ import com.carmabs.ema.core.state.EmaExtraData
 
 @Composable
 fun <T>EmaEvent.toEventEffect(
-    onLaunchedAction: suspend (EmaExtraData) -> T,
+    onLaunchedAction: suspend CoroutineScope.(EmaExtraData) -> T,
     onConsumedAction: suspend (T) -> Unit
 ) {
     EventEffect(this,onLaunchedAction,onConsumedAction)
@@ -28,12 +29,12 @@ fun <T>EmaEvent.toEventEffect(
 @Composable
 fun <T>EventEffect(
     emaEvent: EmaEvent,
-    onLaunchedAction: suspend (EmaExtraData) -> T,
+    onLaunchedAction: suspend CoroutineScope.(EmaExtraData) -> T,
     onConsumedAction: suspend (T) -> Unit
 ) {
     emaEvent.onLaunched {
         LaunchedEffect(key1 = emaEvent) {
-            val value = onLaunchedAction.invoke(it)
+            val value = onLaunchedAction.invoke(this,it)
             onConsumedAction(value)
 
         }
