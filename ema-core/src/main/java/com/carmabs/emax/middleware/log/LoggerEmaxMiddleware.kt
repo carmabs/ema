@@ -1,6 +1,7 @@
 package com.carmabs.emax.middleware.log
 
 import com.carmabs.ema.core.action.EmaAction
+import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.logging.toStringPretty
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.emax.middleware.common.EmaNextMiddleware
@@ -101,7 +102,7 @@ class LoggerEmaxMiddleware<S : EmaDataState>(
                     )
                 val sideEnd = (sideCharacterLimit?.let {
                     String(charArrayOf(character)).repeat(it) + String(charArrayOf(' ')).repeat(
-                        endLength - it
+                        (endLength - it).coerceAtLeast(0)
                     )
                 } ?: String(charArrayOf(character))
                     .repeat(endLength)
