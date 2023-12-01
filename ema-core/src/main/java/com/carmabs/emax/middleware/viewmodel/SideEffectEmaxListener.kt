@@ -4,6 +4,7 @@ import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.emax.EmaxViewModelScope
+import kotlin.reflect.KClass
 
 /**
  * Created by Carlos Mateo Benito on 29/11/23.
@@ -15,6 +16,6 @@ import com.carmabs.emax.EmaxViewModelScope
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 data class SideEffectEmaxListener<S: EmaDataState,A: EmaAction,N: EmaNavigationEvent>(
-    val action:Class<*>,
+    val action:KClass<out A>,
     val scopedAction: EmaxViewModelScope<S, N>.(A)->Unit
 )

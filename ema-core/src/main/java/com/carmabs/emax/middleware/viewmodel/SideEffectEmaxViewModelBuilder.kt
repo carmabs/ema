@@ -4,6 +4,7 @@ import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.emax.EmaxViewModelScope
+import kotlin.reflect.full.isSubclassOf
 
 /**
  * Created by Carlos Mateo Benito on 29/11/23.
@@ -18,9 +19,9 @@ class SideEffectEmaxViewModelBuilder<S : EmaDataState, A : EmaAction, N : EmaNav
 
     private val listeners = mutableListOf<SideEffectEmaxListener<S, A, N>>()
     internal fun applyListeners(action: A, emaxViewModelScope: EmaxViewModelScope<S, N>) {
-        listeners.forEach {
-            if (it.action == action::class.java)
-                it.scopedAction.invoke(emaxViewModelScope, action)
+        listeners.forEach { sideEffect->
+            if (action::class.isSubclassOf(sideEffect.action))
+                sideEffect.scopedAction.invoke(emaxViewModelScope, action)
         }
     }
     fun registerActionListener(
