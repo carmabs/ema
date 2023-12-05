@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.runtime.Composable
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
-import com.carmabs.ema.core.action.ViewModelEmaAction
+import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 
 
-interface EmaComposableScreenContent<S : EmaDataState, A : ViewModelEmaAction> {
+interface EmaComposableScreenContent<S : EmaDataState, A : EmaAction.ViewModel> {
 
     @Composable
     @SuppressLint("ComposableNaming")

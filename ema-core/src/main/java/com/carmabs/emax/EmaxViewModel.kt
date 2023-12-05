@@ -1,10 +1,10 @@
 package com.carmabs.emax
 
 import com.carmabs.ema.core.action.EmaAction
+import com.carmabs.ema.core.action.EmaAction.Lifecycle
+import com.carmabs.ema.core.action.EmaAction.ViewModel
 import com.carmabs.ema.core.action.EmaActionDispatcher
-import com.carmabs.ema.core.action.LifecycleEmaAction
 import com.carmabs.ema.core.action.ResultEmaAction
-import com.carmabs.ema.core.action.ViewModelEmaAction
 import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.extension.ResultId
@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaxViewModel<S : EmaDataState, A : ViewModelEmaAction, D : EmaNavigationEvent>(
+abstract class EmaxViewModel<S : EmaDataState, A : ViewModel, D : EmaNavigationEvent>(
     initialDataState: S,
     defaultScope: CoroutineScope = EmaMainScope()
 ) : EmaViewModel<S, D>, EmaActionDispatcher<A> {
@@ -73,7 +73,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : ViewModelEmaAction, D : EmaNa
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    private val channelAction = Channel<ViewModelEmaAction>()
+    private val channelAction = Channel<ViewModel>()
 
     private val observableAction = channelAction.receiveAsFlow()
 
@@ -107,10 +107,10 @@ abstract class EmaxViewModel<S : EmaDataState, A : ViewModelEmaAction, D : EmaNa
             addMiddleware(
                 ViewEventEmaxMiddleware { action ->
                     when (action) {
-                        LifecycleEmaAction.Resumed -> onViewResumed(action)
-                        LifecycleEmaAction.Paused -> onViewPaused(action)
-                        LifecycleEmaAction.Started -> onViewStarted(action)
-                        LifecycleEmaAction.Stopped -> onViewStopped(action)
+                        Lifecycle.Resumed -> onViewResumed(action)
+                        Lifecycle.Paused -> onViewPaused(action)
+                        Lifecycle.Started -> onViewStarted(action)
+                        Lifecycle.Stopped -> onViewStopped(action)
                     }
                 })
             addMiddleware(
@@ -131,7 +131,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : ViewModelEmaAction, D : EmaNa
                 }
             )
             addReducer(
-                ActionFilterEmaxReducer(ViewModelEmaAction::class) {
+                ActionFilterEmaxReducer(ViewModel::class) {
                     val newState = reducerScope.onReduce(this, it as A)
                     currentState = reducerScope.state.update(newState)
                     currentState.data
@@ -191,7 +191,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : ViewModelEmaAction, D : EmaNa
         Unit
 
     final override fun onStartView() {
-        store.dispatch(LifecycleEmaAction.Started)
+        store.dispatch(Lifecycle.Started)
     }
 
     /**
@@ -199,18 +199,18 @@ abstract class EmaxViewModel<S : EmaDataState, A : ViewModelEmaAction, D : EmaNa
      */
     final override fun onResumeView() {
         firstTimeResumed = false
-        store.dispatch(LifecycleEmaAction.Resumed)
+        store.dispatch(Lifecycle.Resumed)
     }
 
     /**
      * Called when view is hidden in background
      */
     final override fun onPauseView() {
-        store.dispatch(LifecycleEmaAction.Paused)
+        store.dispatch(Lifecycle.Paused)
     }
 
     final override fun onStopView() {
-        store.dispatch(LifecycleEmaAction.Stopped)
+        store.dispatch(Lifecycle.Stopped)
     }
 
     /**

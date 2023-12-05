@@ -9,11 +9,38 @@ package com.carmabs.ema.core.action
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-sealed interface EmaAction{
+sealed interface EmaAction {
 
-    companion object{
+    companion object {
         val type: String = EmaAction::class.java.simpleName
+        object Empty : EmaAction
     }
+
+
     val type: String
         get() = type
+
+    interface Initializer : EmaAction {
+        override val type: String
+            get() = Initializer::class.java.simpleName
+    }
+
+    sealed interface Lifecycle : EmaAction {
+        object Started : Lifecycle
+        object Resumed : Lifecycle
+        object Paused : Lifecycle
+        object Stopped : Lifecycle
+
+    }
+
+    interface ViewModel : EmaAction {
+        fun checkIsValidViewActionClass() = this is Empty || this::class.isSealed
+        override val type: String
+            get() = ViewModel::class.java.simpleName
+
+        object Empty : ViewModel
+    }
 }
+
+
+
