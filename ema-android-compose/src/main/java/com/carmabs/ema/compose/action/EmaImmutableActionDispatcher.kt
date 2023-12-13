@@ -20,9 +20,9 @@ import kotlinx.coroutines.flow.Flow
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 @Immutable
-interface EmaImmutableActionDispatcher<A : EmaAction.ViewModel> : EmaActionDispatcher<A>
+interface EmaImmutableActionDispatcher<A : EmaAction.Screen> : EmaActionDispatcher<A>
 
-fun <A : EmaAction.ViewModel> EmaActionDispatcher<A>.toImmutable():EmaImmutableActionDispatcher<A> {
+fun <A : EmaAction.Screen> EmaActionDispatcher<A>.toImmutable():EmaImmutableActionDispatcher<A> {
     return object :EmaImmutableActionDispatcher<A>{
         override fun onAction(action: A) {
             this@toImmutable.onAction(action)

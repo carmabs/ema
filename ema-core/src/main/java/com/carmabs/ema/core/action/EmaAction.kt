@@ -9,7 +9,7 @@ package com.carmabs.ema.core.action
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-sealed interface EmaAction {
+interface EmaAction {
 
     companion object {
         val type: String = EmaAction::class.java.simpleName
@@ -33,12 +33,12 @@ sealed interface EmaAction {
 
     }
 
-    interface ViewModel : EmaAction {
-        fun checkIsValidViewActionClass() = this is Empty || this::class.isSealed
+    interface Screen : EmaAction {
+        fun checkIsValidScreenActionClass() = this is Empty || this::class.isSealed
         override val type: String
-            get() = ViewModel::class.java.simpleName
+            get() = Screen::class.java.simpleName
 
-        object Empty : ViewModel
+        object Empty : Screen
     }
 }
 

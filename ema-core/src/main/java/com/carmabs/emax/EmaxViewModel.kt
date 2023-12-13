@@ -2,7 +2,7 @@ package com.carmabs.emax
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaAction.Lifecycle
-import com.carmabs.ema.core.action.EmaAction.ViewModel
+import com.carmabs.ema.core.action.EmaAction.Screen
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.action.ResultEmaAction
 import com.carmabs.ema.core.concurrency.EmaMainScope
@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaxViewModel<S : EmaDataState, A : ViewModel, D : EmaNavigationEvent>(
+abstract class EmaxViewModel<S : EmaDataState, A : Screen, D : EmaNavigationEvent>(
     initialDataState: S,
     defaultScope: CoroutineScope = EmaMainScope()
 ) : EmaViewModel<S, D>, EmaActionDispatcher<A> {
@@ -73,7 +73,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : ViewModel, D : EmaNavigationE
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    private val channelAction = Channel<ViewModel>()
+    private val channelAction = Channel<Screen>()
 
     private val observableAction = channelAction.receiveAsFlow()
 
@@ -131,7 +131,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : ViewModel, D : EmaNavigationE
                 }
             )
             addReducer(
-                ActionFilterEmaxReducer(ViewModel::class) {
+                ActionFilterEmaxReducer(Screen::class) {
                     val newState = reducerScope.onReduce(this, it as A)
                     currentState = reducerScope.state.update(newState)
                     currentState.data

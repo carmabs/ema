@@ -9,7 +9,7 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 
 
-interface EmaComposableScreenContent<S : EmaDataState, A : EmaAction.ViewModel> {
+interface EmaComposableScreenContent<S : EmaDataState, A : EmaAction.Screen> {
 
     @Composable
     @SuppressLint("ComposableNaming")

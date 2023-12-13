@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.Flow
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-abstract class EmaViewModelAction<S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.ViewModel>(
+abstract class EmaViewModelAction<S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen>(
     initialDataState: S,
     scope: CoroutineScope = EmaMainScope()
 ) : EmaViewModelBasic<S, D>(initialDataState, scope), EmaActionDispatcher<A> {

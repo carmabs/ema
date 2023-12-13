@@ -47,7 +47,7 @@ fun NavController.navigate(
     navigate(route, navOptions, navigatorExtras)
 }
 
-fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.ViewModel, VM : EmaAndroidViewModel<S, D>> NavGraphBuilder.createComposableScreen(
+fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen, VM : EmaAndroidViewModel<S, D>> NavGraphBuilder.createComposableScreen(
     screenContent: EmaComposableScreenContent<S, A>,
     onNavigationEvent: (D) -> Unit,
     onNavigationBackEvent: () -> Unit,
