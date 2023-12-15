@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 interface EmaActionDispatcher<A : EmaAction> {
-    fun onAction(action: A)
+    fun dispatchAction(action: A)
 
     fun subscribeToActions(): Flow<A>
 }

@@ -24,8 +24,8 @@ interface EmaImmutableActionDispatcher<A : EmaAction.Screen> : EmaActionDispatch
 
 fun <A : EmaAction.Screen> EmaActionDispatcher<A>.toImmutable():EmaImmutableActionDispatcher<A> {
     return object :EmaImmutableActionDispatcher<A>{
-        override fun onAction(action: A) {
-            this@toImmutable.onAction(action)
+        override fun dispatchAction(action: A) {
+            this@toImmutable.dispatchAction(action)
         }
 
         override fun subscribeToActions(): Flow<A> {

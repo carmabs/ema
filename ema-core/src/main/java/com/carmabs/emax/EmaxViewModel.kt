@@ -58,8 +58,6 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, D : EmaNavigationEven
 
     final override val initialState = EmaState.Normal(initialDataState)
 
-    private var currentState: EmaState<S> = initialState
-
     private val emaResultHandler: EmaResultHandler = EmaResultHandler.getInstance()
 
     /**
@@ -125,16 +123,12 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, D : EmaNavigationEven
             )
             addReducer(
                 ActionFilterEmaxReducer(EmaInitializer::class) {
-                    val newState = reducerScope.onReduceInitialization(this, it)
-                    currentState = reducerScope.state.update(newState)
-                    currentState.data
+                     reducerScope.onReduceInitialization(this, it)
                 }
             )
             addReducer(
                 ActionFilterEmaxReducer(Screen::class) {
-                    val newState = reducerScope.onReduce(this, it as A)
-                    currentState = reducerScope.state.update(newState)
-                    currentState.data
+                    reducerScope.onReduce(this, it as A)
                 }
             )
             setup()
@@ -148,7 +142,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, D : EmaNavigationEven
 
     private val observableState: Flow<EmaState<S>> by lazy {
         store.observableState.map {
-            EmaState.Normal(it)
+            reducerScope.state.update(it)
         }
     }
 
@@ -159,7 +153,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, D : EmaNavigationEven
      */
     private var firstTimeResumed: Boolean = true
 
-    final override fun onAction(action: A) {
+    final override fun dispatchAction(action: A) {
         store.dispatch(action)
     }
 

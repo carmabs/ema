@@ -32,10 +32,10 @@ abstract class EmaViewModelAction<S : EmaDataState, D : EmaNavigationEvent, A : 
      */
     override fun subscribeToActions(): Flow<A> = observableAction
 
-    final override fun onAction(action: A) {
-        onFeatureAction(action)
+    final override fun dispatchAction(action: A) {
+        onAction(action)
         observableAction.tryEmit(action)
     }
 
-    abstract fun onFeatureAction(action: A)
+    abstract fun onAction(action: A)
 }
