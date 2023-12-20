@@ -99,31 +99,17 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, D : EmaNavigationEven
                     navigationState = navigationState,
                     observableSingleEvent = observableSingleEvent
                 ) {
-                    onInitializerSideEffectLauncher()
-                }
-            )
-            addMiddleware(
-                ViewEventEmaxMiddleware { action ->
-                    when (action) {
-                        Lifecycle.Resumed -> onViewResumed(action)
-                        Lifecycle.Paused -> onViewPaused(action)
-                        Lifecycle.Started -> onViewStarted(action)
-                        Lifecycle.Stopped -> onViewStopped(action)
-                    }
-                })
-            addMiddleware(
-                ViewModelEmaxMiddleware(
-                    resultHandler = emaResultHandler,
-                    viewModelId = id,
-                    navigationState = navigationState,
-                    observableSingleEvent = observableSingleEvent
-                ) {
-                    onActionSideEffectLauncher()
+                    onSideEffectConfig()
                 }
             )
             addReducer(
                 ActionFilterEmaxReducer(EmaInitializer::class) {
-                     reducerScope.onReduceInitialization(this, it)
+                    reducerScope.onReduceInitialization(this, it)
+                }
+            )
+            addReducer(
+                ActionFilterEmaxReducer(Lifecycle::class) {
+                    reducerScope.onReduceLifecycle(this, it)
                 }
             )
             addReducer(
@@ -135,10 +121,10 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, D : EmaNavigationEven
         }
     }
 
-    protected open fun MiddlewareScope<S>.onViewStarted(action: EmaAction): EmaAction = action
-    protected open fun MiddlewareScope<S>.onViewResumed(action: EmaAction): EmaAction = action
-    protected open fun MiddlewareScope<S>.onViewPaused(action: EmaAction): EmaAction = action
-    protected open fun MiddlewareScope<S>.onViewStopped(action: EmaAction): EmaAction = action
+    protected open fun ViewModelStateEmaxReducerScope<S>.onReduceLifecycle(
+        state: S,
+        action: EmaAction.Lifecycle
+    ): S = state
 
     private val observableState: Flow<EmaState<S>> by lazy {
         store.observableState.map {
@@ -176,13 +162,8 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, D : EmaNavigationEven
         store.dispatch(initializer ?: EmptyEmaInitializer)
     }
 
-    protected open fun SideEffectEmaxViewModelBuilder<S, A, D>.onActionSideEffectLauncher() = Unit
+    protected open fun SideEffectEmaxViewModelBuilder<S, EmaAction, D>.onSideEffectConfig() = Unit
 
-    /**
-     * Call on first time view model is initialized
-     */
-    protected open fun SideEffectEmaxViewModelBuilder<S, EmaInitializer, D>.onInitializerSideEffectLauncher() =
-        Unit
 
     final override fun onStartView() {
         store.dispatch(Lifecycle.Started)

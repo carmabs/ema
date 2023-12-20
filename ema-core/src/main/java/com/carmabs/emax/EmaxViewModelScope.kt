@@ -12,6 +12,7 @@ import com.carmabs.ema.core.viewmodel.EmaResultModel
 import com.carmabs.emax.middleware.common.MiddlewareScope
 import com.carmabs.emax.middleware.common.MiddlewareScopeDsl
 import com.carmabs.emax.middleware.common.SideEffectScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
@@ -44,8 +45,8 @@ class EmaxViewModelScope<S : EmaDataState, in D : EmaNavigationEvent> internal c
         )
     }
 
-    fun sideEffect(sideEffectAction: @MiddlewareScopeDsl suspend (SideEffectScope<S>).() -> Unit) {
-        middlewareScope.sideEffect(sideEffectAction)
+    fun sideEffect(sideEffectAction: @MiddlewareScopeDsl suspend (SideEffectScope<S>).() -> Unit): Job {
+        return middlewareScope.sideEffect(sideEffectAction)
     }
 
     fun addResult(data: Any?, resultId: String? = null) {
