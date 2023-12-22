@@ -48,7 +48,7 @@ abstract class EmaComposableFragment<S : EmaDataState, VM : EmaViewModel<S, D>, 
                     }
                     is EmaState.Overlapped<S> -> {
                         onStateNormal(data = emaState.data)
-                        onStateOverlapped(data = emaState.dataOverlapped)
+                        onStateOverlapped(data = emaState.extraData)
                         isFirstOverlayedExecution = false
                     }
 

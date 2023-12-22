@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.io.Serializable
 import kotlin.jvm.internal.PropertyReference0
 import kotlin.reflect.KProperty
 
@@ -78,7 +79,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
                         onEmaStateTransition(
                             EmaStateTransition.NormalToOverlapped(
                                 previousState.data,
-                                state.dataOverlapped
+                                state.extraData
                             )
                         )
                     }
@@ -86,7 +87,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
                     is EmaState.Normal -> {
                         onEmaStateTransition(
                             EmaStateTransition.OverlappedToNormal(
-                                (previousState as EmaState.Overlapped<S>).dataOverlapped,
+                                (previousState as EmaState.Overlapped<S>).extraData,
                                 state.data
                             )
                         )
@@ -98,7 +99,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
         onEmaStateNormal(state.data)
         when (state) {
             is EmaState.Overlapped -> {
-                onEmaStateOverlapped(state.dataOverlapped)
+                onEmaStateOverlapped(state.extraData)
             }
 
             else -> {
@@ -202,15 +203,15 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
     fun onNavigation(navigation: EmaNavigationDirectionEvent) {
         navigation.onNavigation {
             when (val direction = it) {
-                EmaNavigationDirection.Back -> {
-                    navigateBack()
+                is EmaNavigationDirection.Back -> {
+                    navigateBack(direction.result)
                 }
 
                 is EmaNavigationDirection.Forward -> {
                     navigate(direction.navigationEvent as D)
                 }
             }
-            viewModelSeed.consumeNavigation()
+            viewModelSeed.notifyOnNavigated()
         }
     }
 
@@ -250,11 +251,11 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
      * Called when view model trigger a navigation back event
      * @return True
      */
-    fun navigateBack(): Boolean {
-        return navigator?.navigateBack() ?: onBack()
+    fun navigateBack(result:Any?=null): Boolean {
+        return navigator?.navigateBack(result) ?: onBack(result)
     }
 
-    fun onBack(): Boolean
+    fun onBack(result: Any?): Boolean
 
     fun onCreate(viewModel: VM) {
         startTrigger?.also {

@@ -10,6 +10,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.BuildCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import com.carmabs.ema.android.navigation.EmaNavigationBackHandler
+import com.carmabs.ema.core.model.EmaBackHandlerStrategy
 
 
 /**
@@ -24,38 +27,18 @@ import androidx.fragment.app.Fragment
  * back behaviour.
  */
 @SuppressLint("UnsafeOptInUsageError")
-fun ComponentActivity.addOnBackPressedListener(listener: () -> Boolean) {
-    if (BuildCompat.isAtLeastT()) {
-        val onBackInvokedCallback = object : OnBackInvokedCallback {
-            override fun onBackInvoked() {
-                val backDefaultLaunched = listener.invoke()
-                if (backDefaultLaunched) {
-                    onBackInvokedDispatcher.unregisterOnBackInvokedCallback(this)
-                    onBackPressedDispatcher.onBackPressed()
-                }
-            }
-        }
-
-        onBackInvokedDispatcher
-            .registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT, onBackInvokedCallback
-            )
-
-    } else {
-        onBackPressedDispatcher.addCallback(
-            this, object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    val backDefaultLaunched = listener.invoke()
-                    isEnabled = !backDefaultLaunched
-                    if (backDefaultLaunched) {
-                        onBackPressedDispatcher.onBackPressed()
-                    }
-                }
-            }
-        )
-    }
+fun ComponentActivity.addOnBackPressedListener(
+    lifecycleOwner: LifecycleOwner? = null,
+    listener: () -> EmaBackHandlerStrategy
+): EmaNavigationBackHandler {
+    return EmaNavigationBackHandler(
+        activity = this,
+        lifecycleOwner = lifecycleOwner ?: this,
+        listener = listener
+    )
 
 }
+
 fun Context.findActivity(): Activity {
     var context = this
     while (context is ContextWrapper) {

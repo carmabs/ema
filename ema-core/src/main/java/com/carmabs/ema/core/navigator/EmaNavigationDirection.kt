@@ -13,7 +13,7 @@ sealed interface EmaNavigationDirection {
 
     data class Forward internal constructor(val navigationEvent: EmaNavigationEvent) : EmaNavigationDirection
 
-    object Back : EmaNavigationDirection
+    data class Back(val result:Any?=null) : EmaNavigationDirection
 }
 
 inline fun EmaNavigationDirection.onForward(action: (EmaNavigationEvent) -> Unit) {

@@ -14,6 +14,7 @@ import com.carmabs.ema.android.extension.setInitializer
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigator
+import java.io.Serializable
 
 /**
  *  *<p>
@@ -103,19 +104,5 @@ interface EmaNavControllerNavigator<D : EmaNavigationEvent> : EmaNavigator<D> {
      */
     fun navigateWithDirections(navDirections: NavDirections, extras: Navigator.Extras) {
         navController.navigate(navDirections, extras)
-    }
-
-
-    /**
-     * Navigates back
-     * @return true if a fragment has been popped, false if backstack is empty, in that case, finish
-     * the activity provided.
-     */
-    override fun navigateBack(): Boolean {
-        val hasMoreFragments = navController.popBackStack()
-        if (!hasMoreFragments)
-            activity.finish()
-
-        return hasMoreFragments
     }
 }

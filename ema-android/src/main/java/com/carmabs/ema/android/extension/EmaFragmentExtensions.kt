@@ -6,6 +6,11 @@ import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.BuildCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
+import com.carmabs.ema.android.constants.EMA_RESULT_KEY
+import com.carmabs.ema.android.navigation.EmaNavigationBackHandler
+import com.carmabs.ema.core.model.EmaBackHandlerStrategy
+import com.google.gson.Gson
 
 
 /**
@@ -20,36 +25,19 @@ import androidx.fragment.app.Fragment
  * back behaviour.
  */
 @SuppressLint("UnsafeOptInUsageError")
-fun Fragment.addOnBackPressedListener(listener: () -> Boolean) {
-    if (BuildCompat.isAtLeastT()) {
-        val activity = requireActivity()
-        val onBackInvokedCallback = object : OnBackInvokedCallback {
-            override fun onBackInvoked() {
-                val backDefaultLaunched = listener.invoke()
-                if (backDefaultLaunched) {
-                    activity.onBackInvokedDispatcher.unregisterOnBackInvokedCallback(this)
-                    activity.onBackPressedDispatcher.onBackPressed()
-                }
-            }
-        }
+fun Fragment.addOnBackPressedListener(listener: () -> EmaBackHandlerStrategy): EmaNavigationBackHandler {
+    return requireActivity().addOnBackPressedListener(viewLifecycleOwner,listener)
+}
 
-        activity.onBackInvokedDispatcher
-            .registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT, onBackInvokedCallback
-            )
-    } else {
-        val onBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                val backDefaultLaunched = listener.invoke()
-                isEnabled = !backDefaultLaunched
-                if (backDefaultLaunched) {
-                    requireActivity().onBackPressedDispatcher.onBackPressed()
-                }
+inline fun <reified T>Fragment.setEmaResultListener(crossinline listener: (result:T) -> Unit) {
+    setFragmentResultListener(EMA_RESULT_KEY) { key,bundle->
+        val dataJson = bundle.getString(EMA_RESULT_KEY)
+        val data = kotlin.runCatching {
+            dataJson?.let {
+                Gson().fromJson(it,T::class.java)
             }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner, onBackPressedCallback
-        )
+        }.getOrNull()
+        data?.also(listener)
     }
 }
 

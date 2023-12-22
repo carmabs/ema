@@ -23,6 +23,8 @@ object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent> 
 
 
     override val initialState: EmaState<EmaEmptyState> = EmaState.Normal(EmaEmptyState)
+    override val shouldRenderState: Boolean
+        get() = true
 
     override fun setScope(scope: CoroutineScope) {
 
@@ -64,9 +66,11 @@ object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent> 
 
     }
 
-    override fun consumeNavigation() {
+    override fun notifyOnNavigated() {
 
     }
 
-    override val onBackHardwarePressedListener: (() -> Boolean)? = null
+    override fun onActionBackHardwarePressed() {
+        TODO("Not yet implemented")
+    }
 }

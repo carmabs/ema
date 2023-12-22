@@ -1,17 +1,15 @@
 package com.carmabs.emax
 
-import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirection
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
-import com.carmabs.ema.core.viewmodel.EmaResultHandler
-import com.carmabs.ema.core.viewmodel.EmaResultModel
 import com.carmabs.emax.middleware.common.MiddlewareScope
 import com.carmabs.emax.middleware.common.MiddlewareScopeDsl
 import com.carmabs.emax.middleware.common.SideEffectScope
+import com.carmabs.emax.middleware.result.ResultWrapper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -25,8 +23,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 class EmaxViewModelScope<S : EmaDataState, in D : EmaNavigationEvent> internal constructor(
-    private val resultHandler: EmaResultHandler,
-    private val viewModelId: String,
+    private val resultWrapper: ResultWrapper,
     private val navigationState: MutableSharedFlow<EmaNavigationDirectionEvent>,
     private val observableSingleEvent: MutableSharedFlow<EmaEvent>,
     private val middlewareScope: MiddlewareScope<S>
@@ -49,14 +46,12 @@ class EmaxViewModelScope<S : EmaDataState, in D : EmaNavigationEvent> internal c
         return middlewareScope.sideEffect(sideEffectAction)
     }
 
-    fun addResult(data: Any?, resultId: String? = null) {
-        resultHandler.addResult(
-            EmaResultModel(
-                code = EmaxViewModel::class.resultId(resultId).id,
-                ownerId = viewModelId,
-                data = data
-            )
-        )
+    fun setBackResult(backResult:Any?){
+        resultWrapper.backResult = backResult
+    }
+
+    fun clearBackResult(){
+        resultWrapper.backResult = null
     }
 
     /**

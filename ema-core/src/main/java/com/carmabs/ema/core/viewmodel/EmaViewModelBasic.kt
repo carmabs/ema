@@ -14,12 +14,10 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -35,11 +33,34 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
     /**
      * The scope where coroutines will be launched by default.
      */
-    protected var viewModelScope: CoroutineScope = defaultScope
+    protected var scope: CoroutineScope = defaultScope
+        private set
 
+    /**
+     *
+     */
+    private var backResult:Any?=null
+
+    /**
+     * To determine if the view must be updated when view model is created automatically
+     */
+    protected open val updateOnInitialization: Boolean = true
+
+    /**
+     * Used to know if state has been updated at least once
+     */
+    private var hasBeenUpdated = false
+
+    /**
+     * Used to know if subscribed view should render the state
+     */
+    override val shouldRenderState:Boolean
+        get() {
+            return updateOnInitialization || hasBeenUpdated
+        }
 
     override fun setScope(scope: CoroutineScope) {
-        this.viewModelScope = scope
+        this.scope = scope
     }
 
     /**
@@ -87,22 +108,11 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
     private var firstTimeResumed: Boolean = true
 
     /**
-     * To determine if the view must be updated when view model is created automatically
-     */
-    protected open val updateOnInitialization: Boolean = true
-
-    /**
      * Determine if the viewmodel has initialized its state
      */
 
     protected var hasBeenInitialized: Boolean = false
         private set
-
-    /**
-     * Override and implement this to setup listener that is  called when physic back button is pressed
-     * @return True if you want the back pressed default behaviour is launched. False otherwise.
-     */
-    override val onBackHardwarePressedListener: (() -> Boolean)? = null
 
     /**
      * Methods called the first time ViewModel is created
@@ -119,6 +129,14 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
                 observableState.tryEmit(state)
             onStateCreated(initializer)
         }
+    }
+
+    protected fun setBackResult(result:Any?){
+        backResult = result
+    }
+
+    protected fun clearBackResult(){
+        backResult = null
     }
 
     override fun onStartView() {
@@ -196,6 +214,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
      * @param state Tee current state of the view
      */
     private fun updateView(state: EmaState<S>) {
+        hasBeenUpdated = true
         this.state = state
         observableState.tryEmit(state)
     }
@@ -220,15 +239,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
         navigationState.tryEmit(EmaNavigationDirectionEvent.Launched(EmaNavigationDirection.Forward(navigation)))
     }
 
-    /**
-     * Method use to notify a navigation back event
-     */
-    protected fun navigateBack() {
-        navigationState.tryEmit(EmaNavigationDirectionEvent.Launched(EmaNavigationDirection.Back))
-
-    }
-
-    override fun consumeNavigation() {
+    override fun notifyOnNavigated() {
         navigationState.tryEmit(EmaNavigationDirectionEvent.OnNavigated)
     }
 
@@ -244,27 +255,10 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
      * - job returns the job where the action function has been executed
      */
     protected fun <T> executeUseCase(
-        dispatcher: CoroutineContext = this.viewModelScope.coroutineContext,
+        dispatcher: CoroutineContext = this.scope.coroutineContext,
         action: suspend CoroutineScope.() -> T
     ): EmaFunctionResultHandler<T> {
-        return EmaFunctionResultHandler(viewModelScope, dispatcher, action)
-    }
-
-    /**
-     * When a background task must be executed for data retrieving or other background job, it must
-     * be called through this method with [block] function
-     * @param dispatcher where the useCase is launched by default
-     * @param block is the function that will be executed in background
-     * @return the job that can handle the lifecycle of the background task
-     */
-    protected fun runSuspend(
-        dispatcher: CoroutineContext = viewModelScope.coroutineContext,
-        block: suspend CoroutineScope.() -> Unit
-    ): Job {
-        return viewModelScope.launch(
-            dispatcher,
-            block = block
-        )
+        return EmaFunctionResultHandler(scope, dispatcher, action)
     }
 
     /**
@@ -305,7 +299,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
 
             is EmaState.Overlapped -> {
                 val alternativeState = state as EmaState.Overlapped
-                EmaState.Overlapped(newState, alternativeState.dataOverlapped)
+                EmaState.Overlapped(newState, alternativeState.extraData)
             }
         }
     }
@@ -332,9 +326,17 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
      * Update the data of current state without notify it to the view.
      * @param changeStateFunction create the new state
      */
-    protected fun updateDataState(changeStateFunction: S.() -> S) {
+    protected fun modifyDataState(changeStateFunction: S.() -> S) {
         normalContentData = changeStateFunction.invoke(normalContentData)
         state = updateData(normalContentData)
+    }
+
+    protected fun updateDataState(changeStateFunction: S.() -> S) {
+        normalContentData = changeStateFunction.invoke(normalContentData)
+        state = state.update{
+            normalContentData
+        }
+        updateView(state)
     }
 
 
@@ -361,7 +363,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
      */
     protected fun updateToOverlappedState(data: EmaExtraData? = null) {
         val overlappedData: EmaState.Overlapped<S> = data?.let {
-            EmaState.Overlapped(normalContentData, dataOverlapped = it)
+            EmaState.Overlapped(normalContentData, extraData = it)
         } ?: EmaState.Overlapped(normalContentData)
         updateView(overlappedData)
     }
@@ -403,7 +405,11 @@ abstract class EmaViewModelBasic<S : EmaDataState, D : EmaNavigationEvent>(
     internal fun onCleared() {
         emaResultHandler.notifyResults(id)
         emaResultHandler.removeResultListener(id)
-        viewModelScope.cancel()
+        scope.cancel()
         onDestroy()
+    }
+
+    override fun onActionBackHardwarePressed() {
+        navigationState.tryEmit(EmaNavigationDirectionEvent.Launched(EmaNavigationDirection.Back(backResult)))
     }
 }

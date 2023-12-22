@@ -30,6 +30,8 @@ rootProject.ext {
 
     viewmodelVersion = "2.5.1"
 
+    gsonVersion = "2.10.1"
+
     kotlinCompilerExtensionVersion = '1.0.5'
 
     koinVersion = "3.3.0"
@@ -70,6 +72,7 @@ rootProject.ext {
     ]
 
     emaAndroidDependencies = [
+            gson                : "com.google.code.gson:gson:$gsonVersion",
             koin                : "io.insert-koin:koin-android:$koinVersion",
             reflection          : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
             fragment            : "androidx.fragment:fragment-ktx:$fragmentVersion",

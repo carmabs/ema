@@ -1,5 +1,6 @@
 package com.carmabs.ema.android.base
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,9 +8,12 @@ import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.carmabs.ema.android.constants.EMA_RESULT_CODE
+import com.carmabs.ema.android.constants.EMA_RESULT_KEY
 import com.carmabs.ema.android.delegates.emaViewModelDelegate
 import com.carmabs.ema.android.extension.addOnBackPressedListener
 import com.carmabs.ema.android.extension.getInitializer
@@ -18,6 +22,7 @@ import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
 import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.model.EmaBackHandlerStrategy
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigator
@@ -25,6 +30,7 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.view.EmaViewModelTrigger
 import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -132,11 +138,12 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        vm.onBackHardwarePressedListener?.also {
-            addOnBackPressedListener(it)
+        addOnBackPressedListener {
+            vm.onActionBackHardwarePressed()
+            //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
+            EmaBackHandlerStrategy.Cancelled
         }
         onCreate(viewModelSeed)
-
     }
 
 
@@ -243,18 +250,28 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
     }
 
 
-    final override fun onBack(): Boolean {
+    final override fun onBack(result:Any?): Boolean {
+        val gson = Gson()
         val hasMoreFragments = kotlin.runCatching {
             findNavController().popBackStack()
         }.getOrNull() ?: let {
             val hasMoreFragments = parentFragmentManager.backStackEntryCount > INT_ZERO
+            result?.also {
+                setFragmentResult(EMA_RESULT_KEY,Bundle().apply {
+                    putString(EMA_RESULT_KEY, gson.toJson(it))
+                })
+            }
             if (hasMoreFragments)
                 parentFragmentManager.popBackStack()
             hasMoreFragments
         }
 
-        if (!hasMoreFragments)
+        if (!hasMoreFragments) {
+            result?.also {
+                requireActivity().setResult(EMA_RESULT_CODE, Intent().putExtra(EMA_RESULT_KEY,gson.toJson(it)))
+            }
             requireActivity().finish()
+        }
         return hasMoreFragments
     }
 }

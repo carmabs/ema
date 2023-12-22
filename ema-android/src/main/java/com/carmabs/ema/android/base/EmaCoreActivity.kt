@@ -1,5 +1,6 @@
 package com.carmabs.ema.android.base
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.AnimRes
 import androidx.annotation.CallSuper
@@ -7,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.carmabs.ema.android.constants.EMA_RESULT_CODE
+import com.carmabs.ema.android.constants.EMA_RESULT_KEY
 import com.carmabs.ema.android.delegates.emaViewModelDelegate
 import com.carmabs.ema.android.extension.addOnBackPressedListener
 import com.carmabs.ema.android.extension.getInitializer
@@ -17,18 +20,21 @@ import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
 import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.model.EmaBackHandlerStrategy
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.view.EmaViewModelTrigger
 import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.scope.activityScope
 import org.koin.core.scope.Scope
+import java.io.Serializable
 
 /**
  *
@@ -53,8 +59,10 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
         super<AppCompatActivity>.onCreate(savedInstanceState)
         //Call scope to call scope to enable injection
         scope
-        vm.onBackHardwarePressedListener?.also {
-            addOnBackPressedListener(it)
+        addOnBackPressedListener {
+            vm.onActionBackHardwarePressed()
+            //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
+            EmaBackHandlerStrategy.Cancelled
         }
         onCreate(viewModelSeed)
     }
@@ -242,7 +250,10 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
 
     override fun onSingleEvent(extra: EmaExtraData) = Unit
 
-    final override fun onBack(): Boolean {
+    final override fun onBack(result:Any?): Boolean {
+        result?.also {
+            setResult(EMA_RESULT_CODE, Intent().putExtra(EMA_RESULT_KEY, Gson().toJson(result)))
+        }
         finish()
         return false
     }

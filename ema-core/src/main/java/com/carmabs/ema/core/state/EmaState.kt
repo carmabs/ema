@@ -19,13 +19,25 @@ sealed class EmaState<T> private constructor(open val data: T) : EmaDataState {
      * State that represents an overlapped state of a view.
      * @constructor T is the state model of the view, data represents the current state of the view, dataOverlated represents extra data to handle the overlapped state
      */
-    data class Overlapped<T>(override val data: T, val dataOverlapped: EmaExtraData = EmaExtraData()) : EmaState<T>(data)
+    data class Overlapped<T>(override val data: T, val extraData: EmaExtraData = EmaExtraData()) : EmaState<T>(data)
 
-    fun <T>update(data: T):EmaState<T>{
+    fun update(updateAction: T.()-> T):EmaState<T>{
         return when(this){
-            is Normal -> Normal(data)
-            is Overlapped -> Overlapped(data,dataOverlapped)
+            is Normal -> Normal(data.updateAction())
+            is Overlapped -> Overlapped(data.updateAction(),extraData)
         }
+    }
+
+    fun normal(updateAction: T.()-> T):EmaState<T>{
+        return Normal(data.updateAction())
+    }
+
+    fun normal():EmaState<T>{
+        return Normal(data)
+    }
+
+    fun overlapped(extraData: EmaExtraData = EmaExtraData()):EmaState<T>{
+        return Overlapped(this.data,extraData)
     }
 }
 

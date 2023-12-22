@@ -16,8 +16,8 @@ import com.carmabs.ema.core.viewmodel.EmaViewModelAction
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-fun <S:EmaDataState,D:EmaNavigationEvent,A:EmaAction.Screen>EmaViewModel<S,D>.asViewModelAction():EmaViewModelAction<S, D, A>{
-    return (this as? EmaViewModelAction<S, D, A>)
+fun <A:EmaAction.Screen,S:EmaDataState,D:EmaNavigationEvent>EmaViewModel<S,D>.asViewModelAction():EmaViewModelAction<A,S, D>{
+    return (this as? EmaViewModelAction<A,S, D>)
         ?:throw java.lang.IllegalStateException("${this::class} must inherit form EmaViewModelAction class")
 }
 

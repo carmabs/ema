@@ -2,15 +2,16 @@ package com.carmabs.emax.middleware.viewmodel
 
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.model.EmaEvent
+import com.carmabs.ema.core.navigator.EmaNavigationDirection
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.viewmodel.EmaResultHandler
 import com.carmabs.emax.EmaxViewModelScope
 import com.carmabs.emax.middleware.common.EmaNextMiddleware
 import com.carmabs.emax.middleware.common.EmaNextMiddlewareResult
 import com.carmabs.emax.middleware.common.EmaxMiddleware
 import com.carmabs.emax.middleware.common.MiddlewareScope
+import com.carmabs.emax.middleware.result.ResultWrapper
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
@@ -24,14 +25,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
  */
 @Suppress("UNCHECKED_CAST")
 class ViewModelEmaxMiddleware<S : EmaDataState, A : EmaAction, N : EmaNavigationEvent> internal constructor(
-    private val resultHandler: EmaResultHandler,
-    private val viewModelId: String,
     private val navigationState: MutableSharedFlow<EmaNavigationDirectionEvent>,
     private val observableSingleEvent: MutableSharedFlow<EmaEvent>,
-    private val middlewareBuilder: SideEffectEmaxViewModelBuilder<S,A,N>.()->Unit
+    middlewareBuilder: SideEffectEmaxViewModelBuilder<S,A,N>.()->Unit
 ) : EmaxMiddleware<S> {
 
     private val builder = SideEffectEmaxViewModelBuilder<S,A,N>()
+    private val resultWrapper = ResultWrapper()
     init {
         middlewareBuilder.invoke(builder)
     }
@@ -43,8 +43,7 @@ class ViewModelEmaxMiddleware<S : EmaDataState, A : EmaAction, N : EmaNavigation
     ): EmaNextMiddlewareResult {
         (action as? A)?.let {
             val viewModelScope = EmaxViewModelScope<S, N>(
-                resultHandler,
-                viewModelId,
+                resultWrapper,
                 navigationState,
                 observableSingleEvent,
                 this@MiddlewareScope
@@ -53,5 +52,13 @@ class ViewModelEmaxMiddleware<S : EmaDataState, A : EmaAction, N : EmaNavigation
         }
         return next(action)
     }
-
+    fun onActionBackHardwarePressed() {
+        navigationState.tryEmit(
+            EmaNavigationDirectionEvent.Launched(
+                EmaNavigationDirection.Back(
+                    resultWrapper.backResult
+                )
+            )
+        )
+    }
 }

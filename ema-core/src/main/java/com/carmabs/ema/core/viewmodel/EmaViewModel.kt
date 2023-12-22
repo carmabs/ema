@@ -19,6 +19,11 @@ interface EmaViewModel<S : EmaDataState, D : EmaNavigationEvent> {
 
     val initialState: EmaState<S>
 
+    /**
+     * Used to know if subscribed view should render the state
+     */
+    val shouldRenderState:Boolean
+
     fun setScope(scope: CoroutineScope)
 
     fun onCreated(initializer: EmaInitializer? = null)
@@ -45,13 +50,9 @@ interface EmaViewModel<S : EmaDataState, D : EmaNavigationEvent> {
 
     fun consumeSingleEvent()
 
-    fun consumeNavigation()
+    fun notifyOnNavigated()
 
-    /**
-     * Override and implement this to setup listener that is  called when physic back button is pressed
-     * @return True if you want the back pressed default behaviour is launched. False otherwise.
-     */
-    val onBackHardwarePressedListener: (() -> Boolean)?
+    fun onActionBackHardwarePressed()
 
 
     val id: String
