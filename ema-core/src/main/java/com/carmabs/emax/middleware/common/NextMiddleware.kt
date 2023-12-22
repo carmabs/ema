@@ -11,11 +11,4 @@ import com.carmabs.ema.core.action.EmaAction
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-typealias EmaNextMiddleware = (EmaAction) -> EmaNextMiddlewareResult
-
-sealed interface EmaNextMiddlewareResult {
-    @JvmInline
-    value class NextAction constructor(val value: EmaAction) : EmaNextMiddlewareResult
-
-    object CanceledAction : EmaNextMiddlewareResult
-}
+internal typealias NextMiddleware = (EmaAction) -> EmaxNextMiddlewareResult

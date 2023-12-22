@@ -3,6 +3,7 @@ package com.carmabs.emax.reducer
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.state.EmaDataState
 import kotlin.reflect.KClass
+import kotlin.reflect.cast
 import kotlin.reflect.full.isSubclassOf
 
 /**
@@ -14,14 +15,14 @@ import kotlin.reflect.full.isSubclassOf
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class ActionFilterEmaxReducer<S : EmaDataState, A : EmaAction>(
-    private val filterClass:KClass<A>,
+class EmaxReducerActionFilter<S : EmaDataState, A : EmaAction>(
+    private val filterClass:KClass<out A>,
     private val reduceAction: S.(A) -> S
 ) : EmaxReducer<S> {
 
     override fun reduce(state: S, action: EmaAction): S {
         return action.takeIf { it::class.isSubclassOf(filterClass) }?.let {
-            state.reduceAction(it as A)
+            state.reduceAction(filterClass.cast(action))
         } ?: state
     }
 }

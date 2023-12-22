@@ -22,42 +22,20 @@ import kotlin.coroutines.CoroutineContext
 annotation class MiddlewareScopeDsl
 
 @MiddlewareScopeDsl
-class MiddlewareScope<S : EmaDataState> internal constructor(
+class MiddlewareScope<A : EmaAction, S : EmaDataState> internal constructor(
     private val store: EmaxStore<S>,
     private val scope: CoroutineScope
 ) {
     val state: S
         get() = store.state
 
-    private val sideEffectScope = SideEffectScope(store, scope)
+    private val sideEffectScope = SideEffectScope<A, S>(store, scope)
 
     fun sideEffect(
-        effect: @MiddlewareScopeDsl suspend SideEffectScope<S>.() -> Unit
+        effect: @MiddlewareScopeDsl suspend SideEffectScope<A, S>.() -> Unit
     ): Job {
         return scope.launch {
             effect.invoke(sideEffectScope)
         }
     }
-}
-
-@DslMarker
-@Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
-annotation class SideEffectScopeDsl
-
-@SideEffectScopeDsl
-class SideEffectScope<S : EmaDataState> internal constructor(
-    private val store: EmaxStore<S>,
-    private val scope: CoroutineScope
-) : CoroutineScope {
-    val state: S
-        get() = store.state
-
-    fun dispatch(
-        emaAction: EmaAction
-    ) {
-        store.dispatch(emaAction)
-    }
-
-    override val coroutineContext: CoroutineContext
-        get() = scope.coroutineContext
 }

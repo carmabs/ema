@@ -1,16 +1,14 @@
 package com.carmabs.emax.store
 
 import com.carmabs.ema.core.action.EmaAction
-import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.emax.middleware.common.EmaxMiddlewareStore
+import com.carmabs.emax.middleware.common.MiddlewareStoreBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 
 /**
@@ -25,9 +23,9 @@ import kotlinx.coroutines.flow.stateIn
 class EmaxStore<S : EmaDataState>(
     initialState: S,
     scope: CoroutineScope,
-    setup: EmaxStoreSetupScope<S>.() -> Unit
+    setup: StoreSetupScope<S>.() -> Unit
 ) {
-    private val storeSetupScope = EmaxStoreSetupScope<S>()
+    private val storeSetupScope = StoreSetupScope<S>()
 
     init {
         storeSetupScope.setup()
@@ -36,8 +34,8 @@ class EmaxStore<S : EmaDataState>(
     var state: S = initialState
         private set
 
-    private val middleWareStore: EmaxMiddlewareStore<S> =
-        EmaxMiddlewareStore(this, scope, storeSetupScope.middlewareList)
+    private val middleWareStore: MiddlewareStoreBuilder<S> =
+        MiddlewareStoreBuilder(this, scope, storeSetupScope.middlewareList)
 
     private val channelAction = Channel<EmaAction>()
 

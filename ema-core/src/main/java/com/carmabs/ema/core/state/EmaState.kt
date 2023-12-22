@@ -7,6 +7,10 @@ package com.carmabs.ema.core.state
  * @constructor T is the state model of the view, data represents the current state of the view
  */
 
+@DslMarker
+@Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
+annotation class EmaStateDsl
+@EmaStateDsl
 sealed class EmaState<T> private constructor(open val data: T) : EmaDataState {
 
     /**
@@ -21,14 +25,14 @@ sealed class EmaState<T> private constructor(open val data: T) : EmaDataState {
      */
     data class Overlapped<T>(override val data: T, val extraData: EmaExtraData = EmaExtraData()) : EmaState<T>(data)
 
-    fun update(updateAction: T.()-> T):EmaState<T>{
+    fun update( updateAction: @EmaStateDsl T.()-> T):EmaState<T>{
         return when(this){
             is Normal -> Normal(data.updateAction())
             is Overlapped -> Overlapped(data.updateAction(),extraData)
         }
     }
 
-    fun normal(updateAction: T.()-> T):EmaState<T>{
+    fun normal(updateAction: @EmaStateDsl T.()-> T):EmaState<T>{
         return Normal(data.updateAction())
     }
 

@@ -1,11 +1,10 @@
 package com.carmabs.emax.middleware.log
 
 import com.carmabs.ema.core.action.EmaAction
-import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.logging.toStringPretty
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.emax.middleware.common.EmaNextMiddleware
-import com.carmabs.emax.middleware.common.EmaNextMiddlewareResult
+import com.carmabs.emax.middleware.common.NextMiddleware
+import com.carmabs.emax.middleware.common.EmaxNextMiddlewareResult
 import com.carmabs.emax.middleware.common.EmaxMiddleware
 import com.carmabs.emax.middleware.common.MiddlewareScope
 import java.util.logging.Logger
@@ -22,12 +21,13 @@ import kotlin.math.absoluteValue
  */
 class LoggerEmaxMiddleware<S : EmaDataState>(
     private val lineLength: Int = 80
-) : EmaxMiddleware<S> {
-    context(MiddlewareScope<S>)
+) : EmaxMiddleware<EmaAction,S> {
+
+    context(MiddlewareScope<EmaAction,S>)
     override fun invoke(
         action: EmaAction,
-        next: EmaNextMiddleware
-    ): EmaNextMiddlewareResult {
+        next: NextMiddleware
+    ): EmaxNextMiddlewareResult {
         val padding = "    "
         val nextFunction = Logger.getLogger("EMA").run {
             info("")
