@@ -203,7 +203,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      * It a new observer is attached, it will not be notified
      */
     protected open fun notifySingleEvent(extraData: EmaExtraData) {
-        updateView(state.singleEvent(extraData))
+        updateView(state.setSingleEvent(extraData))
     }
 
     override fun consumeSingleEvent() {
@@ -233,7 +233,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      * - onFinish when the action function has ended, independently if an error has been thrown
      * - job returns the job where the action function has been executed
      */
-    protected fun <T> executeUseCase(
+    protected fun <T> sideEffect(
         dispatcher: CoroutineContext = this.scope.coroutineContext,
         action: suspend CoroutineScope.() -> T
     ): EmaFunctionResultHandler<T> {
