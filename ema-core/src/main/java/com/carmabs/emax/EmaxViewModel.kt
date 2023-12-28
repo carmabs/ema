@@ -1,33 +1,33 @@
 package com.carmabs.emax
 
+import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaAction.Lifecycle
 import com.carmabs.ema.core.action.EmaAction.Screen
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.concurrency.EmaMainScope
-import com.carmabs.ema.core.constants.INT_ONE
+import com.carmabs.ema.core.extension.distinctNavigationChanges
+import com.carmabs.ema.core.extension.distinctSingleEventChanges
+import com.carmabs.ema.core.extension.distinctStateDataChanges
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.initializer.EmptyEmaInitializer
 import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.state.EmaStateDsl
 import com.carmabs.ema.core.viewmodel.EmaResultHandler
 import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.carmabs.emax.middleware.common.emaxMiddlewareOf
 import com.carmabs.emax.middleware.log.LoggerEmaxMiddleware
-import com.carmabs.emax.middleware.viewmodel.SideEffectBuilder
-import com.carmabs.emax.middleware.viewmodel.ViewModelEmaxMiddleware
-import com.carmabs.emax.reducer.EmaxReducerActionFilter
+import com.carmabs.emax.reducer.EmaxReducer
+import com.carmabs.emax.reducer.OnBackReducer
 import com.carmabs.emax.store.EmaxStore
 import com.carmabs.emax.store.StoreSetupScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 @EmaStateDsl
 abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEvent>(
     initialDataState: S,
+    stateReducer: EmaxReducer<EmaState<S, N>>,
     defaultScope: CoroutineScope = EmaMainScope()
 ) : EmaViewModel<S, N>, EmaActionDispatcher<A> {
 
@@ -53,7 +54,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEven
         this.scope = scope
     }
 
-    final override val initialState: EmaState<S> = EmaState.Normal(initialDataState)
+    final override val initialState: EmaState<S, N> = EmaState.Normal(initialDataState)
 
     private val emaResultHandler: EmaResultHandler = EmaResultHandler.getInstance()
 
@@ -70,67 +71,29 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEven
     override val shouldRenderState: Boolean
         get() = updateOnInitialization || hasBeenUpdated
 
-    /**
-     * Observable state that launch event every time a value is set. [N] value be will a [EmaNavigationEvent]
-     * object that represent the destination. This observable will be used for
-     * events that only has to be notified once to its observers and is used to notify the navigation
-     * events
-     */
-    private val navigationState: MutableSharedFlow<EmaNavigationDirectionEvent> = MutableSharedFlow(
-        replay = INT_ONE,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-
     private val channelAction = Channel<Screen>()
 
     private val observableAction = channelAction.receiveAsFlow()
 
-
-    /**
-     * Observable state that launch event every time a value is set. This value will be a [EmaExtraData]
-     * object that can contain any type of object. It will be used for
-     * events that only has to be notified once to its observers, e.g: A toast message.
-     */
-    private val observableSingleEvent: MutableSharedFlow<EmaEvent> = MutableSharedFlow(
-        replay = INT_ONE,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-
-    private val reducerSetupScope = StoreSetupScope<S>()
-
-    private val viewModelMiddleware: ViewModelEmaxMiddleware<EmaState<S>, A, N> by lazy {
-        ViewModelEmaxMiddleware(
-            navigationState = navigationState,
-            observableSingleEvent = observableSingleEvent
-        ) {
-            onSideEffectSetup()
-        }
-    }
-
-
-    private val stateReducer = EmaxReducerActionFilter<EmaState<S>, Screen>(filterClass = Screen::class) {
-        val state = this
-        this@EmaxViewModel.run {
-            hasBeenUpdated = true
-            state.onReduce(it as A)
-        }
-    }
+    private val storeSetupScope = StoreSetupScope<S>()
 
     private val store by lazy {
         EmaxStore(initialState, scope) {
             addMiddleware(LoggerEmaxMiddleware())
-            addMiddleware(viewModelMiddleware)
+            addMiddleware(emaxMiddlewareOf(actionFilter = Screen::class) {
+                hasBeenUpdated = true
+            })
             addReducer(stateReducer)
+            addReducer(OnBackReducer())
             setup()
         }
     }
 
-    private val observableState: Flow<EmaState<S>> by lazy {
+    private val observableState: Flow<EmaState<S, N>> by lazy {
         store.observableState.filter {
             shouldRenderState
         }
     }
-
 
     /**
      * Determine if viewmodel is first time resumed
@@ -143,12 +106,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEven
         store.dispatch(action)
     }
 
-    protected open fun StoreSetupScope<EmaState<S>>.setup() = Unit
-    protected open fun EmaState<S>.onReduceInitialization(
-        initializer: EmaInitializer
-    ): EmaState<S> = this
-
-    protected abstract fun EmaState<S>.onReduce(action: A):EmaState<S>
+    protected open fun StoreSetupScope<EmaState<S, N>>.setup() = Unit
 
     /**
      * Methods called the first time ViewModel is created
@@ -160,10 +118,6 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEven
         }
         store.dispatch(initializer ?: EmptyEmaInitializer)
     }
-
-    protected open fun SideEffectBuilder<EmaState<S>, A, N>.onSideEffectSetup() =
-        Unit
-
 
     final override fun onStartView() {
         store.dispatch(Lifecycle.Started)
@@ -191,7 +145,8 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEven
     /**
      * Get observable state as LiveDaya to avoid state setting from the view
      */
-    final override fun subscribeStateUpdates(): Flow<EmaState<S>> = observableState
+    final override fun subscribeStateUpdates(): Flow<EmaState<S, N>> =
+        observableState.distinctStateDataChanges()
 
 
     final override fun subscribeToActions(): Flow<A> = observableAction.map { it as A }
@@ -201,23 +156,24 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEven
      * Get navigation state as LiveData to avoid state setting from the view
      */
     final override fun subscribeToNavigationEvents(): Flow<EmaNavigationDirectionEvent> =
-        navigationState
+        observableState.distinctNavigationChanges()
 
     /**
      * Get single state as LiveData to avoid state setting from the view
      */
-    final override fun subscribeToSingleEvents(): Flow<EmaEvent> = observableSingleEvent
+    final override fun subscribeToSingleEvents(): Flow<EmaEvent> =
+        observableState.distinctSingleEventChanges()
 
     final override fun consumeSingleEvent() {
-        observableSingleEvent.tryEmit(EmaEvent.Consumed)
+        store.dispatch(EmaAction.ViewModel.ConsumeSingleEvent)
     }
 
     final override fun notifyOnNavigated() {
-        navigationState.tryEmit(EmaNavigationDirectionEvent.OnNavigated)
+        store.dispatch(EmaAction.ViewModel.OnNavigated)
     }
 
     override fun onActionBackHardwarePressed() {
-        viewModelMiddleware.onActionBackHardwarePressed()
+        store.dispatch(EmaAction.ViewModel.NavigationBack)
     }
 
     /**

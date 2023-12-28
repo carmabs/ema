@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.emptyFlow
 object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent> {
 
 
-    override val initialState: EmaState<EmaEmptyState> = EmaState.Normal(EmaEmptyState)
+    override val initialState: EmaState<EmaEmptyState,EmaEmptyNavigationEvent> = EmaState.Normal(EmaEmptyState)
     override val shouldRenderState: Boolean
         get() = true
 
@@ -50,7 +50,7 @@ object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent> 
 
     }
 
-    override fun subscribeStateUpdates(): Flow<EmaState<EmaEmptyState>> {
+    override fun subscribeStateUpdates(): Flow<EmaState<EmaEmptyState,EmaEmptyNavigationEvent>> {
         return emptyFlow()
     }
 

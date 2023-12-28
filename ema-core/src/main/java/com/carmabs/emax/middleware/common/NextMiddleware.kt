@@ -11,4 +11,4 @@ import com.carmabs.ema.core.action.EmaAction
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-internal typealias NextMiddleware = (EmaAction) -> EmaxNextMiddlewareResult
+typealias NextMiddleware = (EmaAction) -> Unit

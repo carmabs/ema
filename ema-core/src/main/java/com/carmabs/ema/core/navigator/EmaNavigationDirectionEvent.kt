@@ -14,6 +14,8 @@ sealed interface EmaNavigationDirectionEvent {
 
     object OnNavigated : EmaNavigationDirectionEvent
 
+    object None: EmaNavigationDirectionEvent
+
     fun hasNavigated(): Boolean {
         return this is OnNavigated
     }

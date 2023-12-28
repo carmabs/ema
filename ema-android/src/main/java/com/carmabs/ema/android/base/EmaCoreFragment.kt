@@ -46,8 +46,8 @@ import org.koin.core.scope.Scope
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
-abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> :
-    Fragment(), EmaAndroidView<S, VM, D>, AndroidScopeComponent {
+abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent> :
+    Fragment(), EmaAndroidView<S, VM, N>, AndroidScopeComponent {
 
     final override val scope: Scope by fragmentScope()
 
@@ -80,21 +80,21 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
      * The list which handles the extra view models attached, to unbind the observers
      * when the view fragment is destroyed
      */
-    private val extraViewModelList: MutableList<EmaAndroidViewModel<S,D>> by lazy { mutableListOf() }
+    private val extraViewModelList: MutableList<EmaAndroidViewModel<S,N>> by lazy { mutableListOf() }
 
     protected open fun provideToolbarTitle(): String? = null
 
     /**
      * Previous state for comparing state properties update
      */
-    final override var previousEmaState: EmaState<S>? = null
+    final override var previousEmaState: EmaState<S,N>? = null
 
-    abstract override val navigator: EmaNavigator<D>?
+    abstract override val navigator: EmaNavigator<N>?
 
-    abstract fun provideAndroidViewModel(): EmaAndroidViewModel<S,D>
+    abstract fun provideAndroidViewModel(): EmaAndroidViewModel<S,N>
 
 
-    final override val androidViewModelSeed: EmaAndroidViewModel<S,D> by lazy {
+    final override val androidViewModelSeed: EmaAndroidViewModel<S,N> by lazy {
         provideAndroidViewModel()
     }
 
@@ -193,11 +193,11 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
      * @param observerFunction the observer of the view model attached
      * @return The view model attached
      */
-    fun <AVM : EmaAndroidViewModel<S,D>> addExtraViewModel(
+    fun <AVM : EmaAndroidViewModel<S,N>> addExtraViewModel(
         viewModelAttachedSeed: AVM,
         fragment: Fragment,
         fragmentActivity: FragmentActivity? = null,
-        observerFunction: ((attachedState: EmaState<S>) -> Unit)? = null
+        observerFunction: ((attachedState: EmaState<S,N>) -> Unit)? = null
     ): AVM {
         val viewModel =
             fragmentActivity?.let {
@@ -219,7 +219,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
             }
             extraViewJobs.add(job)
         }
-        extraViewModelList.add(viewModel as EmaAndroidViewModel<S,D>)
+        extraViewModelList.add(viewModel as EmaAndroidViewModel<S,N>)
 
         return viewModel
     }

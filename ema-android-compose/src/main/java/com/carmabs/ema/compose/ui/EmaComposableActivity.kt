@@ -17,8 +17,8 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent>
-    : EmaCoreActivity<S, VM, D>() {
+abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent>
+    : EmaCoreActivity<S, VM, N>() {
 
     protected var isFirstNormalExecution: Boolean = true
         private set
@@ -34,11 +34,11 @@ abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, D>, 
                 val state = vm.subscribeStateUpdates()
                     .collectAsState(initial = EmaState.Normal(object : EmaDataState {} as S))
                 when (val emaState = state.value) {
-                    is EmaState.Normal<S> -> {
+                    is EmaState.Normal<S,N> -> {
                         onStateNormal(data = emaState.data)
                         isFirstNormalExecution = false
                     }
-                    is EmaState.Overlapped<S> -> {
+                    is EmaState.Overlapped<S,N> -> {
                         onStateNormal(data = emaState.data)
                         onStateOverlayed(data = emaState.extraData)
                         isFirstOverlayedExecution = false

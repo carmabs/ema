@@ -12,11 +12,11 @@ import com.carmabs.ema.core.state.EmaDataState
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-interface EmaxMiddleware<out A:EmaAction,S : EmaDataState> {
+interface EmaxMiddleware<S : EmaDataState,out A:EmaAction> {
 
-    context (MiddlewareScope<A,S>)
+    context (MiddlewareScope<S,A>)
     operator fun invoke(
         action: EmaAction,
-        next: NextMiddleware,
-    ): EmaxNextMiddlewareResult
+        next: NextMiddleware
+    )
 }

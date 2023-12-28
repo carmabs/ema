@@ -13,5 +13,14 @@ import com.carmabs.ema.core.state.EmaDataState
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 interface EmaxReducer<S : EmaDataState> {
+
+    companion object{
+        fun <S:EmaDataState>empty() =
+           object : EmaxReducer<S>{
+            override fun reduce(state: S, action: EmaAction): S {
+                return state
+            }
+        }
+    }
     fun reduce(state: S, action: EmaAction): S
 }

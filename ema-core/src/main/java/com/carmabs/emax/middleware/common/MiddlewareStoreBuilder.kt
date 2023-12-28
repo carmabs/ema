@@ -17,20 +17,19 @@ import kotlinx.coroutines.CoroutineScope
 class MiddlewareStoreBuilder<S : EmaDataState> internal constructor(
     private val store: EmaxStore<S>,
     private val scope: CoroutineScope,
-    private var middlewares: List<EmaxMiddleware<EmaAction,S>> = mutableListOf()
+    private var middlewares: List<EmaxMiddleware<S,EmaAction>> = mutableListOf()
 ) {
-    fun setMiddleware(vararg middleware: EmaxMiddleware<EmaAction,S>) {
+    fun setMiddleware(vararg middleware: EmaxMiddleware<S,EmaAction>) {
         middlewares = listOf(*middleware)
     }
 
     fun applyMiddleware(action: EmaAction, endAction: (EmaAction) -> Unit) {
         val end: NextMiddleware = {
             endAction.invoke(it)
-            EmaxNextMiddlewareResult.CanceledAction
         }
         middlewares.reversed().fold(end) { nextAction, middle ->
             {
-                MiddlewareScope<EmaAction,S>(store, scope).run {
+                MiddlewareScope<S,EmaAction>(store, scope).run {
                     middle.invoke(it, nextAction)
                 }
             }

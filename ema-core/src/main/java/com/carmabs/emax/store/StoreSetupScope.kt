@@ -3,7 +3,10 @@ package com.carmabs.emax.store
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.emax.middleware.common.EmaxMiddleware
+import com.carmabs.emax.middleware.common.MiddlewareScope
+import com.carmabs.emax.middleware.common.emaxMiddlewareOf
 import com.carmabs.emax.reducer.EmaxReducer
+import kotlin.reflect.KClass
 
 /**
  * Created by Carlos Mateo Benito on 29/9/23.
@@ -18,14 +21,23 @@ class StoreSetupScope<S : EmaDataState> internal constructor() {
 
     internal var reducersList: List<EmaxReducer<S>> = emptyList()
         private set
-    internal var middlewareList: List<EmaxMiddleware<EmaAction,S>> = emptyList()
+    internal var middlewareList: List<EmaxMiddleware<S,EmaAction>> = emptyList()
         private set
 
-    fun addMiddleware(vararg middleware: EmaxMiddleware<EmaAction,S>) {
+    fun addMiddleware(vararg middleware: EmaxMiddleware<S,EmaAction>) {
         val mMiddlewareList = middlewareList.toMutableList()
         middleware.forEach {
             mMiddlewareList.add(it)
         }
+        middlewareList = mMiddlewareList.toList()
+    }
+
+    fun <F : EmaAction> addMiddleware(
+        filter: KClass<F>,
+        middlewareAction: MiddlewareScope<S,EmaAction>.(F) -> Unit
+    ) {
+        val mMiddlewareList = middlewareList.toMutableList()
+        mMiddlewareList.add(emaxMiddlewareOf(filter, middlewareAction))
         middlewareList = mMiddlewareList.toList()
     }
 

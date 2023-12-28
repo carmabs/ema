@@ -21,15 +21,15 @@ import kotlin.math.absoluteValue
  */
 class LoggerEmaxMiddleware<S : EmaDataState>(
     private val lineLength: Int = 80
-) : EmaxMiddleware<EmaAction,S> {
+) : EmaxMiddleware<S, EmaAction> {
 
-    context(MiddlewareScope<EmaAction,S>)
+    context(MiddlewareScope<S, EmaAction>)
     override fun invoke(
         action: EmaAction,
         next: NextMiddleware
-    ): EmaxNextMiddlewareResult {
+    ) {
         val padding = "    "
-        val nextFunction = Logger.getLogger("EMA").run {
+        Logger.getLogger("EMA").run {
             info("")
             info(printLine('*', "STARTING EMA STATE LOGGING", textPadding = padding))
             info(printLine('*', "", sideCharacterLimit = 2))
@@ -59,7 +59,7 @@ class LoggerEmaxMiddleware<S : EmaDataState>(
                     )
                 )
             }
-            val nextFunction = next.invoke(action)
+            next.invoke(action)
             info(printLine('|', "State after apply action", textPadding = padding))
             info(printLine('|', "", sideCharacterLimit = 2))
             state.toStringPretty().lines().forEach {
@@ -77,9 +77,7 @@ class LoggerEmaxMiddleware<S : EmaDataState>(
             info(printLine('*', "", sideCharacterLimit = 2))
             info(printLine('*', "FINISHED EMA STATE LOGGING", textPadding = padding))
             info("")
-            nextFunction
         }
-        return nextFunction
     }
 
 
@@ -119,15 +117,17 @@ class LoggerEmaxMiddleware<S : EmaDataState>(
                     )
                 } ?: String(charArrayOf(character)).repeat(sideLength))
                 return (sideString + textPadding + text + textPadding + sideString.reversed()).let {
-                    val remainingCharacters = (lineLength-it.length)
-                    when{
-                        remainingCharacters>0->{
+                    val remainingCharacters = (lineLength - it.length)
+                    when {
+                        remainingCharacters > 0 -> {
                             it + String(charArrayOf(character)).repeat(remainingCharacters)
                         }
-                        remainingCharacters<0->{
+
+                        remainingCharacters < 0 -> {
                             it.dropLast(remainingCharacters.absoluteValue)
                         }
-                        else->{
+
+                        else -> {
                             it
                         }
 

@@ -22,7 +22,7 @@ import kotlin.coroutines.CoroutineContext
 annotation class SideEffectScopeDsl
 
 @SideEffectScopeDsl
-class SideEffectScope<in A : EmaAction, S : EmaDataState> internal constructor(
+class SideEffectScope<S : EmaDataState,in A : EmaAction> internal constructor(
     private val store: EmaxStore<S>,
     private val scope: CoroutineScope
 ) : CoroutineScope {

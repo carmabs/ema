@@ -33,6 +33,15 @@ interface EmaAction {
 
     }
 
+    sealed interface ViewModel: EmaAction{
+        object ConsumeSingleEvent:ViewModel
+
+        object NavigationBack:ViewModel
+
+        object OnNavigated:ViewModel
+
+    }
+
     interface Screen : EmaAction {
         fun checkIsValidScreenActionClass() = this is Empty || this::class.isSealed
         override val type: String

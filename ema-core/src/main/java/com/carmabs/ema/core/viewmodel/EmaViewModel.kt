@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.Flow
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-interface EmaViewModel<S : EmaDataState, D : EmaNavigationEvent> {
+interface EmaViewModel<S : EmaDataState, N : EmaNavigationEvent> {
 
 
-    val initialState: EmaState<S>
+    val initialState: EmaState<S,N>
 
     /**
      * Used to know if subscribed view should render the state
@@ -36,7 +36,7 @@ interface EmaViewModel<S : EmaDataState, D : EmaNavigationEvent> {
 
     fun onStopView()
 
-    fun subscribeStateUpdates(): Flow<EmaState<S>>
+    fun subscribeStateUpdates(): Flow<EmaState<S,N>>
 
     /**
      * Get navigation state as LiveData to avoid state setting from the view

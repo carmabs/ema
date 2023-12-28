@@ -266,8 +266,8 @@ private fun <D : EmaNavigationEvent, S : EmaDataState> rememberBackHardwareClick
 }
 
 @Composable
-private fun <S : EmaDataState, A : EmaAction.Screen> OverlappedComposable(
-    overlappedState: EmaState.Overlapped<S>? = null,
+private fun <S : EmaDataState, A : EmaAction.Screen,N:EmaNavigationEvent> OverlappedComposable(
+    overlappedState: EmaState.Overlapped<S,N>? = null,
     screenContent: EmaComposableScreenContent<S, A>,
     actions: EmaImmutableActionDispatcher<A>
 ) {
