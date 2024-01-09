@@ -29,12 +29,6 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        freeCompilerArgs += [
-                "-Xallow-jvm-ir-dependencies",
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
-        ]
-        //useIR = true
     }
     packagingOptions {
         resources {

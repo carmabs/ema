@@ -12,3 +12,5 @@ package com.carmabs.ema.core.state
 interface EmaDataState {
     fun checkIsValidStateDataClass() = this is EmaEmptyState || this::class.isData
 }
+
+

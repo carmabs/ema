@@ -46,20 +46,16 @@ fun screenWidthDp(): Dp {
 
 @Composable
 fun Int.pxToDp(): Dp {
-    val context = LocalContext.current
-    val resources = context.resources
-    val metrics = resources.displayMetrics
-    val px = this
-    return (px / (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).dp
+    val density = LocalDensity.current
+    return with(density){
+        toDp()
+    }
 }
 
 @Composable
 fun Float.pxToDp(): Dp {
-    val context = LocalContext.current
-    val resources = context.resources
-    val metrics = resources.displayMetrics
-    val px = this
-    return (px / (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).dp
+    val screenPixelDensity = LocalContext.current.resources.displayMetrics.density
+    return  (this / screenPixelDensity).dp
 }
 
 @Composable

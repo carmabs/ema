@@ -6,7 +6,6 @@ import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.model.emaFlowSingleEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.state.EmaState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
@@ -21,22 +20,22 @@ import kotlinx.coroutines.flow.Flow
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-abstract class EmaViewModelAction<S : EmaDataState, D : EmaNavigationEvent, A : EmaAction>(
+abstract class EmaViewModelAction<A : EmaAction.Screen,S : EmaDataState,D : EmaNavigationEvent,>(
     initialDataState: S,
     scope: CoroutineScope = EmaMainScope()
-) : EmaViewModel<S, D>(initialDataState, scope), EmaActionDispatcher<A>{
+) : EmaViewModelBasic<S, D>(initialDataState, scope), EmaActionDispatcher<A> {
 
     private val observableAction = emaFlowSingleEvent<A>()
 
     /**
      * Subscribe to the actions dispatched to this ViewModel
      */
-    fun subscribeToActions(): Flow<A> = observableAction
+    override fun subscribeToActions(): Flow<A> = observableAction
 
-    final override fun onAction(action: A) {
-        onViewAction(action)
+    final override fun dispatch(action: A) {
+        onAction(action)
         observableAction.tryEmit(action)
     }
 
-    abstract fun onViewAction(action:A)
+    abstract fun onAction(action: A)
 }

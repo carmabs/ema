@@ -12,4 +12,4 @@ import com.carmabs.ema.core.action.EmaActionDispatcherEmpty
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-fun <A : EmaAction>EmaImmutableActionDispatcherEmpty() = EmaActionDispatcherEmpty<A>().toImmutable()
+fun <A : EmaAction.Screen>EmaImmutableActionDispatcherEmpty() = EmaActionDispatcherEmpty<A>().toImmutable()

@@ -26,7 +26,7 @@ fun EmaInitializer?.toBundle():Bundle?{
  */
 fun Bundle.getInitializer(): EmaInitializer? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getSerializable(EmaInitializer.KEY,EmaInitializer::class.java)
+        getSerializable(EmaInitializer.KEY, EmaInitializer::class.java)
     } else {
         getSerializable(EmaInitializer.KEY) as? EmaInitializer
     }
@@ -47,6 +47,20 @@ fun Activity.getInitializer(): EmaInitializer? {
  */
 fun Activity.setInitializer(initializer: EmaInitializer) {
     intent = Intent().apply { putExtra(EmaInitializer.KEY, initializer) }
+}
+
+/**
+ * Set the initializer for the current activity intent
+ */
+fun Intent.setInitializer(initializer: EmaInitializer) {
+     putExtra(EmaInitializer.KEY, initializer)
+}
+
+/**
+ * Set the initializer for the current activity intent
+ */
+fun Intent.getInitializer(): EmaInitializer? {
+    return extras?.getInitializer()
 }
 
 /**

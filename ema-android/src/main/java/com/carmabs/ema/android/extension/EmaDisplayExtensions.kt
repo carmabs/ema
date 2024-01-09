@@ -3,12 +3,16 @@ package com.carmabs.ema.android.extension
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.graphics.Insets
 import android.os.Build
 import android.util.DisplayMetrics
+import android.util.Size
 import android.util.TypedValue
+import android.view.WindowInsets
 import android.view.WindowManager
 import com.carmabs.ema.core.constants.INT_ZERO
 import kotlin.math.roundToInt
+
 
 /**
  * Extension methods for display feature
@@ -61,15 +65,44 @@ val Float.sp
 /**
  * Get display metrics
  */
-fun getScreenMetrics(context: Context): DisplayMetrics {
+fun getScreenMetrics(context: Context,excludeInsets:Boolean = false): DisplayMetrics {
     val displayMetrics = context.resources.displayMetrics
     val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        val boundsActivity = windowManager.currentWindowMetrics.bounds
+        val metrics = windowManager.currentWindowMetrics
+        // Gets all excluding insets
+        val windowInsets = metrics.windowInsets
+        val insets: Insets = windowInsets.getInsetsIgnoringVisibility(
+            WindowInsets.Type.navigationBars()
+                    or WindowInsets.Type.displayCutout()
+        )
+
+        val insetsWidth: Int = insets.right + insets.left
+        val insetsHeight: Int = insets.top + insets.bottom
+
+
+        // Legacy size that Display#getSize reports
+        val bounds = metrics.bounds
+        val legacySize = Size(
+            bounds.width() - insetsWidth,
+            bounds.height() - insetsHeight
+        )
         displayMetrics.apply {
-            heightPixels = boundsActivity.height()
-            widthPixels = boundsActivity.width()
+            heightPixels = legacySize.height
+            widthPixels = legacySize.width
+        }
+        /**
+         * Get the application size including decoration
+         *
+         *
+        */
+        if(excludeInsets) {
+            val boundsActivity = windowManager.currentWindowMetrics.bounds
+            displayMetrics.apply {
+                heightPixels = boundsActivity.height()
+                widthPixels = boundsActivity.width()
+            }
         }
 
     } else {

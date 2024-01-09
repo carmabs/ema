@@ -29,10 +29,10 @@ import kotlin.coroutines.suspendCoroutine
  * Created by Carlos Mateo Benito on 2020-05-07.
  *
  * <p>
- * Copyright (c) 2020 by atSistemas. All rights reserved.
+ * Copyright (c) 2020 by Carmabs. All rights reserved.
  * </p>
  *
- * @author <a href=“mailto:cmateo.benito@atsistemas.com”>Carlos Mateo Benito</a>
+ * @author <a href=“mailto:apps.carmabs@gmail.com.com”>Carlos Mateo Benito</a>
  */
 class EmaAndroidPermissionManager : EmaPermissionManager {
 

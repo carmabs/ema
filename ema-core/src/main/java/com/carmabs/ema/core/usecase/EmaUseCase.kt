@@ -22,7 +22,7 @@ abstract class EmaUseCase<I, O>(
     /**
      * Dispatcher used for useCase execution
      */
-    open val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    protected open val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : UseCase<I, O> {
 
     /**
@@ -40,7 +40,7 @@ abstract class EmaUseCase<I, O>(
      */
     override fun executeBlocking(input: I): O {
         return runBlocking(dispatcher) {
-                useCaseFunction(input)
+            useCaseFunction(input)
         }
     }
 
@@ -51,7 +51,7 @@ abstract class EmaUseCase<I, O>(
      */
     override fun executeBlockingInCurrentThread(input: I): O {
         return runBlocking {
-           useCaseFunction(input)
+            useCaseFunction(input)
         }
     }
 

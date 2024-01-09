@@ -1,5 +1,6 @@
 package com.carmabs.ema.android.base
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,9 +8,12 @@ import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.carmabs.ema.android.constants.EMA_RESULT_CODE
+import com.carmabs.ema.android.constants.EMA_RESULT_KEY
 import com.carmabs.ema.android.delegates.emaViewModelDelegate
 import com.carmabs.ema.android.extension.addOnBackPressedListener
 import com.carmabs.ema.android.extension.getInitializer
@@ -18,6 +22,7 @@ import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
 import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.model.EmaBackHandlerStrategy
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigator
@@ -25,6 +30,7 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.view.EmaViewModelTrigger
 import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -40,10 +46,12 @@ import org.koin.core.scope.Scope
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
-abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> :
-    Fragment(), EmaAndroidView<S, VM, D>, AndroidScopeComponent {
+abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent> :
+    Fragment(), EmaAndroidView<S, VM, N>, AndroidScopeComponent {
 
     final override val scope: Scope by fragmentScope()
+
+    open val handleBackPressedManually = false
 
     val viewScope: CoroutineScope
         get() = viewLifecycleOwner.lifecycleScope
@@ -74,21 +82,21 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
      * The list which handles the extra view models attached, to unbind the observers
      * when the view fragment is destroyed
      */
-    private val extraViewModelList: MutableList<EmaAndroidViewModel<S,D>> by lazy { mutableListOf() }
+    private val extraViewModelList: MutableList<EmaAndroidViewModel<S, N>> by lazy { mutableListOf() }
 
     protected open fun provideToolbarTitle(): String? = null
 
     /**
      * Previous state for comparing state properties update
      */
-    final override var previousEmaState: EmaState<S>? = null
+    final override var previousEmaState: EmaState<S, N>? = null
 
-    abstract override val navigator: EmaNavigator<D>?
+    abstract override val navigator: EmaNavigator<N>?
 
-    abstract fun provideAndroidViewModel(): EmaAndroidViewModel<S,D>
+    abstract fun provideAndroidViewModel(): EmaAndroidViewModel<S, N>
 
 
-    final override val androidViewModelSeed: EmaAndroidViewModel<S,D> by lazy {
+    final override val androidViewModelSeed: EmaAndroidViewModel<S, N> by lazy {
         provideAndroidViewModel()
     }
 
@@ -132,10 +140,13 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        vm.onBackHardwarePressedListener?.also {
-            addOnBackPressedListener(it)
-        }
-
+        if (!handleBackPressedManually)
+            addOnBackPressedListener {
+                vm.onActionBackHardwarePressed()
+                //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
+                EmaBackHandlerStrategy.Cancelled
+            }
+        onCreate(viewModelSeed)
     }
 
 
@@ -185,11 +196,11 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
      * @param observerFunction the observer of the view model attached
      * @return The view model attached
      */
-    fun <AVM : EmaAndroidViewModel<S,D>> addExtraViewModel(
+    fun <AVM : EmaAndroidViewModel<S, N>> addExtraViewModel(
         viewModelAttachedSeed: AVM,
         fragment: Fragment,
         fragmentActivity: FragmentActivity? = null,
-        observerFunction: ((attachedState: EmaState<S>) -> Unit)? = null
+        observerFunction: ((attachedState: EmaState<S, N>) -> Unit)? = null
     ): AVM {
         val viewModel =
             fragmentActivity?.let {
@@ -211,7 +222,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
             }
             extraViewJobs.add(job)
         }
-        extraViewModelList.add(viewModel as EmaAndroidViewModel<S,D>)
+        extraViewModelList.add(viewModel as EmaAndroidViewModel<S, N>)
 
         return viewModel
     }
@@ -242,18 +253,31 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : Em
     }
 
 
-    final override fun onBack(): Boolean {
+    final override fun onBack(result: Any?): Boolean {
+        val gson = Gson()
         val hasMoreFragments = kotlin.runCatching {
             findNavController().popBackStack()
         }.getOrNull() ?: let {
             val hasMoreFragments = parentFragmentManager.backStackEntryCount > INT_ZERO
+            result?.also {
+                setFragmentResult(EMA_RESULT_KEY, Bundle().apply {
+                    putString(EMA_RESULT_KEY, gson.toJson(it))
+                })
+            }
             if (hasMoreFragments)
                 parentFragmentManager.popBackStack()
             hasMoreFragments
         }
 
-        if (!hasMoreFragments)
+        if (!hasMoreFragments) {
+            result?.also {
+                requireActivity().setResult(
+                    EMA_RESULT_CODE,
+                    Intent().putExtra(EMA_RESULT_KEY, gson.toJson(it))
+                )
+            }
             requireActivity().finish()
+        }
         return hasMoreFragments
     }
 }

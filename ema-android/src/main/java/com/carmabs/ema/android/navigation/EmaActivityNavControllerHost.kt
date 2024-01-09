@@ -1,7 +1,12 @@
 package com.carmabs.ema.android.navigation
 
 import android.app.Activity
+import android.content.Intent
+import com.carmabs.ema.android.constants.EMA_RESULT_CODE
+import com.carmabs.ema.android.constants.EMA_RESULT_KEY
 import com.carmabs.ema.core.navigator.EmaEmptyNavigationEvent
+import com.google.gson.Gson
+import java.io.Serializable
 
 /**
  * Created by Carlos Mateo Benito on 29/7/22.
@@ -21,5 +26,28 @@ class EmaActivityNavControllerHost(
     navHostId: Int,
     graphId: Int
 ) : EmaActivityNavControllerNavigator<EmaEmptyNavigationEvent>(activity, navHostId, graphId) {
-    override fun navigate(destination: EmaEmptyNavigationEvent) = false
+
+    private val gson by lazy {
+        Gson()
+    }
+    override fun navigate(destination: EmaEmptyNavigationEvent) = Unit
+
+    /**
+     * Navigates back
+     * @return true if a fragment has been popped, false if backstack is empty, in that case, finish
+     * the activity provided.
+     */
+    override fun navigateBack(result: Any?): Boolean {
+        val hasMoreFragments = navController.popBackStack()
+        if (!hasMoreFragments) {
+            result?.also {
+                activity.setResult(
+                    EMA_RESULT_CODE,
+                    Intent().putExtra(EMA_RESULT_KEY, gson.toJson(it))
+                )
+            }
+            activity.finish()
+        }
+        return hasMoreFragments
+    }
 }

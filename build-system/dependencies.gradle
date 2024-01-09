@@ -26,9 +26,11 @@ rootProject.ext {
 
     espressoVersion = "3.4.0"
 
-    kotlinVersion = '1.8.0'
+    kotlinVersion = '1.9.10'
 
     viewmodelVersion = "2.5.1"
+
+    gsonVersion = "2.10.1"
 
     kotlinCompilerExtensionVersion = '1.0.5'
 
@@ -42,8 +44,8 @@ rootProject.ext {
 
     emaVersioning = [
             minSdk           : 24,
-            compileSdk       : 33,
-            targetSdk        : 33,
+            compileSdk       : 34,
+            targetSdk        : 34,
             versionCode      : 16,
             versionName      : "5.1.0",
             groupId          : 'com.github.carmabs',
@@ -70,6 +72,7 @@ rootProject.ext {
     ]
 
     emaAndroidDependencies = [
+            gson                : "com.google.code.gson:gson:$gsonVersion",
             koin                : "io.insert-koin:koin-android:$koinVersion",
             reflection          : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
             fragment            : "androidx.fragment:fragment-ktx:$fragmentVersion",

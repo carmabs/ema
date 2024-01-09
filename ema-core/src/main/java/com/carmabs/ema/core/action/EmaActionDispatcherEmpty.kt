@@ -1,5 +1,8 @@
 package com.carmabs.ema.core.action
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+
 /**
  * Created by Carlos Mateo Benito on 14/04/2023.
  *
@@ -13,5 +16,9 @@ package com.carmabs.ema.core.action
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 class EmaActionDispatcherEmpty<A : EmaAction>: EmaActionDispatcher<A> {
-    override fun onAction(action: A) = Unit
+    override fun dispatch(action: A) = Unit
+
+    override fun subscribeToActions(): Flow<A> {
+        return emptyFlow()
+    }
 }

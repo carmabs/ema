@@ -3,9 +3,9 @@ package com.carmabs.ema.core.state
 sealed interface EmaStateTransition {
     data class NormalToOverlapped<S>(
         val previousNormalState: S,
-        val currentOverlayedState: EmaExtraData) : EmaStateTransition
+        val currentOverlappedState: EmaExtraData) : EmaStateTransition
 
     data class OverlappedToNormal<S>(
-        val previousOverlayedState: EmaExtraData,
+        val previousOverlappedState: EmaExtraData,
         val currentNormalState: S) : EmaStateTransition
 }

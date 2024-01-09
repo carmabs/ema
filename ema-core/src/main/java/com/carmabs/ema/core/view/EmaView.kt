@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.io.Serializable
 import kotlin.jvm.internal.PropertyReference0
 import kotlin.reflect.KProperty
 
@@ -29,7 +30,7 @@ import kotlin.reflect.KProperty
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> {
+interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent> {
 
     /**
      * Scope for flow updates
@@ -44,7 +45,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
     /**
      * The navigator [EmaNavigator]
      */
-    val navigator: EmaNavigator<D>?
+    val navigator: EmaNavigator<N>?
 
     /**
      * The initializer from previous views when it is launched.
@@ -54,7 +55,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
     /**
      * The previous state of the View
      */
-    var previousEmaState: EmaState<S>?
+    var previousEmaState: EmaState<S,N>?
 
     val previousStateData: S?
         get() = previousEmaState?.data
@@ -69,7 +70,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
      * Called when view model trigger an update view event
      * @param state of the view
      */
-    private fun onDataUpdated(state: EmaState<S>) {
+    private fun onDataUpdated(state: EmaState<S,N>) {
 
         previousEmaState?.let { previousState ->
             if (previousState.javaClass.name != state.javaClass.name) {
@@ -78,7 +79,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
                         onEmaStateTransition(
                             EmaStateTransition.NormalToOverlapped(
                                 previousState.data,
-                                state.dataOverlapped
+                                state.extraData
                             )
                         )
                     }
@@ -86,7 +87,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
                     is EmaState.Normal -> {
                         onEmaStateTransition(
                             EmaStateTransition.OverlappedToNormal(
-                                (previousState as EmaState.Overlapped<S>).dataOverlapped,
+                                (previousState as EmaState.Overlapped<S,N>).extraData,
                                 state.data
                             )
                         )
@@ -98,7 +99,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
         onEmaStateNormal(state.data)
         when (state) {
             is EmaState.Overlapped -> {
-                onEmaStateOverlapped(state.dataOverlapped)
+                onEmaStateOverlapped(state.extraData)
             }
 
             else -> {
@@ -202,12 +203,12 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
     fun onNavigation(navigation: EmaNavigationDirectionEvent) {
         navigation.onNavigation {
             when (val direction = it) {
-                EmaNavigationDirection.Back -> {
-                    navigateBack()
+                is EmaNavigationDirection.Back -> {
+                    navigateBack(direction.result)
                 }
 
                 is EmaNavigationDirection.Forward -> {
-                    navigate(direction.navigationEvent as D)
+                    navigate(direction.navigationEvent as N)
                 }
             }
             viewModelSeed.notifyOnNavigated()
@@ -237,7 +238,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
      * @param navigationEvent for the navigation event data
      */
 
-    fun navigate(navigationEvent: D) {
+    fun navigate(navigationEvent: N) {
         navigator?.navigate(navigationEvent) ?: throwNavigationException()
     }
 
@@ -250,11 +251,21 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
      * Called when view model trigger a navigation back event
      * @return True
      */
-    fun navigateBack(): Boolean {
-        return navigator?.navigateBack() ?: onBack()
+    fun navigateBack(result:Any?=null): Boolean {
+        return navigator?.navigateBack(result) ?: onBack(result)
     }
 
-    fun onBack(): Boolean
+    fun onBack(result: Any?): Boolean
+
+    fun onCreate(viewModel: VM) {
+        startTrigger?.also {
+            it.triggerAction = {
+                viewModel.onCreated(initializer)
+            }
+        } ?: also {
+            viewModel.onCreated(initializer)
+        }
+    }
 
     /**
      * Called when view model is started
@@ -262,10 +273,10 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEv
     fun onStartView(viewModel: VM) {
         startTrigger?.also {
             it.triggerAction = {
-                viewModel.onStart(initializer)
+                viewModel.onStartView()
             }
         } ?: also {
-            viewModel.onStart(initializer)
+            viewModel.onStartView()
         }
     }
 

@@ -8,4 +8,5 @@ fun <T:EmaViewModel<*,*>> KClass<T>.resultId(id:String?=null): ResultId {
     return ResultId("Result_${resultId}_${this.java.name}_${this.hashCode()}")
 }
 
-class ResultId internal constructor(val id: String)
+@JvmInline
+value class ResultId internal constructor(val id: String)

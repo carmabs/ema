@@ -45,6 +45,7 @@ android {
 dependencies {
 
     implementation emaAndroidDependencies.reflection
+    implementation emaAndroidDependencies.gson
     // Java language implementation
     // Kotlin
     api emaAndroidDependencies.fragment

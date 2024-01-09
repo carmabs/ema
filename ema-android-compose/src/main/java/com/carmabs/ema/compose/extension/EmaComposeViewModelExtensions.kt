@@ -4,7 +4,6 @@ import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
-import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.carmabs.ema.core.viewmodel.EmaViewModelAction
 
@@ -17,12 +16,12 @@ import com.carmabs.ema.core.viewmodel.EmaViewModelAction
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-fun <S:EmaDataState,D:EmaNavigationEvent,A:EmaAction>EmaViewModel<S,D>.asViewModelAction():EmaViewModelAction<S, D, A>{
-    return (this as? EmaViewModelAction<S, D, A>)
-        ?:throw java.lang.IllegalStateException("${this::class} must implement EmaActionDispatcher with the proper action")
+fun <A:EmaAction.Screen,S:EmaDataState,D:EmaNavigationEvent>EmaViewModel<S,D>.asViewModelAction():EmaViewModelAction<A,S, D>{
+    return (this as? EmaViewModelAction<A,S, D>)
+        ?:throw java.lang.IllegalStateException("${this::class} must inherit form EmaViewModelAction class")
 }
 
-fun <A:EmaAction>EmaViewModel<*,*>.asActionDispatcher():EmaActionDispatcher<A>{
+fun <A:EmaAction.Screen>EmaViewModel<*,*>.asActionDispatcher():EmaActionDispatcher<A>{
     return (this as? EmaActionDispatcher<A>)
         ?:throw java.lang.IllegalStateException("${this::class} must implement EmaActionDispatcher with the proper action")
 }

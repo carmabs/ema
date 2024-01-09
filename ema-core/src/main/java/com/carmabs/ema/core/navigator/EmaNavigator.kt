@@ -10,7 +10,7 @@ package com.carmabs.ema.core.navigator
 
 interface EmaNavigator<D : EmaNavigationEvent> {
 
-    fun navigate(destination: D): Boolean
+    fun navigate(destination: D)
 
-    fun navigateBack(): Boolean
+    fun navigateBack(result:Any?=null): Boolean
 }
