@@ -50,6 +50,20 @@ fun Activity.setInitializer(initializer: EmaInitializer) {
 }
 
 /**
+ * Set the initializer for the current activity intent
+ */
+fun Intent.setInitializer(initializer: EmaInitializer) {
+     putExtra(EmaInitializer.KEY, initializer)
+}
+
+/**
+ * Set the initializer for the current activity intent
+ */
+fun Intent.getInitializer(): EmaInitializer? {
+    return extras?.getInitializer()
+}
+
+/**
  * Set the initializer for the current fragment
  */
 fun Fragment.setInitializer(initializer: EmaInitializer) {

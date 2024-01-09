@@ -11,5 +11,5 @@ package com.carmabs.ema.core.model
  */
 sealed interface EmaBackHandlerStrategy {
     class ContinueOnBackPressed(val removeBackHandler:Boolean = true): EmaBackHandlerStrategy
-    object Cancelled: EmaBackHandlerStrategy
+    data object Cancelled: EmaBackHandlerStrategy
 }

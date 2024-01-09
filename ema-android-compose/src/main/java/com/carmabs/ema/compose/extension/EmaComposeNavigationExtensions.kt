@@ -61,7 +61,7 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen, VM : EmaAnd
     screenContent: EmaComposableScreenContent<S, A>,
     onNavigationEvent: (D) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
-    routeId: String = screenContent::class.routeId(),
+    routeId: String = screenContent::class.routeId,
     overrideInitializer: EmaInitializer? = null,
     androidViewModel: @Composable () -> VM,
     onViewModelInstance: (@Composable (EmaViewModel<S, D>) -> Unit)? = null,

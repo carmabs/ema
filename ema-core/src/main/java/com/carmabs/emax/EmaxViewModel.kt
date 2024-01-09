@@ -9,7 +9,6 @@ import com.carmabs.ema.core.extension.distinctNavigationChanges
 import com.carmabs.ema.core.extension.distinctSingleEventChanges
 import com.carmabs.ema.core.extension.distinctStateDataChanges
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.initializer.EmptyEmaInitializer
 import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
@@ -68,7 +67,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEven
      * Used to know if state has been updated at least once
      */
     private var hasBeenUpdated = false
-    override val shouldRenderState: Boolean
+    final override val shouldRenderState: Boolean
         get() = updateOnInitialization || hasBeenUpdated
 
     private val channelAction = Channel<Screen>()
@@ -80,6 +79,10 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEven
     private val store by lazy {
         EmaxStore(initialState, scope) {
             addMiddleware(LoggerEmaxMiddleware())
+            addMiddleware(emaxMiddlewareOf(actionFilter = EmaInitializer::class) {
+                if(it !is EmaInitializer.EMPTY)
+                    hasBeenUpdated = true
+            })
             addMiddleware(emaxMiddlewareOf(actionFilter = Screen::class) {
                 hasBeenUpdated = true
             })
@@ -116,7 +119,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEven
         if (!store.state.checkIsValidStateDataClass()) {
             throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
         }
-        store.dispatch(initializer ?: EmptyEmaInitializer)
+        store.dispatch(initializer ?: EmaInitializer.EMPTY)
     }
 
     final override fun onStartView() {
@@ -172,7 +175,7 @@ abstract class EmaxViewModel<S : EmaDataState, A : Screen, N : EmaNavigationEven
         store.dispatch(EmaAction.ViewModel.OnNavigated)
     }
 
-    override fun onActionBackHardwarePressed() {
+    final override fun onActionBackHardwarePressed() {
         store.dispatch(EmaAction.ViewModel.NavigationBack)
     }
 

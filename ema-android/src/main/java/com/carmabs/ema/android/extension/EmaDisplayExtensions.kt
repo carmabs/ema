@@ -65,7 +65,7 @@ val Float.sp
 /**
  * Get display metrics
  */
-fun getScreenMetrics(context: Context): DisplayMetrics {
+fun getScreenMetrics(context: Context,excludeInsets:Boolean = false): DisplayMetrics {
     val displayMetrics = context.resources.displayMetrics
     val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
@@ -96,13 +96,14 @@ fun getScreenMetrics(context: Context): DisplayMetrics {
          * Get the application size including decoration
          *
          *
-        val boundsActivity = windowManager.currentWindowMetrics.bounds
-
-        displayMetrics.apply {
-            heightPixels = boundsActivity.height()
-            widthPixels = boundsActivity.width()
-        }
         */
+        if(excludeInsets) {
+            val boundsActivity = windowManager.currentWindowMetrics.bounds
+            displayMetrics.apply {
+                heightPixels = boundsActivity.height()
+                widthPixels = boundsActivity.width()
+            }
+        }
 
     } else {
         windowManager.defaultDisplay.getMetrics(displayMetrics)

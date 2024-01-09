@@ -4,7 +4,6 @@ import com.carmabs.ema.compose.ui.EmaComposableScreenContent
 import kotlin.reflect.KClass
 
 
-fun <T : EmaComposableScreenContent<*, *>> KClass<T>.routeId(): String {
-    return "screen/${this.java.name}/${this.hashCode()}"
-}
+val <T : EmaComposableScreenContent<*, *>> KClass<T>.routeId: String
+    get() = "screen/${this.java.name}/${this.hashCode()}"
 

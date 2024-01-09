@@ -13,7 +13,7 @@ interface EmaAction {
 
     companion object {
         val type: String = EmaAction::class.java.simpleName
-        object Empty : EmaAction
+        data object EMPTY : EmaAction
     }
 
 
@@ -26,28 +26,28 @@ interface EmaAction {
     }
 
     sealed interface Lifecycle : EmaAction {
-        object Started : Lifecycle
-        object Resumed : Lifecycle
-        object Paused : Lifecycle
-        object Stopped : Lifecycle
+        data object Started : Lifecycle
+        data object Resumed : Lifecycle
+        data object Paused : Lifecycle
+        data object Stopped : Lifecycle
 
     }
 
     sealed interface ViewModel: EmaAction{
-        object ConsumeSingleEvent:ViewModel
+        data object ConsumeSingleEvent:ViewModel
 
-        object NavigationBack:ViewModel
+        data object NavigationBack:ViewModel
 
-        object OnNavigated:ViewModel
+        data object OnNavigated:ViewModel
 
     }
 
     interface Screen : EmaAction {
-        fun checkIsValidScreenActionClass() = this is Empty || this::class.isSealed
+        fun checkIsValidScreenActionClass() = this is EMPTY || this::class.isSealed
         override val type: String
             get() = Screen::class.java.simpleName
 
-        object Empty : Screen
+        object EMPTY : Screen
     }
 }
 

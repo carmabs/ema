@@ -43,7 +43,7 @@ object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent> 
     }
 
     override fun onPauseView() {
-        TODO("Not yet implemented")
+
     }
 
     override fun onStopView() {
@@ -71,6 +71,6 @@ object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent> 
     }
 
     override fun onActionBackHardwarePressed() {
-        TODO("Not yet implemented")
+
     }
 }

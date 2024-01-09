@@ -14,8 +14,9 @@ import java.io.Serializable
  */
 interface EmaInitializer : EmaAction.Initializer, Serializable {
     companion object {
+
         const val KEY = "EmaInitializer"
     }
+    object EMPTY : EmaInitializer
 }
 
-object EmptyEmaInitializer : EmaInitializer

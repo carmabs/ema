@@ -12,9 +12,9 @@ package com.carmabs.ema.core.navigator
 sealed interface EmaNavigationDirectionEvent {
     data class Launched internal constructor(val navigationDirection: EmaNavigationDirection) : EmaNavigationDirectionEvent
 
-    object OnNavigated : EmaNavigationDirectionEvent
+    data object OnNavigated : EmaNavigationDirectionEvent
 
-    object None: EmaNavigationDirectionEvent
+    data object None: EmaNavigationDirectionEvent
 
     fun hasNavigated(): Boolean {
         return this is OnNavigated
