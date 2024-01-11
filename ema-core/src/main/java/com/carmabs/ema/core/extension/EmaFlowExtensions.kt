@@ -12,10 +12,17 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.takeWhile
+import kotlin.reflect.KClass
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.jvmName
 
-suspend inline fun <T, reified R> Flow<T>.untilInstanceOf(clazz: Class<R>): R {
-    return first { it is R } as R
+inline fun <reified R> Flow<R & Any>.whileIsInstanceOf(clazz: KClass<out R & Any>): Flow<R> {
+    return takeWhile { it::class.isSubclassOf(clazz) }
+}
+
+suspend inline fun <reified R> Flow<R>.untilInstanceOf(clazz: KClass<out R&Any>): R {
+    return first { it?.let { it::class.isSubclassOf(clazz) } ?: false }
 }
 
 suspend inline fun <T> Flow<T>.until(noinline condition: (T) -> Boolean): T {
@@ -29,10 +36,13 @@ fun <T> Flow<T>.concat(flow: Flow<T>): Flow<T> {
 fun <S : EmaDataState, N : EmaNavigationEvent> Flow<EmaState<S, N>>.distinctStateDataChanges(): Flow<EmaState<S, N>> {
     return distinctUntilChanged { old, new ->
         when {
+            old.singleEvent != new.singleEvent -> true // It means the change is due to single event
+            old.navigation != new.navigation -> true // It means the change is due to navigation event
+            old.result != new.result -> true // It means the change is due to navigation event
             old.data != new.data -> false
             old::class.jvmName != new::class.jvmName -> false
             old is EmaState.Overlapped && new is EmaState.Overlapped
-                    && old.extraData != new.extraData ->  false
+                    && old.extraData != new.extraData -> false
             else -> true
         }
     }

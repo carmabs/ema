@@ -5,6 +5,7 @@ import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.extension.ResultId
 import com.carmabs.ema.core.extension.distinctNavigationChanges
 import com.carmabs.ema.core.extension.distinctSingleEventChanges
+import com.carmabs.ema.core.extension.distinctStateDataChanges
 import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaEvent
@@ -167,7 +168,8 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
     /**
      * Get observable state as LiveDaya to avoid state setting from the view
      */
-    override fun subscribeStateUpdates(): Flow<EmaState<S, N>> = observableState
+    override fun subscribeStateUpdates(): Flow<EmaState<S, N>> =
+        observableState.distinctStateDataChanges()
 
     /**
      * Get current state of view
