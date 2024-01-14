@@ -5,7 +5,6 @@ import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.extension.ResultId
 import com.carmabs.ema.core.extension.distinctNavigationChanges
 import com.carmabs.ema.core.extension.distinctSingleEventChanges
-import com.carmabs.ema.core.extension.distinctStateDataChanges
 import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaEvent
@@ -39,7 +38,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
         private set
 
 
-    /**
+     /**
      * To determine if the view must be updated when view model is created automatically
      */
     protected open val updateOnInitialization: Boolean = true
@@ -73,7 +72,17 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      *              -> switch has been set again
      *                  -> saved in view model ------> INFINITE LOOP)
      */
-    private val observableState: MutableSharedFlow<EmaState<S, N>> = MutableSharedFlow(
+    private val eventObservableState: MutableSharedFlow<EmaState<S, N>> = MutableSharedFlow(
+        replay = INT_ONE,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
+
+    /**
+     * Observable for state data update. It must be a separate one to allow separate update on updateToNormalState(). Otherwise, if eventObservableState was used,
+     * if a user make a modifyState, then sends a singleEvent or navigation, the observableState was launch to notify data because their data are different.
+     */
+    private val dataObservableState: MutableSharedFlow<EmaState<S, N>> = MutableSharedFlow(
         replay = INT_ONE,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
@@ -103,7 +112,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
             hasBeenInitialized = true
             onResultListenerSetup()
             if (updateOnInitialization)
-                observableState.tryEmit(state)
+                dataObservableState.tryEmit(state)
             onStateCreated(initializer)
         }
     }
@@ -168,8 +177,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
     /**
      * Get observable state as LiveDaya to avoid state setting from the view
      */
-    override fun subscribeStateUpdates(): Flow<EmaState<S, N>> =
-        observableState.distinctStateDataChanges()
+    override fun subscribeStateUpdates(): Flow<EmaState<S, N>> = dataObservableState
 
     /**
      * Get current state of view
@@ -180,24 +188,34 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      * Get navigation state as LiveData to avoid state setting from the view
      */
     override fun subscribeToNavigationEvents(): Flow<EmaNavigationDirectionEvent> =
-        observableState.distinctNavigationChanges()
+        eventObservableState.distinctNavigationChanges()
 
 
     /**
      * Get single state as LiveData to avoid state setting from the view
      */
     override fun subscribeToSingleEvents(): Flow<EmaEvent> =
-        observableState.distinctSingleEventChanges()
+        eventObservableState.distinctSingleEventChanges()
 
 
     /**
      * Method used to update the state of the view. It will be notified to the observers
      * @param state Tee current state of the view
      */
-    private fun updateView(state: EmaState<S, N>) {
+    private fun updateEventView(state: EmaState<S, N>) {
         hasBeenUpdated = true
         this.state = state
-        observableState.tryEmit(state)
+        eventObservableState.tryEmit(state)
+    }
+
+    /**
+     * Method used to update the state of the view. It will be notified to the observers
+     * @param state Tee current state of the view
+     */
+    private fun updateDataView(state: EmaState<S, N>) {
+        hasBeenUpdated = true
+        this.state = state
+        dataObservableState.tryEmit(state)
     }
 
     /**
@@ -205,11 +223,11 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      * It a new observer is attached, it will not be notified
      */
     protected open fun notifySingleEvent(extraData: EmaExtraData) {
-        updateView(state.setSingleEvent(extraData))
+        updateEventView(state.setSingleEvent(extraData))
     }
 
     override fun consumeSingleEvent() {
-        updateView(state.consumeSingleEvent())
+        updateEventView(state.consumeSingleEvent())
     }
 
     /**
@@ -217,11 +235,11 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      * @param navigation The object that represent the destination of the navigation
      */
     protected fun navigate(navigation: N) {
-        updateView(state.navigate(navigation))
+        updateEventView(state.navigate(navigation))
     }
 
     override fun notifyOnNavigated() {
-        updateView(state.onNavigated())
+        updateEventView(state.onNavigated())
     }
 
     /**
@@ -271,7 +289,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      * @param changeStateFunction create the new state
      */
     protected fun updateToNormalState(changeStateFunction: S.() -> S) {
-        updateView(state.normal {
+        updateDataView(state.normal {
             changeStateFunction.invoke(this)
         })
     }
@@ -281,7 +299,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      * Use the EmaState -> Normal
      */
     protected fun updateToNormalState() {
-        updateView(state.normal())
+        updateDataView(state.normal())
     }
 
     /**
@@ -295,7 +313,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
     }
 
     protected fun updateDataState(changeStateFunction: S.() -> S) {
-        updateView(state.update {
+        updateDataView(state.update {
             changeStateFunction(this)
         })
     }
@@ -326,7 +344,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
         val overlappedData: EmaState.Overlapped<S, N> = data?.let {
             state.overlapped(extraData = it)
         } ?: state.overlapped()
-        updateView(overlappedData)
+        updateDataView(overlappedData)
     }
 
     /**
@@ -371,6 +389,6 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
     }
 
     override fun onActionBackHardwarePressed() {
-        updateView(state.navigateBack())
+        updateEventView(state.navigateBack())
     }
 }

@@ -13,6 +13,7 @@ import com.carmabs.ema.android.constants.EMA_RESULT_KEY
 import com.carmabs.ema.android.delegates.emaViewModelDelegate
 import com.carmabs.ema.android.extension.addOnBackPressedListener
 import com.carmabs.ema.android.extension.getInitializer
+import com.carmabs.ema.android.navigation.EmaActivityBackDelegate
 import com.carmabs.ema.android.navigation.EmaActivityNavControllerNavigator
 import com.carmabs.ema.android.navigation.EmaNavControllerNavigator
 import com.carmabs.ema.android.ui.EmaAndroidView
@@ -44,11 +45,12 @@ import java.io.Serializable
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent> :
-    AppCompatActivity(), EmaAndroidView<S, VM, N>, AndroidScopeComponent {
+    AppCompatActivity(), EmaAndroidView<S, VM, N>, AndroidScopeComponent, EmaActivityBackDelegate {
 
     final override val scope: Scope by activityScope()
 
 
+    override val ownsBackDelegate = false
     /**
      * The onCreate base will set the view specified in [.getLayout] and will
      * inject dependencies and views.
@@ -59,12 +61,19 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         super<AppCompatActivity>.onCreate(savedInstanceState)
         //Call scope to call scope to enable injection
         scope
-        addOnBackPressedListener {
-            vm.onActionBackHardwarePressed()
-            //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
-            EmaBackHandlerStrategy.Cancelled
+        if(!ownsBackDelegate){
+            addOnBackPressedListener {
+                onBackDelegate()
+            }
         }
+
         onCreate(viewModelSeed)
+    }
+
+    final override fun onBackDelegate():EmaBackHandlerStrategy {
+        vm.onActionBackHardwarePressed()
+        //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
+        return EmaBackHandlerStrategy.Cancelled
     }
 
     @CallSuper

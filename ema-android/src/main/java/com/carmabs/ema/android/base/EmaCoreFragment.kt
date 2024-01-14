@@ -17,6 +17,7 @@ import com.carmabs.ema.android.constants.EMA_RESULT_KEY
 import com.carmabs.ema.android.delegates.emaViewModelDelegate
 import com.carmabs.ema.android.extension.addOnBackPressedListener
 import com.carmabs.ema.android.extension.getInitializer
+import com.carmabs.ema.android.navigation.EmaActivityBackDelegate
 import com.carmabs.ema.android.ui.EmaAndroidView
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
@@ -142,9 +143,23 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         super.onViewCreated(view, savedInstanceState)
         if (!handleBackPressedManually)
             addOnBackPressedListener {
-                vm.onActionBackHardwarePressed()
-                //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
-                EmaBackHandlerStrategy.Cancelled
+                val parentActivity = requireActivity()
+                if( parentActivity is EmaActivityBackDelegate){
+                    if(parentActivity.ownsBackDelegate){
+                        parentActivity.onBackDelegate()
+                    }else{
+                        vm.onActionBackHardwarePressed()
+                        //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
+                        EmaBackHandlerStrategy.Cancelled
+                    }
+
+                }
+                else{
+                    vm.onActionBackHardwarePressed()
+                    //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
+                    EmaBackHandlerStrategy.Cancelled
+                }
+
             }
         onCreate(viewModelSeed)
     }

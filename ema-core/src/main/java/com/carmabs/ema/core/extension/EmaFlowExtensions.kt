@@ -36,9 +36,6 @@ fun <T> Flow<T>.concat(flow: Flow<T>): Flow<T> {
 fun <S : EmaDataState, N : EmaNavigationEvent> Flow<EmaState<S, N>>.distinctStateDataChanges(): Flow<EmaState<S, N>> {
     return distinctUntilChanged { old, new ->
         when {
-            old.singleEvent != new.singleEvent -> true // It means the change is due to single event
-            old.navigation != new.navigation -> true // It means the change is due to navigation event
-            old.result != new.result -> true // It means the change is due to navigation event
             old.data != new.data -> false
             old::class.jvmName != new::class.jvmName -> false
             old is EmaState.Overlapped && new is EmaState.Overlapped
