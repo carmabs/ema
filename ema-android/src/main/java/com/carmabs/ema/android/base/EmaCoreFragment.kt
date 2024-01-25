@@ -63,11 +63,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         mutableListOf()
     }
 
-    /**
-     * The view model of the fragment
-     */
-    protected val vm: VM by emaViewModelDelegate()
-
+    override val viewModel: VM by emaViewModelDelegate()
     /**
      * Trigger to start viewmodel only when startViewModel is launched
      */
@@ -100,9 +96,6 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     final override val androidViewModelSeed: EmaAndroidViewModel<S, N> by lazy {
         provideAndroidViewModel()
     }
-
-    final override val viewModelSeed: VM
-        get() = androidViewModelSeed.emaViewModel as VM
 
     override val coroutineScope: CoroutineScope
         get() = lifecycleScope
@@ -148,20 +141,20 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
                     if(parentActivity.ownsBackDelegate){
                         parentActivity.onBackDelegate()
                     }else{
-                        vm.onActionBackHardwarePressed()
+                        viewModel.onActionBackHardwarePressed()
                         //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
                         EmaBackHandlerStrategy.Cancelled
                     }
 
                 }
                 else{
-                    vm.onActionBackHardwarePressed()
+                    viewModel.onActionBackHardwarePressed()
                     //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
                     EmaBackHandlerStrategy.Cancelled
                 }
 
             }
-        onCreate(viewModelSeed)
+        onCreate(viewModel)
     }
 
 
@@ -171,7 +164,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     @CallSuper
     override fun onStart() {
         super.onStart()
-        onStartView(vm)
+        onStartView(viewModel)
     }
 
     /**
@@ -187,10 +180,10 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         //On restoreInstanceState is called between onStart and onResume, on re-initialization, so binding the views here, guarantees the state of
         //savedInstances has been restored
         if (viewJob == null) {
-            viewJob = onBindView(getScope(), vm)
+            viewJob = onBindView(getScope(), viewModel)
         }
         super.onResume()
-        onResumeView(vm)
+        onResumeView(viewModel)
     }
 
     /**
@@ -199,7 +192,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     @CallSuper
     override fun onPause() {
         super.onPause()
-        onPauseView(vm)
+        onPauseView(viewModel)
     }
 
     /**
@@ -250,7 +243,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     @CallSuper
     override fun onStop() {
         super.onStop()
-        onUnbindView(viewJob, vm)
+        onUnbindView(viewJob, viewModel)
         viewJob = null
         removeExtraViewModels()
     }

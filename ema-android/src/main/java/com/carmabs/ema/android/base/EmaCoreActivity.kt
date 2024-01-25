@@ -35,7 +35,6 @@ import kotlinx.coroutines.launch
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.scope.activityScope
 import org.koin.core.scope.Scope
-import java.io.Serializable
 
 /**
  *
@@ -67,11 +66,11 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
             }
         }
 
-        onCreate(viewModelSeed)
+        onCreate(viewModel)
     }
 
     final override fun onBackDelegate():EmaBackHandlerStrategy {
-        vm.onActionBackHardwarePressed()
+        viewModel.onActionBackHardwarePressed()
         //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
         return EmaBackHandlerStrategy.Cancelled
     }
@@ -101,8 +100,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         get() = lifecycleScope
 
 
-    override val viewModelSeed: VM
-        get() = androidViewModelSeed.emaViewModel as VM
+    override val viewModel: VM by emaViewModelDelegate()
 
 
     private var viewJob: MutableList<Job>? = null
@@ -116,11 +114,6 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     private val extraViewJobs: MutableList<Job> by lazy {
         mutableListOf()
     }
-
-    /**
-     * The view model of the fragment
-     */
-    protected val vm: VM by emaViewModelDelegate()
 
     /**
      * Trigger to start viewmodel only when startViewModel is launched
@@ -139,7 +132,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
      */
     @CallSuper
     override fun onStart() {
-        onStartView(vm)
+        onStartView(viewModel)
         super.onStart()
     }
 
@@ -155,10 +148,10 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         //On restoreInstanceState is called between onStart and onResume, on re-initialization, so binding the views here, guarantees the state of
         //savedInstances has been restored
         if(viewJob == null){
-            viewJob = onBindView(this.lifecycleScope, vm)
+            viewJob = onBindView(this.lifecycleScope, viewModel)
         }
         super.onResume()
-        onResumeView(vm)
+        onResumeView(viewModel)
     }
 
     /**
@@ -166,7 +159,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
      */
     @CallSuper
     override fun onPause() {
-        onPauseView(vm)
+        onPauseView(viewModel)
         super.onPause()
     }
 
@@ -222,7 +215,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     @CallSuper
     override fun onStop() {
         removeExtraViewModels()
-        onUnbindView(viewJob, vm)
+        onUnbindView(viewJob, viewModel)
         viewJob = null
         super.onStop()
     }

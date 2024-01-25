@@ -12,7 +12,7 @@ rootProject.ext {
 
     constraintVersion = "2.1.4"
 
-    materialVersion = "1.7.0"
+    materialVersion = "1.11.0"
 
     coroutinesVersion = "1.6.4"
 
@@ -38,7 +38,7 @@ rootProject.ext {
 
     lifecycleKtExtensionVersion = '2.5.1'
 
-    fragmentVersion = "1.5.4"
+    fragmentVersion = "1.5.5"
 
     reflectVersion = "1.8.0"
 

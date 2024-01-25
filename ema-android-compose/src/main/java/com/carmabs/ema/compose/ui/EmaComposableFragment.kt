@@ -39,7 +39,7 @@ abstract class EmaComposableFragment<S : EmaDataState, VM : EmaViewModel<S, N>, 
         isFirstOverlayedExecution = true
         return ComposeView(requireContext()).apply {
             setContent {
-                val state = vm.subscribeStateUpdates()
+                val state = viewModel.subscribeStateUpdates()
                     .collectAsState(initial = EmaState.Normal(object : EmaDataState {} as S))
                 when (val emaState = state.value) {
                     is EmaState.Normal<S,N> -> {

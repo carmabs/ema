@@ -17,7 +17,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.io.Serializable
 import kotlin.jvm.internal.PropertyReference0
 import kotlin.reflect.KProperty
 
@@ -38,9 +37,9 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEv
     val coroutineScope: CoroutineScope
 
     /**
-     * The view mdeol seed [EmaViewModel] for the view
+     * The view model [EmaViewModel] for the view
      */
-    val viewModelSeed: VM
+    val viewModel: VM
 
     /**
      * The navigator [EmaNavigator]
@@ -191,7 +190,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEv
     fun onSingleData(event : EmaEvent) {
         event.onLaunched {
             onSingleEvent(it)
-            viewModelSeed.consumeSingleEvent()
+            viewModel.consumeSingleEvent()
         }
 
     }
@@ -211,7 +210,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEv
                     navigate(direction.navigationEvent as N)
                 }
             }
-            viewModelSeed.notifyOnNavigated()
+            viewModel.notifyOnNavigated()
         }
     }
 

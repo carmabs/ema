@@ -42,9 +42,6 @@ class EmaNavigationBackHandler(
                 }
             }
         }
-        activity.onBackPressedDispatcher.addCallback(
-            lifecycleOwner, backPressedCallback
-        )
     }
 
     fun remove() {
@@ -54,8 +51,12 @@ class EmaNavigationBackHandler(
 
     fun restore() {
         if (shouldRestore) {
-            activity.onBackPressedDispatcher.addCallback(backPressedCallback)
+            activity.onBackPressedDispatcher.addCallback(lifecycleOwner,backPressedCallback)
             shouldRestore = false
         }
+    }
+
+    internal fun add() {
+        activity.onBackPressedDispatcher.addCallback(lifecycleOwner,backPressedCallback)
     }
 }
