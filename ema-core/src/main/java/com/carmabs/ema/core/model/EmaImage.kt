@@ -1,5 +1,6 @@
 package com.carmabs.ema.core.model
 
+import com.carmabs.ema.core.value.EmaUriRes
 import java.io.Serializable
 
 /**
@@ -38,6 +39,11 @@ sealed class EmaImage(
             return bytes.contentHashCode()
         }
     }
+
+    data class Uri(val uri: EmaUriRes,
+                  override val width: Int? = null,
+                  override val height: Int? = null ,
+                  override val colorTint: Int? = null) : EmaImage()
 
     data class Id(val id: Int,
                   override val width: Int? = null,
