@@ -24,6 +24,11 @@ fun EmaUriRes.requireDrawable(context: Context): Drawable {
 }
 
 @SuppressLint("DiscouragedApi")
+fun EmaUriRes.getResourceId(context: Context):Int {
+    return context.resources.getIdentifier(Uri.parse(value).lastPathSegment, "drawable", context.packageName)
+}
+
+@SuppressLint("DiscouragedApi")
 fun EmaUriRes.getVectorDrawable(context: Context):Drawable? {
     val resourceId = context.resources.getIdentifier(Uri.parse(value).lastPathSegment, "drawable", context.packageName)
     return VectorDrawableCompat.create(context.resources, resourceId, context.theme)?.current

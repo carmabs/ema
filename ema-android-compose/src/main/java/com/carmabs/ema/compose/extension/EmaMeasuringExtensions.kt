@@ -2,6 +2,7 @@ package com.carmabs.ema.compose.extension
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import com.carmabs.ema.core.constants.INT_ZERO
@@ -31,3 +32,11 @@ fun EmaMeasureViewWidth(
         }
     }
 }
+
+
+val Dp.inSp
+    @Composable
+    get() = run {
+        val dp = this
+        with(LocalDensity.current) { dp.toSp() }
+    }
