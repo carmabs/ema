@@ -59,11 +59,11 @@ fun NavController.navigate(
 
 fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen, VM : EmaAndroidViewModel<S, D>> NavGraphBuilder.createComposableScreen(
     screenContent: EmaComposableScreenContent<S, A>,
+    androidViewModel: @Composable () -> VM,
     onNavigationEvent: (D) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     routeId: String = screenContent::class.routeId,
     overrideInitializer: EmaInitializer? = null,
-    androidViewModel: @Composable () -> VM,
     onViewModelInstance: (@Composable (EmaViewModel<S, D>) -> Unit)? = null,
     fullScreenDialogMode: Boolean = false,
     transitionAnimation: EmaComposableTransitions = EmaComposableTransitions(),

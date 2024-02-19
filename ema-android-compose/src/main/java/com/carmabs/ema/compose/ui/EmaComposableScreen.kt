@@ -44,7 +44,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : EmaA
     screenContent: EmaComposableScreenContent<S, A>,
     onNavigationEvent: (D) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
-    actionSubscriber: ((A) -> Unit)? = null,
+    onAction: ((A) -> Unit)? = null,
     previewRenderState: S? = null
 ) {
     skipForPreview(
@@ -69,7 +69,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : EmaA
             immutableActions,
             onNavigationEvent,
             onBackEvent,
-            actionSubscriber
+            onAction
         )
     }
 }
@@ -81,7 +81,7 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen> EmaComposab
     screenContent: EmaComposableScreenContent<S, A>,
     onNavigationEvent: (D) -> Unit,
     onBackEvent:((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
-    actionsSubscriber: ((A) -> Unit)? = null,
+    onAction: ((A) -> Unit)? = null,
     previewRenderState: S? = null
 ) {
     skipForPreview(
@@ -110,7 +110,7 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen> EmaComposab
             immutableActions,
             onNavigationEvent,
             onBackEvent,
-            actionsSubscriber
+            onAction
         )
     }
 }
@@ -123,7 +123,7 @@ private fun <A : EmaAction.Screen, D : EmaNavigationEvent, S : EmaDataState> ren
     immutableActions: EmaImmutableActionDispatcher<A>,
     onNavigationEvent: (D) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
-    actionSubscriber: ((A) -> Unit)? = null,
+    onAction: ((A) -> Unit)? = null,
     ) {
     val currentActivity = LocalContext.activity
     //We want to use onBackEvent to enable manual back navigation from viewmodel to handle
@@ -233,10 +233,10 @@ private fun <A : EmaAction.Screen, D : EmaNavigationEvent, S : EmaDataState> ren
         }
     }
 
-    actionSubscriber?.also {
+    onAction?.also {
         LaunchedEffect(key1 = Unit) {
             vm.asActionDispatcher<A>().subscribeToActions().collect{
-                actionSubscriber(it)
+                onAction(it)
             }
         }
     }
