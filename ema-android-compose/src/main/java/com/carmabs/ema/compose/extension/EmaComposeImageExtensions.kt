@@ -2,15 +2,22 @@ package com.carmabs.ema.compose.extension
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import com.carmabs.ema.android.extension.getResourceId
+import com.carmabs.ema.android.extension.toBitmap
 import com.carmabs.ema.core.model.EmaImage
+import kotlinx.coroutines.runBlocking
 
 /**
  * Created by Carlos Mateo Benito on 13/2/24.
@@ -47,11 +54,20 @@ fun EmaImage.toComposableImage(
 fun EmaImage.toComposePainter(): Painter {
     return  when (this) {
         is EmaImage.Id -> {
-            androidx.compose.ui.res.painterResource(id = id)
+            painterResource(id = id)
         }
 
         is EmaImage.Uri -> {
-            androidx.compose.ui.res.painterResource(id = uri.getResourceId(LocalContext.current))
+            painterResource(id = uri.getResourceId(LocalContext.current))
+        }
+
+        is EmaImage.ByteArray -> {
+            remember {
+                val bitmap = runBlocking {
+                    bytes.toBitmap(width,height,colorTint)
+                }
+                BitmapPainter(bitmap.asImageBitmap())
+            }
         }
     }
 }
