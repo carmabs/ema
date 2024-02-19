@@ -15,6 +15,7 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -31,6 +32,9 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
     defaultScope: CoroutineScope = EmaMainScope()
 ) : EmaViewModel<S, N> {
 
+    private val singleSideEffectMap by lazy {
+        hashMapOf<String,Job>()
+    }
     /**
      * The scope where coroutines will be launched by default.
      */
@@ -260,6 +264,17 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
         return EmaFunctionResultHandler(scope, dispatcher, action)
     }
 
+    protected fun <T> singleSideEffect(
+        id:String,
+        dispatcher: CoroutineContext = this.scope.coroutineContext,
+        action: suspend CoroutineScope.() -> T
+    ): EmaFunctionResultHandler<T> {
+        singleSideEffectMap[id]?.cancel()
+        val handler =  EmaFunctionResultHandler(scope, dispatcher, action)
+        singleSideEffectMap[id] = handler.job
+        return handler
+    }
+
     /**
      * Method to override onCleared ViewModel method
      */
@@ -312,7 +327,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
         }
     }
 
-    protected fun updateDataState(changeStateFunction: S.() -> S) {
+    protected fun updateState(changeStateFunction: S.() -> S) {
         updateDataView(state.update {
             changeStateFunction(this)
         })
