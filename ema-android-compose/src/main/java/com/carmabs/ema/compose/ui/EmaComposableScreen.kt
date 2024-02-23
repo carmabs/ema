@@ -13,8 +13,10 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import com.carmabs.ema.android.extension.addOnBackPressedListener
 import com.carmabs.ema.android.navigation.EmaNavigationBackHandler
+import com.carmabs.ema.android.savestate.SaveStateManager
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcherEmpty
@@ -35,6 +37,7 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.carmabs.ema.core.viewmodel.EmaViewModelAction
 
 @Composable
 fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : EmaAction.Screen> EmaComposableScreen(
@@ -75,13 +78,14 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : EmaA
 }
 
 @Composable
-fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen> EmaComposableScreen(
+fun <S : EmaDataState, N : EmaNavigationEvent, A : EmaAction.Screen> EmaComposableScreen(
     initializer: EmaInitializer? = null,
-    vm: () -> EmaAndroidViewModel<S, D>,
+    vm: () -> EmaViewModel<S, N>,
     screenContent: EmaComposableScreenContent<S, A>,
-    onNavigationEvent: (D) -> Unit,
-    onBackEvent:((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
+    onNavigationEvent: (N) -> Unit,
+    onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     onAction: ((A) -> Unit)? = null,
+    saveStateManager: SaveStateManager<A, S, N>? = null,
     previewRenderState: S? = null
 ) {
     skipForPreview(
@@ -95,24 +99,52 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen> EmaComposab
 
         }
     ) {
-        val viewModel = EmaScreenProvider.provideComposableViewModel(androidViewModel = remember {
+        val androidVm = EmaScreenProvider.provideComposableViewModel(viewModel = remember {
             vm.invoke()
         })
 
+        val emaVm = androidVm.emaViewModel
+
         val immutableActions = remember {
-            viewModel.asActionDispatcher<A>().toImmutable()
+            emaVm.asActionDispatcher<A>().toImmutable()
         }
 
+        val initializerWithSaveStateSupport =
+            handleSaveStateSupport(
+                initializer = initializer,
+                androidViewModel = androidVm,
+                saveStateManager = saveStateManager
+            )
+
         renderScreen(
-            initializer,
+            initializerWithSaveStateSupport,
             screenContent,
-            viewModel,
+            emaVm,
             immutableActions,
             onNavigationEvent,
             onBackEvent,
             onAction
         )
     }
+}
+
+@Composable
+internal fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> handleSaveStateSupport(
+    initializer: EmaInitializer?,
+    androidViewModel: EmaAndroidViewModel<S, N>,
+    saveStateManager: SaveStateManager<A, S, N>?
+): EmaInitializer? = remember {
+    saveStateManager?.also { handler ->
+        initializer?.also {
+            handler.save(it, androidViewModel.savedStateHandle)
+        }
+    }
+    saveStateManager?.onSaveStateHandling(
+        androidViewModel.viewModelScope,
+        androidViewModel.savedStateHandle,
+        androidViewModel.emaViewModel as EmaViewModelAction<A, S, N>
+    )
+    initializer ?: saveStateManager?.restore(androidViewModel.savedStateHandle)
 }
 
 @Composable
@@ -124,7 +156,7 @@ private fun <A : EmaAction.Screen, D : EmaNavigationEvent, S : EmaDataState> ren
     onNavigationEvent: (D) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     onAction: ((A) -> Unit)? = null,
-    ) {
+) {
     val currentActivity = LocalContext.activity
     //We want to use onBackEvent to enable manual back navigation from viewmodel to handle
     //back result
@@ -218,7 +250,7 @@ private fun <A : EmaAction.Screen, D : EmaNavigationEvent, S : EmaDataState> ren
         }
     }
 
-    if(vm.shouldRenderState) {
+    if (vm.shouldRenderState) {
         screenContent.onStateNormal(state.data, immutableActions)
         OverlappedComposable((state as? EmaState.Overlapped), screenContent, immutableActions)
     }
@@ -235,7 +267,7 @@ private fun <A : EmaAction.Screen, D : EmaNavigationEvent, S : EmaDataState> ren
 
     onAction?.also {
         LaunchedEffect(key1 = Unit) {
-            vm.asActionDispatcher<A>().subscribeToActions().collect{
+            vm.asActionDispatcher<A>().subscribeToActions().collect {
                 onAction(it)
             }
         }
@@ -266,8 +298,8 @@ private fun <D : EmaNavigationEvent, S : EmaDataState> rememberBackHardwareClick
 }
 
 @Composable
-private fun <S : EmaDataState, A : EmaAction.Screen,N:EmaNavigationEvent> OverlappedComposable(
-    overlappedState: EmaState.Overlapped<S,N>? = null,
+private fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> OverlappedComposable(
+    overlappedState: EmaState.Overlapped<S, N>? = null,
     screenContent: EmaComposableScreenContent<S, A>,
     actions: EmaImmutableActionDispatcher<A>
 ) {

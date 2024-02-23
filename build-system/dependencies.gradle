@@ -42,6 +42,8 @@ rootProject.ext {
 
     reflectVersion = "1.8.0"
 
+    serializationJsonVersion = "1.6.0"
+
     emaVersioning = [
             minSdk           : 24,
             compileSdk       : 34,
@@ -55,9 +57,10 @@ rootProject.ext {
     ]
 
     emaCoreDependencies = [
-            kotlin    : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:" + project.kotlinVersion,
-            coroutines: 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + project.coroutinesVersion,
-            reflect   : 'org.jetbrains.kotlin:kotlin-reflect:' + project.reflectVersion
+            kotlin           : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:" + project.kotlinVersion,
+            coroutines       : 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + project.coroutinesVersion,
+            reflect          : 'org.jetbrains.kotlin:kotlin-reflect:' + project.reflectVersion,
+            serializationJson: 'org.jetbrains.kotlinx:kotlinx-serialization-json:' + project.serializationJsonVersion
     ]
 
     emaTestingDependencies = [

@@ -396,7 +396,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      * Method called when the ViewModel is destroyed. It cancels all background pending tasks.
      * Check call name for EmaAndroidView. It uses reflection to call this internal method
      */
-    internal fun onCleared() {
+    override fun onCleared() {
         emaResultHandler.notifyResults(id)
         emaResultHandler.removeResultListener(id)
         scope.cancel()

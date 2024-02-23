@@ -13,6 +13,7 @@ compileKotlin {
 dependencies {
     api emaCoreDependencies.kotlin
     api emaCoreDependencies.coroutines
+    api emaCoreDependencies.serializationJson
     implementation emaCoreDependencies.reflect
     implementation emaTestingDependencies.junit
 }

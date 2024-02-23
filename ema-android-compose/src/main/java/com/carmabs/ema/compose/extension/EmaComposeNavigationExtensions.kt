@@ -2,6 +2,7 @@ package com.carmabs.ema.compose.extension
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
 import androidx.navigation.NavBackStackEntry
@@ -13,22 +14,21 @@ import androidx.navigation.Navigator
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import com.carmabs.ema.android.extension.findComponentActivity
-import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
+import com.carmabs.ema.android.savestate.SaveStateManager
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.toImmutable
 import com.carmabs.ema.compose.navigation.EmaComposableTransitions
 import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.compose.ui.EmaComposableScreen
 import com.carmabs.ema.compose.ui.EmaComposableScreenContent
+import com.carmabs.ema.compose.ui.handleSaveStateSupport
 import com.carmabs.ema.core.action.EmaAction
-import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaBackHandlerStrategy
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import com.carmabs.ema.core.viewmodel.EmaViewModelAction
 import kotlin.collections.set
 
 
@@ -57,34 +57,47 @@ fun NavController.navigate(
     navigate(route, navOptions, navigatorExtras)
 }
 
-fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen, VM : EmaAndroidViewModel<S, D>> NavGraphBuilder.createComposableScreen(
+fun <S : EmaDataState, N : EmaNavigationEvent, A : EmaAction.Screen> NavGraphBuilder.createComposableScreen(
     screenContent: EmaComposableScreenContent<S, A>,
-    androidViewModel: @Composable () -> VM,
-    onNavigationEvent: (D) -> Unit,
+    viewModel: () -> EmaViewModel<S, N>,
+    onNavigationEvent: (N) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     routeId: String = screenContent::class.routeId,
     overrideInitializer: EmaInitializer? = null,
-    onViewModelInstance: (@Composable (EmaViewModel<S, D>) -> Unit)? = null,
+    saveStateManager: SaveStateManager<A, S, N>? = null,
+    onViewModelInstance: (@Composable (EmaViewModel<S, N>) -> Unit)? = null,
     fullScreenDialogMode: Boolean = false,
     transitionAnimation: EmaComposableTransitions = EmaComposableTransitions(),
     decoration: @Composable ((content: @Composable () -> Unit, dispatcher: EmaImmutableActionDispatcher<A>) -> Unit)? = null,
     previewRenderState: S? = null
 ) {
     val content: @Composable (NavGraphBuilder.(NavBackStackEntry) -> Unit) =
-        @Composable { navBack ->
-            val viewModel =
-                EmaScreenProvider.provideComposableViewModel(androidViewModel = androidViewModel.invoke())
-            val vmActions = viewModel.asActionDispatcher<A>().toImmutable()
+        @Composable { _ ->
+            val androidVm = EmaScreenProvider.provideComposableViewModel(viewModel = remember {
+                viewModel.invoke()
+            })
 
-            onViewModelInstance?.invoke(viewModel)
+            val vm = androidVm.emaViewModel
+
+            val vmActions = vm.asActionDispatcher<A>().toImmutable()
+
+            val initializerWithSaveStateSupport =
+                handleSaveStateSupport(
+                    initializer = overrideInitializer ?: getAndReleaseInitializer(routeId),
+                    androidViewModel = androidVm,
+                    saveStateManager = saveStateManager
+                )
+
+            onViewModelInstance?.invoke(vm)
             val screenToDraw = @Composable {
                 EmaComposableScreen(
-                    initializer = overrideInitializer ?: getAndReleaseInitializer(routeId),
+                    initializer = initializerWithSaveStateSupport,
                     onNavigationEvent = onNavigationEvent,
                     onBackEvent = onBackEvent,
                     vm = viewModel,
                     actions = vmActions,
                     screenContent = screenContent,
+                    saveStateManager = saveStateManager,
                     previewRenderState = previewRenderState
                 )
             }
