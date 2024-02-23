@@ -51,7 +51,7 @@ class LoginFragment :
         }
     }
 
-    override fun provideAndroidViewModel(): EmaAndroidViewModel {
+    override fun provideAndroidViewModel(): EmaViewModel {
         return LoginAndroidViewModel(injectDirect())
     }
 

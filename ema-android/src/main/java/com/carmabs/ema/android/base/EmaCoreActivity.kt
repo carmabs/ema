@@ -90,11 +90,11 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     protected open fun overrideDestinationInitializer(): EmaInitializer? = null
 
 
-    final override val androidViewModelSeed: EmaAndroidViewModel<S,N> by lazy {
+    final override val androidViewModelSeed: VM by lazy {
         provideAndroidViewModel()
     }
 
-    abstract fun provideAndroidViewModel(): EmaAndroidViewModel<S,N>
+    abstract fun provideAndroidViewModel(): VM
 
     override val coroutineScope: CoroutineScope
         get() = lifecycleScope
@@ -109,7 +109,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
      * The map which handles the view model attached with their respective scopes, to unbind the observers
      * when the view activity is destroyed
      */
-    private val extraViewModelList: MutableList<EmaAndroidViewModel<S,N>> by lazy { mutableListOf() }
+    private val extraViewModelList: MutableList<EmaViewModel<S,N>> by lazy { mutableListOf() }
 
     private val extraViewJobs: MutableList<Job> by lazy {
         mutableListOf()
@@ -177,7 +177,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
      * @param observerFunction the observer of the view model attached
      * @return The view model attached
      */
-    fun <AVM : EmaAndroidViewModel<S,N>> addExtraViewModel(
+    fun <AVM : EmaViewModel<S,N>> addExtraViewModel(
         viewModelAttachedSeed: AVM,
         fragment: Fragment? = null,
         observerFunction: ((attachedState: EmaState<*,*>) -> Unit)? = null
@@ -188,12 +188,12 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
                 ViewModelProvider(
                     it,
                     EmaViewModelFactory(viewModelAttachedSeed)
-                )[viewModelAttachedSeed::class.java]
+                )[viewModelAttachedSeed.id,EmaAndroidViewModel::class.java]
             }
                 ?: ViewModelProvider(
                     this,
                     EmaViewModelFactory(viewModelAttachedSeed)
-                )[viewModelAttachedSeed::class.java]
+                )[viewModelAttachedSeed.id,EmaAndroidViewModel::class.java]
 
         observerFunction?.also {
             extraViewJobs.add(coroutineScope.launch {
@@ -203,9 +203,9 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
             }
             )
         }
-        extraViewModelList.add(viewModel as EmaAndroidViewModel<S,N>)
+        extraViewModelList.add(viewModel.emaViewModel as EmaViewModel<S,N>)
 
-        return viewModel
+        return viewModel.emaViewModel as AVM
     }
 
 

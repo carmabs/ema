@@ -40,9 +40,9 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.carmabs.ema.core.viewmodel.EmaViewModelAction
 
 @Composable
-fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : EmaAction.Screen> EmaComposableScreen(
+fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen> EmaComposableScreen(
     initializer: EmaInitializer? = null,
-    vm: VM,
+    vm: EmaViewModel<S, D>,
     actions: EmaActionDispatcher<A>,
     screenContent: EmaComposableScreenContent<S, A>,
     onNavigationEvent: (D) -> Unit,
@@ -61,6 +61,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : EmaA
 
         }
     ) {
+
         val immutableActions = remember {
             actions.toImmutable()
         }
@@ -78,7 +79,7 @@ fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent, A : EmaA
 }
 
 @Composable
-fun <S : EmaDataState, N : EmaNavigationEvent, A : EmaAction.Screen> EmaComposableScreen(
+fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> EmaComposableScreen(
     initializer: EmaInitializer? = null,
     vm: () -> EmaViewModel<S, N>,
     screenContent: EmaComposableScreenContent<S, A>,
@@ -148,12 +149,12 @@ internal fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> ha
 }
 
 @Composable
-private fun <A : EmaAction.Screen, D : EmaNavigationEvent, S : EmaDataState> renderScreen(
+private fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> renderScreen(
     initializer: EmaInitializer?,
     screenContent: EmaComposableScreenContent<S, A>,
-    vm: EmaViewModel<S, D>,
+    vm: EmaViewModel<S, N>,
     immutableActions: EmaImmutableActionDispatcher<A>,
-    onNavigationEvent: (D) -> Unit,
+    onNavigationEvent: (N) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     onAction: ((A) -> Unit)? = null,
 ) {
@@ -242,7 +243,7 @@ private fun <A : EmaAction.Screen, D : EmaNavigationEvent, S : EmaDataState> ren
                     }
 
                     is EmaNavigationDirection.Forward -> {
-                        onNavigationEvent(eventData.navigationEvent as D)
+                        onNavigationEvent(eventData.navigationEvent as N)
                     }
                 }
                 vm.notifyOnNavigated()

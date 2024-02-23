@@ -44,7 +44,7 @@ class HomeFragment :
         }
     }
 
-    override fun provideAndroidViewModel(): EmaAndroidViewModel {
+    override fun provideAndroidViewModel(): EmaViewModel {
         return HomeAndroidViewModel(injectDirect())
     }
 

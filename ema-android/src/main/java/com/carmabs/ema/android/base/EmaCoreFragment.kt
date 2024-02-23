@@ -90,10 +90,10 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
 
     abstract override val navigator: EmaNavigator<N>?
 
-    abstract fun provideAndroidViewModel(): EmaAndroidViewModel<S, N>
+    abstract fun provideAndroidViewModel(): VM
 
 
-    final override val androidViewModelSeed: EmaAndroidViewModel<S, N> by lazy {
+    final override val androidViewModelSeed: VM by lazy {
         provideAndroidViewModel()
     }
 
@@ -204,7 +204,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
      * @param observerFunction the observer of the view model attached
      * @return The view model attached
      */
-    fun <AVM : EmaAndroidViewModel<S, N>> addExtraViewModel(
+    fun <AVM : EmaViewModel<S, N>> addExtraViewModel(
         viewModelAttachedSeed: AVM,
         fragment: Fragment,
         fragmentActivity: FragmentActivity? = null,
@@ -215,24 +215,24 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
                 ViewModelProvider(
                     it,
                     EmaViewModelFactory(viewModelAttachedSeed)
-                )[viewModelAttachedSeed::class.java]
+                )[viewModelAttachedSeed.id, EmaAndroidViewModel::class.java]
             }
                 ?: ViewModelProvider(
                     fragment,
                     EmaViewModelFactory(viewModelAttachedSeed)
-                )[viewModelAttachedSeed::class.java]
+                )[viewModelAttachedSeed.id, EmaAndroidViewModel::class.java]
 
         observerFunction?.also {
             val job = coroutineScope.launch {
                 viewModel.emaViewModel.subscribeStateUpdates().collect {
-                    observerFunction.invoke(it)
+                    observerFunction.invoke(it as EmaState<S, N>)
                 }
             }
             extraViewJobs.add(job)
         }
         extraViewModelList.add(viewModel as EmaAndroidViewModel<S, N>)
 
-        return viewModel
+        return viewModel.emaViewModel as AVM
     }
 
     /**

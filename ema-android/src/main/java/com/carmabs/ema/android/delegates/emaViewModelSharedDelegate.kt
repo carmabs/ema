@@ -22,7 +22,7 @@ import kotlin.reflect.KProperty
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 @Suppress("ClassName")
-class emaViewModelSharedDelegate<S : EmaDataState, VM : EmaAndroidViewModel<S, N>, N : EmaNavigationEvent>(
+class emaViewModelSharedDelegate<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent>(
     private val viewModelSeed: () -> VM,
     private val observerFunction: ((attachedState: EmaState<S,N>) -> Unit)? = null,
 

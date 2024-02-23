@@ -3,6 +3,8 @@ package com.carmabs.ema.android.viewmodel
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
+import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 
 
@@ -11,7 +13,7 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-internal abstract class EmaFactory<VM : EmaViewModel<*, *>> : AbstractSavedStateViewModelFactory() {
+abstract class EmaFactory<VM : EmaViewModel<*, *>> : AbstractSavedStateViewModelFactory() {
 
     /**
      * Called if the view model has not been created yet

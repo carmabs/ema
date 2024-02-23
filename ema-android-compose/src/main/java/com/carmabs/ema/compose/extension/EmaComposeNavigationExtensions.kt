@@ -57,7 +57,7 @@ fun NavController.navigate(
     navigate(route, navOptions, navigatorExtras)
 }
 
-fun <S : EmaDataState, N : EmaNavigationEvent, A : EmaAction.Screen> NavGraphBuilder.createComposableScreen(
+fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> NavGraphBuilder.createComposableScreen(
     screenContent: EmaComposableScreenContent<S, A>,
     viewModel: () -> EmaViewModel<S, N>,
     onNavigationEvent: (N) -> Unit,
@@ -94,10 +94,9 @@ fun <S : EmaDataState, N : EmaNavigationEvent, A : EmaAction.Screen> NavGraphBui
                     initializer = initializerWithSaveStateSupport,
                     onNavigationEvent = onNavigationEvent,
                     onBackEvent = onBackEvent,
-                    vm = viewModel,
+                    vm = vm,
                     actions = vmActions,
                     screenContent = screenContent,
-                    saveStateManager = saveStateManager,
                     previewRenderState = previewRenderState
                 )
             }

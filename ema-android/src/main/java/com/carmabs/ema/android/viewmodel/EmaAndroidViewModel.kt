@@ -21,7 +21,7 @@ import kotlin.reflect.jvm.javaMethod
  */
 open class EmaAndroidViewModel<S:EmaDataState,D:EmaNavigationEvent>(
     val emaViewModel:EmaViewModel<S,D>,
-    val savedStateHandle: SavedStateHandle
+    val savedStateHandle: SavedStateHandle = SavedStateHandle()
 ) : ViewModel() {
 
     init {

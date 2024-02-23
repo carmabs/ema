@@ -1,6 +1,7 @@
 package com.carmabs.ema.core.initializer
 
 import com.carmabs.ema.core.action.EmaAction
+import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.Serializable
 
 /**
@@ -12,12 +13,14 @@ import kotlinx.serialization.Serializable
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-@Serializable
-interface EmaInitializer : EmaAction.Initializer {
+@Serializable(
+    with = PolymorphicSerializer::class)
+interface EmaInitializer : EmaAction.Initializer,java.io.Serializable {
     companion object {
 
         const val KEY = "EmaInitializer"
     }
+
     object EMPTY : EmaInitializer
 }
 
