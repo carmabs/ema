@@ -23,26 +23,26 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
 interface EmaAndroidView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> :
     EmaView<S, VM, D> {
 
-    val androidViewModelSeed: EmaAndroidViewModel<S,D>
-
     fun initializeViewModel(
         activity: ComponentActivity,
+        viewModelSeed: VM
     ): VM {
-        val emaFactory = EmaViewModelFactory(androidViewModelSeed)
+        val emaFactory = EmaViewModelFactory(viewModelSeed)
         val vm = ViewModelProvider(
             activity,
             emaFactory
-        )[androidViewModelSeed::class.java]
+        )[viewModelSeed.id, EmaAndroidViewModel::class.java]
 
 
         return vm.emaViewModel as VM
     }
 
     fun initializeViewModel(
-        fragment: Fragment
+        fragment: Fragment,
+        viewModelSeed:VM,
     ): VM {
-        val emaFactory = EmaViewModelFactory(androidViewModelSeed)
-        val vm = ViewModelProvider(fragment, emaFactory)[androidViewModelSeed::class.java]
+        val emaFactory = EmaViewModelFactory(viewModelSeed)
+        val vm = ViewModelProvider(fragment, emaFactory)[viewModelSeed.id, EmaAndroidViewModel::class.java]
         return vm.emaViewModel as VM
     }
 }

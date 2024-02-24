@@ -36,6 +36,8 @@ interface EmaViewModel<S : EmaDataState, N : EmaNavigationEvent> {
 
     fun onStopView()
 
+    fun onCleared()
+
     fun subscribeStateUpdates(): Flow<EmaState<S,N>>
 
     /**

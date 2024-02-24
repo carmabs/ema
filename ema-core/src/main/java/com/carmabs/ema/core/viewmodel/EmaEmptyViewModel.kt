@@ -50,6 +50,10 @@ object EmaEmptyViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent> 
 
     }
 
+    override fun onCleared() {
+
+    }
+
     override fun subscribeStateUpdates(): Flow<EmaState<EmaEmptyState,EmaEmptyNavigationEvent>> {
         return emptyFlow()
     }

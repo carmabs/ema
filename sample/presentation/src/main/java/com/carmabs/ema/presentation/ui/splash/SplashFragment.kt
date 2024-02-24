@@ -22,7 +22,7 @@ class SplashFragment :
 
 
 
-    override fun provideAndroidViewModel(): EmaAndroidViewModel {
+    override fun provideViewModel(): EmaViewModel {
         return SplashAndroidViewModel(injectDirect())
     }
 

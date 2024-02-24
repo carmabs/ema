@@ -11,10 +11,11 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
 object EmaScreenProvider {
 
     @Composable
-    fun <S:EmaDataState,D:EmaNavigationEvent>provideComposableViewModel(androidViewModel:EmaAndroidViewModel<S,D>):EmaViewModel<S,D>{
+    fun <S : EmaDataState, N : EmaNavigationEvent> provideComposableViewModel(viewModel: EmaViewModel<S, N>): EmaAndroidViewModel<S, N> {
         return viewModel(
-            androidViewModel::class.java,
-            factory = EmaViewModelFactory(androidViewModel)
-        ).emaViewModel
+            modelClass = EmaAndroidViewModel::class.java,
+            key = viewModel.id,
+            factory = EmaViewModelFactory(viewModel)
+        ) as EmaAndroidViewModel<S, N>
     }
 }

@@ -5,7 +5,7 @@ import kotlin.reflect.KClass
 
 fun <T:EmaViewModel<*,*>> KClass<T>.resultId(id:String?=null): ResultId {
     val resultId = id?:"Default"
-    return ResultId("Result_${resultId}_${this.java.name}_${this.hashCode()}")
+    return ResultId("ViewModel_Result/${resultId}_${this.java.name}_${this.hashCode()}")
 }
 
 @JvmInline
