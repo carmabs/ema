@@ -14,7 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.carmabs.ema.android.constants.EMA_RESULT_CODE
 import com.carmabs.ema.android.constants.EMA_RESULT_KEY
-import com.carmabs.ema.android.delegates.emaViewModelDelegate
+import com.carmabs.ema.android.extension.generateViewModel
 import com.carmabs.ema.android.extension.addOnBackPressedListener
 import com.carmabs.ema.android.extension.getInitializer
 import com.carmabs.ema.android.navigation.EmaActivityBackDelegate
@@ -63,7 +63,9 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         mutableListOf()
     }
 
-    override val viewModel: VM by emaViewModelDelegate()
+    override val viewModel: VM by lazy {
+        generateViewModel(provideViewModel())
+    }
     /**
      * Trigger to start viewmodel only when startViewModel is launched
      */
@@ -90,12 +92,8 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
 
     abstract override val navigator: EmaNavigator<N>?
 
-    abstract fun provideAndroidViewModel(): VM
+    abstract fun provideViewModel(): VM
 
-
-    final override val androidViewModelSeed: VM by lazy {
-        provideAndroidViewModel()
-    }
 
     override val coroutineScope: CoroutineScope
         get() = lifecycleScope

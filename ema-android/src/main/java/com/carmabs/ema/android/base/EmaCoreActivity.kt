@@ -10,8 +10,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.carmabs.ema.android.constants.EMA_RESULT_CODE
 import com.carmabs.ema.android.constants.EMA_RESULT_KEY
-import com.carmabs.ema.android.delegates.emaViewModelDelegate
 import com.carmabs.ema.android.extension.addOnBackPressedListener
+import com.carmabs.ema.android.extension.generateViewModel
 import com.carmabs.ema.android.extension.getInitializer
 import com.carmabs.ema.android.navigation.EmaActivityBackDelegate
 import com.carmabs.ema.android.navigation.EmaActivityNavControllerNavigator
@@ -89,18 +89,15 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
 
     protected open fun overrideDestinationInitializer(): EmaInitializer? = null
 
-
-    final override val androidViewModelSeed: VM by lazy {
-        provideAndroidViewModel()
-    }
-
-    abstract fun provideAndroidViewModel(): VM
+    abstract fun provideViewModel(): VM
 
     override val coroutineScope: CoroutineScope
         get() = lifecycleScope
 
 
-    override val viewModel: VM by emaViewModelDelegate()
+    override val viewModel: VM by lazy {
+        generateViewModel(provideViewModel())
+    }
 
 
     private var viewJob: MutableList<Job>? = null

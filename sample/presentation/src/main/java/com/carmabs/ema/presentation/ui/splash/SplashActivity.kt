@@ -37,7 +37,7 @@ class SplashActivity :
        return ablSplash
     }
 
-    override fun provideAndroidViewModel(): EmaViewModel {
+    override fun provideViewModel(): EmaViewModel {
         return EmaEmptyAndroidViewModel
     }
 
