@@ -8,6 +8,7 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 /**
  * View model to handle view states.
@@ -61,4 +62,64 @@ interface EmaViewModel<S : EmaDataState, N : EmaNavigationEvent> {
         get() {
             return "EmaViewModel ID: ${this.javaClass.name}"
         }
+
+    object EMPTY : EmaViewModel<EmaDataState.EMPTY, EmaNavigationEvent.EMPTY> {
+
+
+        override val initialState: EmaState<EmaDataState.EMPTY,EmaNavigationEvent.EMPTY> = EmaState.Normal(EmaDataState.EMPTY)
+        override val shouldRenderState: Boolean
+        get() = true
+
+        override fun setScope(scope: CoroutineScope) {
+
+        }
+
+        override fun onCreated(initializer: EmaInitializer?) {
+
+        }
+
+        override fun onStartView() {
+
+        }
+
+        override fun onResumeView() {
+
+        }
+
+        override fun onPauseView() {
+
+        }
+
+        override fun onStopView() {
+
+        }
+
+        override fun onCleared() {
+
+        }
+
+        override fun subscribeStateUpdates(): Flow<EmaState<EmaDataState.EMPTY,EmaNavigationEvent.EMPTY>> {
+            return emptyFlow()
+        }
+
+        override fun subscribeToNavigationEvents(): Flow<EmaNavigationDirectionEvent> {
+            return emptyFlow()
+        }
+
+        override fun subscribeToSingleEvents(): Flow<EmaEvent> {
+            return emptyFlow()
+        }
+
+        override fun consumeSingleEvent() {
+
+        }
+
+        override fun notifyOnNavigated() {
+
+        }
+
+        override fun onActionBackHardwarePressed() {
+
+        }
+    }
 }

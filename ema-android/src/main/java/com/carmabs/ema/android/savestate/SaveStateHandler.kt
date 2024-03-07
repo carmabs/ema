@@ -16,22 +16,22 @@ import kotlinx.coroutines.CoroutineScope
  *
  * @author <a href=“mailto:apps.carmabs@gmail.comm”>Carlos Mateo Benito</a>
  */
-interface SaveStateHandler<A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> {
+interface SaveStateHandler<S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> {
     fun onSaveStateHandling(
         scope: CoroutineScope,
         saveStateHandle: SavedStateHandle,
-        viewModel: EmaViewModelAction<A, S, N>
+        viewModel: EmaViewModelAction<S, A, N>
     )
 }
 
-fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> emaSaveStateHandler(
-    onSaveStateHandling: (CoroutineScope, SavedStateHandle, EmaViewModelAction<A, S, N>) -> Unit
-): SaveStateHandler<A, S, N> {
-    return object : SaveStateHandler<A, S, N> {
+fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> emaSaveStateHandler(
+    onSaveStateHandling: (CoroutineScope, SavedStateHandle, EmaViewModelAction<S, A, N>) -> Unit
+): SaveStateHandler<S, A, N> {
+    return object : SaveStateHandler<S, A, N> {
         override fun onSaveStateHandling(
             scope: CoroutineScope,
             saveStateHandle: SavedStateHandle,
-            viewModel: EmaViewModelAction<A, S, N>
+            viewModel: EmaViewModelAction<S, A, N>
         ) {
             onSaveStateHandling.invoke(scope, saveStateHandle, viewModel)
         }

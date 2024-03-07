@@ -64,7 +64,7 @@ fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> NavGraphBui
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     routeId: String = screenContent::class.routeId,
     overrideInitializer: EmaInitializer? = null,
-    saveStateManager: SaveStateManager<A, S, N>? = null,
+    saveStateManager: SaveStateManager<S, A, N>? = null,
     onViewModelInstance: (@Composable (EmaViewModel<S, N>) -> Unit)? = null,
     fullScreenDialogMode: Boolean = false,
     transitionAnimation: EmaComposableTransitions = EmaComposableTransitions(),

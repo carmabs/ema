@@ -11,7 +11,6 @@ import com.carmabs.ema.android.di.injectDirect
 import com.carmabs.ema.android.extension.getFormattedString
 import com.carmabs.ema.android.extension.setTextWithCursorAtEnd
 import com.carmabs.ema.android.extension.string
-import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.core.constants.STRING_EMPTY
 import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.core.navigator.EmaNavigator
@@ -22,7 +21,7 @@ import com.carmabs.ema.sample.ema.databinding.LoginFragmentBinding
 
 
 class LoginFragment :
-    BaseFragment<LoginFragmentBinding, LoginState, LoginViewModel, LoginDestination>() {
+    BaseFragment<LoginFragmentBinding, LoginState, LoginViewModel, LoginNavigationEvent>() {
 
     override fun createViewBinding(
         inflater: LayoutInflater,
@@ -38,21 +37,21 @@ class LoginFragment :
 
     private fun LoginFragmentBinding.setupListeners() {
         layoutLoginUser.etUser.addTextChangedListener {
-            vm.onActionUserWrite(it?.toString() ?: STRING_EMPTY)
+            viewModel.onActionUserWrite(it?.toString() ?: STRING_EMPTY)
         }
         layoutLoginPassword.etPassword.addTextChangedListener {
-            vm.onActionPasswordWrite(it?.toString() ?: STRING_EMPTY)
+            viewModel.onActionPasswordWrite(it?.toString() ?: STRING_EMPTY)
         }
         bLoginSign.setOnClickListener {
-            vm.onActionLogin()
+            viewModel.onActionLogin()
         }
         layoutLoginUser.ivHomeTouchEmptyUser.setOnClickListener {
-            vm.onActionDeleteUser()
+            viewModel.onActionDeleteUser()
         }
     }
 
-    override fun provideViewModel(): EmaViewModel {
-        return LoginAndroidViewModel(injectDirect())
+    override fun provideViewModel(): LoginViewModel {
+        return injectDirect()
     }
 
     override fun LoginFragmentBinding.onNormal(data: LoginState) {
@@ -86,5 +85,5 @@ class LoginFragment :
         }
     }
 
-    override val navigator: EmaNavigator<LoginDestination> = LoginNavigator(this)
+    override val navigator: EmaNavigator<LoginNavigationEvent> = LoginNavigator(this)
 }

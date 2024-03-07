@@ -17,20 +17,20 @@ import kotlinx.coroutines.CoroutineScope
  *
  * @author <a href=“mailto:apps.carmabs@gmail.comm”>Carlos Mateo Benito</a>
  */
-abstract class SaveStateManager<A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> :
-    InitializerRepository, SaveStateHandler<A, S, N> {
+abstract class SaveStateManager<S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> :
+    InitializerRepository, SaveStateHandler<S, A, N> {
     override fun onSaveStateHandling(
         scope: CoroutineScope,
         saveStateHandle: SavedStateHandle,
-        viewModel: EmaViewModelAction<A, S, N>
+        viewModel: EmaViewModelAction<S, A, N>
     ) = Unit
 }
 
-fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> emaSaveStateManagerOf(
+fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> emaSaveStateManagerOf(
     initializerHandler: InitializerRepository,
-    saveStateHandler: SaveStateHandler<A, S, N>? = null
-): SaveStateManager<A, S, N> {
-    return object : SaveStateManager<A, S, N>() {
+    saveStateHandler: SaveStateHandler<S, A, N>? = null
+): SaveStateManager<S, A, N> {
+    return object : SaveStateManager<S, A, N>() {
         override fun save(arcInitializer: EmaInitializer, savedStateHandle: SavedStateHandle) {
             initializerHandler.save(arcInitializer, savedStateHandle)
         }
@@ -42,7 +42,7 @@ fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> emaSaveStat
         override fun onSaveStateHandling(
             scope: CoroutineScope,
             saveStateHandle: SavedStateHandle,
-            viewModel: EmaViewModelAction<A, S, N>
+            viewModel: EmaViewModelAction<S, A, N>
         ) {
             saveStateHandler?.onSaveStateHandling(scope, saveStateHandle, viewModel)
         }

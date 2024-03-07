@@ -14,4 +14,5 @@ import com.carmabs.ema.core.constants.STRING_EMPTY
 data class User(
     val name: String = STRING_EMPTY,
     val surname: String = STRING_EMPTY,
-    val role: Role = Role.BASIC):java.io.Serializable
+    val role: Role = Role.BASIC
+)

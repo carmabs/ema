@@ -78,14 +78,14 @@ class ProfileOnBoardingScreenContent :
                 AppButton(
                     text = stringResource(id = R.string.profile_user_admin)
                 ) {
-                    actions.onAction(ProfileOnBoardingActions.AdminClicked)
+                    actions.dispatch(ProfileOnBoardingActions.AdminClicked)
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
                 AppButton(
                     text = stringResource(id = R.string.profile_user_basic)
                 ) {
-                    actions.onAction(ProfileOnBoardingActions.UserClicked)
+                    actions.dispatch(ProfileOnBoardingActions.UserClicked)
                 }
             }
         }
@@ -95,7 +95,7 @@ class ProfileOnBoardingScreenContent :
 
     @Preview(device = Devices.NEXUS_5)
     @Composable
-    fun normalPreview() {
+    private fun NormalPreview() {
         onNormal(
             state = ProfileOnBoardingState(
                 User(

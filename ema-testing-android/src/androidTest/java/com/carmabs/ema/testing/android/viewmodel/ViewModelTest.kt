@@ -2,9 +2,9 @@ package com.carmabs.ema.testing.android.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.navigator.EmaEmptyNavigationEvent
-import com.carmabs.ema.core.state.EmaEmptyState
-import com.carmabs.ema.core.viewmodel.EmaViewModel
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
+import com.carmabs.ema.core.state.EmaDataState
+import com.carmabs.ema.core.viewmodel.EmaViewModelBasic
 import com.carmabs.ema.testing.core.EmaTest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -40,16 +40,12 @@ class ViewModelTest : EmaTest() {
         }
     }
 
-    private inner class TestViewModel : EmaViewModel<EmaEmptyState, EmaEmptyNavigationEvent>() {
-
-
-        override suspend fun onCreateState(initializer: EmaInitializer?): EmaEmptyState {
-            return EmaEmptyState
-        }
-
+    private inner class TestViewModel :
+        EmaViewModelBasic<EmaDataState.EMPTY, EmaNavigationEvent.EMPTY>(EmaDataState.EMPTY) {
+        override fun onStateCreated(initializer: EmaInitializer?) = Unit
         suspend fun onActionTestExecuteUseCase() {
             var isFinished = false
-            val result = executeUseCase {
+            val result = sideEffect {
                 log("Start execution")
                 delay(1000)
                 isFinished = true

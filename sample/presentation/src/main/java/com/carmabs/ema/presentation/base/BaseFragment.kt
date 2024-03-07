@@ -3,7 +3,7 @@ package com.carmabs.ema.presentation.base
 import androidx.viewbinding.ViewBinding
 import com.carmabs.ema.android.ui.EmaFragment
 import com.carmabs.ema.core.model.EmaText
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaExtraDialogData
@@ -27,8 +27,8 @@ import org.koin.core.parameter.parametersOf
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
-abstract class BaseFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> :
-    EmaFragment<B, S, VM, D>() {
+abstract class BaseFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent> :
+    EmaFragment<B, S, VM, N>() {
 
 
     private val appDialogProvider: AppDialogProvider by inject {

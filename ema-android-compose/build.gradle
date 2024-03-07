@@ -22,7 +22,6 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled = true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -56,8 +55,6 @@ dependencies {
     api emaComposeDependencies.viewmodel
     api emaComposeDependencies.navigation
 
-    //Java Time API for SDK version < 26
-    coreLibraryDesugaring emaAndroidDependencies.desugaring
 }
 
 afterEvaluate {

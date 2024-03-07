@@ -5,10 +5,18 @@ import com.carmabs.ema.core.constants.STRING_EMPTY
 import com.carmabs.ema.core.state.EmaDataState
 
 data class ProfileCreationState(
-    val role: Role = Role.BASIC,
-    val name: String = STRING_EMPTY,
-    val surname: String = STRING_EMPTY
+    val role: Role,
+    val name: String,
+    val surname: String
 ) : EmaDataState {
+
+    companion object {
+        val DEFAULT = ProfileCreationState(
+            Role.BASIC,
+            STRING_EMPTY,
+            STRING_EMPTY
+        )
+    }
 
     val roleText
         get() = role.name

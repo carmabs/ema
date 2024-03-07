@@ -12,15 +12,12 @@ android {
         minSdkVersion emaVersioning.minSdk
         compileSdkVersion emaVersioning.compileSdk
         targetSdkVersion emaVersioning.targetSdk
-        versionCode emaVersioning.versionCode
-        versionName emaVersioning.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     flavorDimensions 'default'
 
     buildTypes {
         debug {
-            debuggable true
             minifyEnabled false
         }
         release {
@@ -34,13 +31,11 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion "1.4.0"
-        kotlinCompilerVersion '1.8.0'
+        kotlinCompilerExtensionVersion "1.5.10"
     }
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        //useIR = true
     }
 
     compileOptions {

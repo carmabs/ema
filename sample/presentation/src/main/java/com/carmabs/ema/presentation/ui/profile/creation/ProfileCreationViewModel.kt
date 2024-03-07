@@ -3,51 +3,54 @@ package com.carmabs.ema.presentation.ui.profile.creation
 import com.carmabs.domain.manager.ResourceManager
 import com.carmabs.domain.model.Role
 import com.carmabs.domain.model.User
-import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.navigator.EmaEmptyDestination
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.presentation.base.BaseViewModel
 import com.carmabs.ema.presentation.dialog.simple.SimpleDialogData
 import com.carmabs.ema.presentation.dialog.simple.SimpleDialogListener
 
 class ProfileCreationViewModel(
-    private val resourceManager: ResourceManager
-) : BaseViewModel<ProfileCreationState, EmaEmptyDestination>(), EmaActionDispatcher<ProfileCreationActions> {
+    private val resourceManager: ResourceManager,
+    initialDataState: ProfileCreationState
+) : BaseViewModel<ProfileCreationState, ProfileCreationAction, ProfileCreationNavigationEvent>(
+    initialDataState
+) {
 
     companion object {
         const val OVERLAPPED_DIALOG_CONFIRMATION = "OVERLAPPED_DIALOG_CONFIRMATION"
     }
 
-    override suspend fun onCreateState(initializer: EmaInitializer?): ProfileCreationState {
-        return when (val init = initializer as ProfileCreationInitializer) {
-            ProfileCreationInitializer.Admin -> ProfileCreationState(
-                Role.ADMIN
-            )
-            ProfileCreationInitializer.User -> ProfileCreationState(
-                Role.BASIC
-            )
+    override fun onStateCreated(initializer: EmaInitializer?) {
+        when (initializer as ProfileCreationInitializer) {
+            ProfileCreationInitializer.Admin -> updateState {
+                copy(role = Role.ADMIN)
+            }
+
+            ProfileCreationInitializer.User -> updateState {
+                copy(role = Role.BASIC)
+            }
         }
     }
 
-    override fun onAction(action: ProfileCreationActions) {
-        when(action){
-            ProfileCreationActions.CreateClicked -> onActionCreateClicked()
-            ProfileCreationActions.DialogCancelClicked -> onActionDialogCancelClicked()
-            ProfileCreationActions.DialogConfirmClicked -> onActionDialogConfirmClicked()
-            is ProfileCreationActions.UserNameWritten -> onActionUserNameWritten(action.name)
-            is ProfileCreationActions.UserSurnameWritten ->onActionUserNameWritten(action.surname)
+    override fun onAction(action: ProfileCreationAction) {
+        when (action) {
+            ProfileCreationAction.CreateClicked -> onActionCreateClicked()
+            ProfileCreationAction.DialogCancelClicked -> onActionDialogCancelClicked()
+            ProfileCreationAction.DialogConfirmClicked -> onActionDialogConfirmClicked()
+            is ProfileCreationAction.UserNameWritten -> onActionUserNameWritten(action.name)
+            is ProfileCreationAction.UserSurnameWritten -> onActionUserNameWritten(action.surname)
+            ProfileCreationAction.OnBack -> onActionBack()
         }
     }
 
     private fun onActionUserNameWritten(name: String) {
-        updateToNormalState {
+        updateState {
             copy(name = name)
         }
     }
 
     private fun onActionUserSurnameWritten(surname: String) {
-        updateToNormalState {
+        updateState {
             copy(surname = surname)
         }
     }
@@ -72,19 +75,20 @@ class ProfileCreationViewModel(
                 )
             )
         )
-        addResult(User(stateData.name, stateData.surname, stateData.role))
+        addBroadcast(User(stateData.name, stateData.surname, stateData.role))
     }
 
     private fun onActionDialogConfirmClicked() {
         updateToNormalState()
-        navigateBack()
+        navigate(ProfileCreationNavigationEvent.DialogConfirmationAccepted)
     }
 
     private fun onActionDialogCancelClicked() {
         updateToNormalState()
     }
 
-    override val onBackHardwarePressedListener: (() -> Boolean) = {
+
+    private fun onActionBack() {
         showDialog(
             SimpleDialogData(
                 title = resourceManager.getDoYouWantToExitTitleCreationUserTitle(),
@@ -93,22 +97,21 @@ class ProfileCreationViewModel(
                 showCancel = true,
                 image = resourceManager.getExitImage()
             ),
-            object : SimpleDialogListener{
+            object : SimpleDialogListener {
                 override fun onCancelClicked() {
-                   updateToNormalState()
+                    updateToNormalState()
                 }
 
                 override fun onConfirmClicked() {
                     updateToNormalState()
-                    navigateBack()
+                    navigate(ProfileCreationNavigationEvent.DialogConfirmationAccepted)
                 }
 
                 override fun onBackPressed() {
-                   updateToNormalState()
+                    updateToNormalState()
                 }
 
             }
         )
-        false
     }
 }

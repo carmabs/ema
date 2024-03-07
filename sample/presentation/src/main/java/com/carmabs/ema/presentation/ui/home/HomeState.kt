@@ -6,15 +6,27 @@ import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.core.state.EmaDataState
 
 data class HomeState(
-    private val userRole: Role,
-    val listName: EmaText,
+    val userData: UserData,
     val userList: List<User>
 ) : EmaDataState {
 
+    companion object {
+        val DEFAULT = HomeState(
+            userData = UserData.Basic,
+            userList = emptyList()
+        )
+    }
+
+    sealed class UserData(val role:Role) {
+        data object Basic : UserData(Role.BASIC)
+
+        data class Admin(val name: String) : UserData(Role.ADMIN)
+    }
+
     val showCreateButton
-        get() = userRole == Role.ADMIN
+        get() = userData is UserData.Admin
 
     val showFriendList
-        get() = userRole == Role.BASIC
+        get() = userData is UserData.Admin
 }
 

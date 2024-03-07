@@ -1,58 +1,64 @@
 package com.carmabs.ema.presentation.ui.home
 
-import com.carmabs.domain.manager.ResourceManager
 import com.carmabs.domain.model.Role
 import com.carmabs.domain.model.User
 import com.carmabs.domain.usecase.GetUserFriendsUseCase
-import com.carmabs.ema.core.extension.resultId
+import com.carmabs.ema.core.broadcast.broadcastId
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.presentation.base.BaseViewModel
 import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationViewModel
-import com.carmabs.ema.presentation.ui.profile.onboarding.ProfileOnBoardingInitializer
 
 class HomeViewModel(
     private val getUserFriendsUseCase: GetUserFriendsUseCase,
-    private val resourceManager: ResourceManager
-) : BaseViewModel<HomeState, HomeDestination>() {
+    initialDataState: HomeState
+) : BaseViewModel<HomeState, HomeAction, HomeNavigationEvent>(initialDataState) {
 
     private var admin: User? = null
-    override suspend fun onCreateState(initializer: EmaInitializer?): HomeState {
-        return when (val homeInitializer = initializer as HomeInitializer) {
+
+    override fun onStateCreated(initializer: EmaInitializer?) {
+        when (val homeInitializer = initializer as HomeInitializer) {
             is HomeInitializer.Admin -> {
                 admin = homeInitializer.admin
-                HomeState(
-                    userRole = Role.ADMIN,
-                    listName = resourceManager.getHomeAdminTitle(homeInitializer.admin),
-                    userList = emptyList()
-                )
+                updateState {
+                    copy(
+                        userData = HomeState.UserData.Admin(homeInitializer.admin.name),
+                        userList = emptyList()
+                    )
+                }
             }
+
             HomeInitializer.BasicUser -> {
-                val friends = getUserFriendsUseCase(Unit)
-                HomeState(
-                    userRole = Role.BASIC,
-                    listName = resourceManager.getHomeUserTitle(),
-                    userList = friends
-                )
+                sideEffect {
+                    val friends = getUserFriendsUseCase(Unit)
+                    updateState {
+                        copy(
+                            userData = HomeState.UserData.Basic,
+                            userList = friends
+                        )
+                    }
+                }
             }
         }
     }
 
+    override fun onAction(action: HomeAction) {
+        when(action){
+            HomeAction.ProfileClicked -> {
+                onActionCreateProfileClicked()
+            }
+        }
+    }
 
-    fun onActionCreateProfileClicked() {
+    private fun onActionCreateProfileClicked() {
         navigate(
-            HomeDestination.Profile()
-                .setInitializer(
-                    ProfileOnBoardingInitializer.Default(
-                        admin ?: throw IllegalStateException("Admin cannot be null")
-                    )
-                )
+            HomeNavigationEvent.ProfileClicked(admin ?: throw IllegalStateException("Admin cannot be null"))
         )
     }
 
-    override fun onResultListenerSetup() {
-        addOnResultListener(ProfileCreationViewModel::class.resultId()) {
+    override fun onBroadcastListenerSetup() {
+        addOnBroadcastListener(ProfileCreationViewModel::class.broadcastId) {
             val user = it as User
-            updateToNormalState {
+            updateState {
                 copy(userList = userList.toMutableList().apply {
                     add(user)
                 })

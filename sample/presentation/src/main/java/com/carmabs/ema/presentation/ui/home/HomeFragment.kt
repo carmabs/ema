@@ -12,54 +12,69 @@ import com.carmabs.ema.android.di.injectDirect
 import com.carmabs.ema.android.extension.string
 import com.carmabs.ema.android.ui.EmaFragment
 import com.carmabs.ema.android.ui.recycler.EmaBaseRecyclerAdapter
-import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.core.navigator.EmaNavigator
 import com.carmabs.ema.sample.ema.databinding.HomeFragmentBinding
 
 
 class HomeFragment :
-    EmaFragment<HomeFragmentBinding,HomeState, HomeViewModel, HomeDestination>() {
+    EmaFragment<HomeFragmentBinding, HomeState, HomeViewModel, HomeNavigationEvent>() {
 
-    private var adapter:EmaBaseRecyclerAdapter<User>?=null
+    private var adapter: EmaBaseRecyclerAdapter<User>? = null
 
     override fun createViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
     ): HomeFragmentBinding {
-        return HomeFragmentBinding.inflate(inflater,container,false)
+        return HomeFragmentBinding.inflate(inflater, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.setupListeners()
         binding.apply {
-            rvHomeUsers.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
-            rvHomeUsers.addItemDecoration(DividerItemDecoration(requireContext(),DividerItemDecoration.VERTICAL))
+            rvHomeUsers.layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            rvHomeUsers.addItemDecoration(
+                DividerItemDecoration(
+                    requireContext(),
+                    DividerItemDecoration.VERTICAL
+                )
+            )
         }
     }
 
     private fun HomeFragmentBinding.setupListeners() {
         bHomeCreateProfile.setOnClickListener {
-            vm.onActionCreateProfileClicked()
+            viewModel.dispatch(HomeAction.ProfileClicked)
         }
     }
 
-    override fun provideViewModel(): EmaViewModel {
-        return HomeAndroidViewModel(injectDirect())
+
+    override fun provideViewModel(): HomeViewModel {
+        return injectDirect()
     }
 
-    override fun HomeFragmentBinding.onStateNormal(data: HomeState){
-        if(isFirstNormalExecution){
-            adapter = if(data.showFriendList)
+    override fun HomeFragmentBinding.onStateNormal(data: HomeState) {
+        if (isFirstNormalExecution) {
+            adapter = if (data.showFriendList)
                 HomeSingleAdapter()
             else
                 HomeMultiAdapter()
             rvHomeUsers.adapter = adapter
         }
         adapter?.submitList(data.userList)
-        tvHomeListTitle.text = data.listName.string(requireContext())
+        tvHomeListTitle.text = when (val user = data.userData) {
+            is HomeState.UserData.Admin -> {
+                ""
+            }
+
+            HomeState.UserData.Basic -> {
+                ""
+            }
+        }
+
         bHomeCreateProfile.isVisible = data.showCreateButton
     }
 
-    override val navigator: EmaNavigator<HomeDestination> = HomeNavigator(this)
+    override val navigator: EmaNavigator<HomeNavigationEvent> = HomeNavigator(this)
 }

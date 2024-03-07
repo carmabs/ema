@@ -86,7 +86,7 @@ fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> EmaComposab
     onNavigationEvent: (N) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     onAction: ((A) -> Unit)? = null,
-    saveStateManager: SaveStateManager<A, S, N>? = null,
+    saveStateManager: SaveStateManager<S, A, N>? = null,
     previewRenderState: S? = null
 ) {
     skipForPreview(
@@ -130,10 +130,10 @@ fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> EmaComposab
 }
 
 @Composable
-internal fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> handleSaveStateSupport(
+internal fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> handleSaveStateSupport(
     initializer: EmaInitializer?,
     androidViewModel: EmaAndroidViewModel<S, N>,
-    saveStateManager: SaveStateManager<A, S, N>?
+    saveStateManager: SaveStateManager<S, A, N>?
 ): EmaInitializer? = remember {
     saveStateManager?.also { handler ->
         initializer?.also {
@@ -143,7 +143,7 @@ internal fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> ha
     saveStateManager?.onSaveStateHandling(
         androidViewModel.viewModelScope,
         androidViewModel.savedStateHandle,
-        androidViewModel.emaViewModel as EmaViewModelAction<A, S, N>
+        androidViewModel.emaViewModel as EmaViewModelAction<S, A, N>
     )
     initializer ?: saveStateManager?.restore(androidViewModel.savedStateHandle)
 }

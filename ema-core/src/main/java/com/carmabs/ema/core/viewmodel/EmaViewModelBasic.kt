@@ -1,11 +1,11 @@
 package com.carmabs.ema.core.viewmodel
 
+import com.carmabs.ema.core.broadcast.BroadcastId
+import com.carmabs.ema.core.broadcast.broadcastId
 import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.constants.INT_ONE
-import com.carmabs.ema.core.extension.ResultId
 import com.carmabs.ema.core.extension.distinctNavigationChanges
 import com.carmabs.ema.core.extension.distinctSingleEventChanges
-import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.model.EmaFunctionResultHandler
@@ -55,7 +55,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
     /**
      * Used to know if subscribed view should render the state
      */
-    override val shouldRenderState: Boolean
+    final override val shouldRenderState: Boolean
         get() {
             return updateOnInitialization || hasBeenUpdated
         }
@@ -114,7 +114,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
                 throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
             }
             hasBeenInitialized = true
-            onResultListenerSetup()
+            onBroadcastListenerSetup()
             if (updateOnInitialization)
                 dataObservableState.tryEmit(state)
             onStateCreated(initializer)
@@ -295,9 +295,9 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
 
 
     /**
-     * Here should implement the listener for result data from other views through [addOnResultListener] method
+     * Here should implement the listener for result data from other views through [addOnBroadcastListener] method
      */
-    protected open fun onResultListenerSetup() = Unit
+    protected open fun onBroadcastListenerSetup() = Unit
 
     /**
      * Update the current state and update the normal view state by default
@@ -365,10 +365,10 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
     /**
      * Set a result for previous view when the current one is destroyed
      */
-    protected fun addResult(data: Any?, resultId: String? = null) {
+    protected fun addBroadcast(data: Any?) {
         emaResultHandler.addResult(
             EmaResultModel(
-                code = this::class.resultId(resultId).id,
+                code = this::class.broadcastId.id,
                 ownerId = id,
                 data = data
             )
@@ -379,13 +379,13 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      * Set the listener for back data when the result view is destroyed. To select the resultId use the EmaViewModel::class.resultId() method
      * of the selected implementation of EmaViewModel whose result is required. Example SampleEmaViewModel::class.resultId()
      */
-    protected fun addOnResultListener(
-        resultId: ResultId,
+    protected fun addOnBroadcastListener(
+        broadcastId: BroadcastId,
         receiver: (Any?) -> Unit
     ) {
         emaResultHandler.addResultReceiver(
             EmaReceiverModel(
-                resultCode = resultId.id,
+                resultCode = broadcastId.id,
                 ownerId = id,
                 function = receiver
             )
@@ -403,7 +403,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
         onDestroy()
     }
 
-    override fun onActionBackHardwarePressed() {
+    final override fun onActionBackHardwarePressed() {
         updateEventView(state.navigateBack())
     }
 }

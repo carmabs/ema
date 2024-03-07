@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -21,6 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carmabs.domain.model.Role
+import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
+import com.carmabs.ema.compose.action.EmaImmutableActionDispatcherEmpty
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.action.EmaActionDispatcherEmpty
 import com.carmabs.ema.core.model.EmaText
@@ -33,13 +34,12 @@ import com.carmabs.ema.presentation.ui.compose.SimpleDialogComposable
 import com.carmabs.ema.sample.ema.R
 
 class ProfileCreationScreenContent :
-    BaseScreenComposable<ProfileCreationState, ProfileCreationActions>() {
+    BaseScreenComposable<ProfileCreationState, ProfileCreationAction>() {
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun onNormal(
         state: ProfileCreationState,
-        actions: EmaActionDispatcher<ProfileCreationActions>
+        actions: EmaActionDispatcher<ProfileCreationAction>
     ) {
         Surface(
             modifier = Modifier
@@ -71,7 +71,7 @@ class ProfileCreationScreenContent :
                         Text(stringResource(id = R.string.profile_creation_create_name))
                     },
                     onValueChange = {
-                        actions.onAction(ProfileCreationActions.UserNameWritten(it))
+                        actions.dispatch(ProfileCreationAction.UserNameWritten(it))
                     }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -82,7 +82,7 @@ class ProfileCreationScreenContent :
                         Text(stringResource(id = R.string.profile_creation_create_surname))
                     },
                     onValueChange = {
-                        actions.onAction(ProfileCreationActions.UserSurnameWritten(it))
+                        actions.dispatch(ProfileCreationAction.UserSurnameWritten(it))
                     }
                 )
 
@@ -92,7 +92,7 @@ class ProfileCreationScreenContent :
                         .fillMaxWidth()
                         .padding(top = 20.dp)
                 ) {
-                    actions.onAction(ProfileCreationActions.CreateClicked)
+                    actions.dispatch(ProfileCreationAction.CreateClicked)
                 }
             }
         }
@@ -100,23 +100,23 @@ class ProfileCreationScreenContent :
     }
 
     @Composable
-    override fun onOverlapped(extraData: EmaExtraData, actions: EmaActionDispatcher<ProfileCreationActions>) {
-        when (extraData.id) {
+    override fun onOverlapped(extra: EmaExtraData, actions: EmaActionDispatcher<ProfileCreationAction>) {
+        when (extra.id) {
             ProfileCreationViewModel.OVERLAPPED_DIALOG_CONFIRMATION -> {
-                val dialogData = extraData.data as SimpleDialogData
+                val dialogData = extra.data as SimpleDialogData
                 SimpleDialogComposable(
                     dialogData = dialogData,
                     dialogListener = object : SimpleDialogListener {
                         override fun onCancelClicked() {
-                            actions.onAction(ProfileCreationActions.DialogCancelClicked)
+                            actions.dispatch(ProfileCreationAction.DialogCancelClicked)
                         }
 
                         override fun onConfirmClicked() {
-                            actions.onAction(ProfileCreationActions.DialogConfirmClicked)
+                            actions.dispatch(ProfileCreationAction.DialogConfirmClicked)
                         }
 
                         override fun onBackPressed() {
-                            actions.onAction(ProfileCreationActions.DialogCancelClicked)
+                            actions.dispatch(ProfileCreationAction.DialogCancelClicked)
                         }
 
                     })
@@ -127,22 +127,22 @@ class ProfileCreationScreenContent :
 
     @Preview(device = Devices.NEXUS_5)
     @Composable
-    fun normalPreview() {
+    private fun NormalPreview() {
         onStateNormal(
             state = ProfileCreationState(
                 Role.ADMIN,
                 "Carlos",
                 "Mateo"
             ),
-            actions = EmaActionDispatcherEmpty()
+            actions = EmaImmutableActionDispatcherEmpty()
         )
     }
 
     @Preview(device = Devices.PIXEL_3)
     @Composable
-    fun overlappedPreview() {
-        normalPreview()
-        showDialog(
+    private fun OverlappedPreview() {
+        NormalPreview()
+        ShowDialog(
             SimpleDialogData(
                 title = EmaText.text("Test title"),
                 message = EmaText.text("test message"),
