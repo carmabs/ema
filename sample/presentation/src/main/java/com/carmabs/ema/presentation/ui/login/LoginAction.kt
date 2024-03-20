@@ -13,11 +13,18 @@ import com.carmabs.ema.core.action.EmaAction
  */
 sealed interface LoginAction : EmaAction.Screen {
 
-    data object Login: LoginAction
+    data object Login : LoginAction
 
-    data object DeleteUser: LoginAction
+    data object DeleteUser : LoginAction
 
-    data class UserNameWritten(val user:String): LoginAction
+    data class UserNameWritten(val user: String) : LoginAction
 
-    data class PasswordWritten(val password:String): LoginAction
+    data class PasswordWritten(val password: String) : LoginAction
+
+    sealed interface Error : LoginAction {
+        data object BadCredentialsAccepted : Error
+        data object UserEmptyAccepted : Error
+        data object PasswordEmptyAccepted : Error
+        data object BackPressed : Error
+    }
 }

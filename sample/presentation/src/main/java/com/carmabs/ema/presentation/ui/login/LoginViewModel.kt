@@ -1,6 +1,5 @@
 package com.carmabs.ema.presentation.ui.login
 
-import com.carmabs.domain.manager.ResourceManager
 import com.carmabs.domain.model.LoginRequest
 import com.carmabs.domain.model.Role
 import com.carmabs.domain.model.User
@@ -8,40 +7,56 @@ import com.carmabs.domain.usecase.LoginUseCase
 import com.carmabs.ema.core.broadcast.broadcastId
 import com.carmabs.ema.core.constants.STRING_EMPTY
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.model.onFailure
+import com.carmabs.ema.core.model.onSuccess
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.presentation.base.BaseViewModel
-import com.carmabs.ema.presentation.dialog.error.ErrorDialogData
-import com.carmabs.ema.presentation.dialog.error.ErrorDialogListener
-import com.carmabs.ema.presentation.ui.home.HomeInitializer
 import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationViewModel
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
-    private val resourceManager: ResourceManager,
     initialDataState: LoginState
 ) : BaseViewModel<LoginState, LoginAction, LoginNavigationEvent>(initialDataState) {
-
-    companion object {
-        const val EVENT_MESSAGE = "EVENT_MESSAGE"
-        const val EVENT_LAST_USER_ADDED = "EVENT_LAST_USER_ADDED"
-    }
-
     override fun onStateCreated(initializer: EmaInitializer?) = Unit
     override fun onAction(action: LoginAction) {
-        when(action){
+        when (action) {
             LoginAction.DeleteUser -> {
                 onActionDeleteUser()
             }
+
             LoginAction.Login -> {
                 onActionLogin()
             }
+
             is LoginAction.PasswordWritten -> {
                 onActionPasswordWrite(action.password)
             }
+
             is LoginAction.UserNameWritten -> {
                 onActionUserWrite(action.user)
             }
+
+            LoginAction.Error.BadCredentialsAccepted -> onActionBadCredentialsAccepted()
+            LoginAction.Error.BackPressed -> onActionErrorBackPressed()
+            LoginAction.Error.PasswordEmptyAccepted -> onActionErrorPasswordEmptyAccepted()
+            LoginAction.Error.UserEmptyAccepted -> onActionErrorUserEmptyAccepted()
         }
+    }
+
+    private fun onActionErrorUserEmptyAccepted() {
+        updateToNormalState()
+    }
+
+    private fun onActionErrorPasswordEmptyAccepted() {
+        updateToNormalState()
+    }
+
+    private fun onActionBadCredentialsAccepted() {
+        updateToNormalState()
+    }
+
+    private fun onActionErrorBackPressed() {
+        updateToNormalState()
     }
 
     private var pendingUser: User? = null
@@ -60,7 +75,7 @@ class LoginViewModel(
     override fun onViewResumed() {
         super.onViewResumed()
         pendingUser?.also {
-            notifySingleEvent(EmaExtraData(EVENT_LAST_USER_ADDED, data = it))
+            notifySingleEvent(EmaExtraData(data = LoginSingleEvent.LastUserAdded(it)))
         }
         pendingUser = null
     }
@@ -68,74 +83,36 @@ class LoginViewModel(
     private fun doLogin() {
         sideEffect {
             showLoading()
-            val user =
+            val userLogged =
                 loginUseCase.invoke(LoginRequest(stateData.userName, stateData.userPassword))
             updateToNormalState()
-            notifySingleEvent(
-                EmaExtraData(
-                    EVENT_MESSAGE,
-                    resourceManager.getCongratulations(user.name)
+            userLogged.onSuccess {user->
+                notifySingleEvent(
+                    EmaExtraData(
+                        data = LoginSingleEvent.Message(user.name)
+                    )
                 )
-            )
-            val userType = when (user.role) {
-                Role.ADMIN -> LoginNavigationEvent.LoginSuccess.UserType.Admin(
-                    user = user
-                )
+                val userType = when (user.role) {
+                    Role.ADMIN -> LoginNavigationEvent.LoginSuccess.UserType.Admin(
+                        user = user
+                    )
 
-                Role.BASIC ->
-                    LoginNavigationEvent.LoginSuccess.UserType.Basic
+                    Role.BASIC ->
+                        LoginNavigationEvent.LoginSuccess.UserType.Basic
+                }
+                navigate(LoginNavigationEvent.LoginSuccess(userType))
+            }.onFailure {
+                showError(LoginOverlap.ErrorBadCredentials)
             }
-            navigate(LoginNavigationEvent.LoginSuccess(userType))
 
-        }.onError {
-            showError(ErrorDialogData(
-                resourceManager.getErrorTitle(),
-                resourceManager.getErrorLogin()
-            ),
-                object : ErrorDialogListener {
-                    override fun onConfirmClicked() {
-                        updateToNormalState()
-                    }
-
-                    override fun onBackPressed() {
-                        updateToNormalState()
-                    }
-
-                })
         }
     }
 
     fun onActionLogin() {
         when {
-            stateData.userName.isEmpty() -> showError(ErrorDialogData(
-                resourceManager.getErrorTitle(),
-                resourceManager.getErrorLoginUserEmpty()
-            ),
-                object : ErrorDialogListener {
-                    override fun onConfirmClicked() {
-                        updateToNormalState()
-                    }
+            stateData.userName.isEmpty() -> showError(LoginOverlap.ErrorUserEmpty)
 
-                    override fun onBackPressed() {
-                        updateToNormalState()
-                    }
-
-                })
-
-            stateData.userPassword.isEmpty() -> showError(ErrorDialogData(
-                resourceManager.getErrorTitle(),
-                resourceManager.getErrorLoginPasswordEmpty()
-            ),
-                object : ErrorDialogListener {
-                    override fun onConfirmClicked() {
-                        updateToNormalState()
-                    }
-
-                    override fun onBackPressed() {
-                        updateToNormalState()
-                    }
-
-                })
+            stateData.userPassword.isEmpty() -> showError(LoginOverlap.ErrorPasswordEmpty)
 
             else -> doLogin()
         }

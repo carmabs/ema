@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class ProfileCreationInitializer: EmaInitializer {
     @Serializable
-    data object User : ProfileCreationInitializer()
+    data object UserBasic : ProfileCreationInitializer()
     @Serializable
     data object Admin: ProfileCreationInitializer()
 }

@@ -80,7 +80,7 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     }
 
     abstract fun B.onStateNormal(data: S)
-    protected open fun B.onStateOverlapped(extra: EmaExtraData) {}
-    protected open fun B.onSingleEvent(extra: EmaExtraData) {}
+    protected open fun B.onStateOverlapped(extraData: EmaExtraData) {}
+    protected open fun B.onSingleEvent(extraData: EmaExtraData) {}
 
 }

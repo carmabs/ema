@@ -14,6 +14,7 @@ import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationViewModel
 import com.carmabs.ema.presentation.ui.profile.onboarding.ProfileOnBoardingState
 import com.carmabs.ema.presentation.ui.profile.onboarding.ProfileOnBoardingViewModel
 import com.carmabs.ema.presentation.ui.splash.SplashViewModel
+import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val uiModule = module {
@@ -28,10 +29,10 @@ val uiModule = module {
     }
 
     factory { SplashViewModel() }
-    factory { LoginViewModel(get(),get(), get()) }
-    factory { HomeViewModel(get(), get()) }
-    factory { ProfileOnBoardingViewModel(get()) }
-    factory { ProfileCreationViewModel(get(),get()) }
+    factoryOf(::LoginViewModel)
+    factoryOf(::HomeViewModel)
+    factoryOf(::ProfileOnBoardingViewModel)
+    factoryOf(::ProfileCreationViewModel)
 
     factory { LoginState.DEFAULT }
     factory { HomeState.DEFAULT }

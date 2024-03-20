@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -18,23 +19,21 @@ import com.carmabs.ema.android.extension.findComponentActivity
 import com.carmabs.ema.android.extension.getInitializer
 import com.carmabs.ema.android.initializer.EmaInitializerBundle
 import com.carmabs.ema.android.initializer.bundle.strategy.BundleSerializerStrategy
-import com.carmabs.ema.android.initializer.savestate.SaveStateManager
+import com.carmabs.ema.android.initializer.savestate.SaveStateHandler
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.toImmutable
+import com.carmabs.ema.compose.initializer.EmaInitializerSupport
 import com.carmabs.ema.compose.navigation.EmaComposableTransitions
 import com.carmabs.ema.compose.navigation.EmaInitializerNavType
 import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.compose.ui.EmaComposableScreen
 import com.carmabs.ema.compose.ui.EmaComposableScreenContent
-import com.carmabs.ema.compose.ui.handleSaveStateSupport
 import com.carmabs.ema.core.action.EmaAction
-import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.EmaBackHandlerStrategy
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import kotlin.collections.set
 
 fun NavController.navigate(
     route: String,
@@ -61,9 +60,8 @@ fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> NavGraphBui
     onNavigationEvent: (N) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     routeId: String = screenContent::class.routeId,
-    overrideInitializer: EmaInitializer? = null,
-    bundleSerializerStrategy: BundleSerializerStrategy? = null,
-    saveStateManager: SaveStateManager<S, N>? = null,
+    initializerSupport: EmaInitializerSupport? = null,
+    saveStateHandler: SaveStateHandler<S, N>? = null,
     onViewModelInstance: (@Composable (EmaViewModel<S, N>) -> Unit)? = null,
     fullScreenDialogMode: Boolean = false,
     transitionAnimation: EmaComposableTransitions = EmaComposableTransitions(),
@@ -81,19 +79,19 @@ fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> NavGraphBui
 
             val vmActions = vm.asActionDispatcher<A>().toImmutable()
 
-            val initializer = overrideInitializer
-                ?: bundleSerializerStrategy?.let { backEntry.arguments?.getInitializer(it) }
-            val initializerWithSaveStateSupport =
-                handleSaveStateSupport(
-                    initializer = initializer,
-                    androidViewModel = androidVm,
-                    saveStateManager = saveStateManager
-                )
+            val initializer = initializerSupport?.let {
+                it.overrideInitializer?: backEntry.arguments?.getInitializer(it.serializerStrategy)
+            }
 
+            saveStateHandler?.onSaveStateHandling(
+                androidVm.viewModelScope,
+                androidVm.savedStateHandle,
+                androidVm.emaViewModel
+            )
             onViewModelInstance?.invoke(vm)
             val screenToDraw = @Composable {
                 EmaComposableScreen(
-                    initializer = initializerWithSaveStateSupport,
+                    initializer = initializer,
                     onNavigationEvent = onNavigationEvent,
                     onBackEvent = onBackEvent,
                     vm = vm,
@@ -116,8 +114,8 @@ fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> NavGraphBui
         composable(
             route = parseRouteWithInitializerSupport(routeId),
             arguments = listOf(navArgument(EmaInitializer.KEY) {
-                bundleSerializerStrategy?.also {
-                    type = EmaInitializerNavType(it)
+                initializerSupport?.also {
+                    type = EmaInitializerNavType(it.serializerStrategy)
                 }
                 nullable = true
             }),

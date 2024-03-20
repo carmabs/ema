@@ -15,4 +15,9 @@ sealed interface ProfileCreationAction : EmaAction.Screen {
     data object DialogCancelClicked:ProfileCreationAction
 
     data object OnBack : ProfileCreationAction
+
+    data object DialogBackConfirm : ProfileCreationAction
+
+    data object DialogBackCancel : ProfileCreationAction
+
 }

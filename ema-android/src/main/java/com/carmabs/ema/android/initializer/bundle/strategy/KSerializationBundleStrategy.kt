@@ -14,22 +14,22 @@ import kotlinx.serialization.json.Json
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-class KSerializationBundleStrategy<I:EmaInitializer>(private val kSerializer: KSerializer<I>):BundleSerializerStrategy{
+class KSerializationBundleStrategy<I:EmaInitializer> internal constructor(private val serializer: KSerializer<I>):BundleSerializerStrategy{
     override fun save(initializer:EmaInitializer,bundle: Bundle){
         val json = toStringValue(initializer)
         bundle.putString(EmaInitializer.KEY, json)
     }
 
     override fun toStringValue(initializer:EmaInitializer): String {
-        return Json.encodeToString(kSerializer, initializer as I)
+        return Json.encodeToString(serializer, initializer as I)
     }
 
     override fun fromStringValue(value: String): EmaInitializer {
-        return  Json.decodeFromString(kSerializer, value)
+        return  Json.decodeFromString(serializer, value)
     }
 
     override fun restore(bundle: Bundle):EmaInitializer?{
         val json = bundle.getString(EmaInitializer.KEY)
-        return json?.let { Json.decodeFromString(kSerializer, it) }
+        return json?.let { Json.decodeFromString(serializer, it) }
     }
 }

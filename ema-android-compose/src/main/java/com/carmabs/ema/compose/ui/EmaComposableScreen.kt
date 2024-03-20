@@ -15,9 +15,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.carmabs.ema.android.extension.addOnBackPressedListener
-import com.carmabs.ema.android.initializer.savestate.SaveStateManager
+import com.carmabs.ema.android.initializer.savestate.SaveStateHandler
 import com.carmabs.ema.android.navigation.EmaNavigationBackHandler
-import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcherEmpty
 import com.carmabs.ema.compose.action.toImmutable
@@ -85,7 +84,7 @@ fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> EmaComposab
     onNavigationEvent: (N) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     onAction: ((A) -> Unit)? = null,
-    saveStateManager: SaveStateManager<S, N>? = null,
+    saveStateHandler: SaveStateHandler<S, N>? = null,
     previewRenderState: S? = null
 ) {
     skipForPreview(
@@ -109,15 +108,10 @@ fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> EmaComposab
             emaVm.asActionDispatcher<A>().toImmutable()
         }
 
-        val initializerWithSaveStateSupport =
-            handleSaveStateSupport(
-                initializer = initializer,
-                androidViewModel = androidVm,
-                saveStateManager = saveStateManager
-            )
+        saveStateHandler?.onSaveStateHandling(androidVm.viewModelScope,androidVm.savedStateHandle,androidVm.emaViewModel)
 
         RenderScreen(
-            initializerWithSaveStateSupport,
+            initializer,
             screenContent,
             emaVm,
             immutableActions,
@@ -126,25 +120,6 @@ fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> EmaComposab
             onAction
         )
     }
-}
-
-@Composable
-internal fun <S : EmaDataState, N : EmaNavigationEvent> handleSaveStateSupport(
-    initializer: EmaInitializer?,
-    androidViewModel: EmaAndroidViewModel<S, N>,
-    saveStateManager: SaveStateManager<S, N>?
-): EmaInitializer? = remember {
-    saveStateManager?.also { handler ->
-        initializer?.also {
-            handler.save(it, androidViewModel.savedStateHandle)
-        }
-    }
-    saveStateManager?.onSaveStateHandling(
-        androidViewModel.viewModelScope,
-        androidViewModel.savedStateHandle,
-        androidViewModel.emaViewModel
-    )
-    initializer ?: saveStateManager?.restore(androidViewModel.savedStateHandle)
 }
 
 @Composable

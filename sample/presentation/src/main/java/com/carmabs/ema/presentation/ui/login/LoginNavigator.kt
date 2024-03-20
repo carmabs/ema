@@ -3,6 +3,7 @@ package com.carmabs.ema.presentation.ui.login
 import androidx.fragment.app.Fragment
 import com.carmabs.ema.android.extension.navigate
 import com.carmabs.ema.android.initializer.EmaInitializerBundle
+import com.carmabs.ema.android.initializer.bundle.strategy.BundleSerializerStrategy
 import com.carmabs.ema.android.initializer.bundle.strategy.KSerializationBundleStrategy
 import com.carmabs.ema.android.navigation.EmaFragmentNavControllerNavigator
 import com.carmabs.ema.presentation.ui.home.HomeInitializer
@@ -19,7 +20,7 @@ class LoginNavigator(
                     id = R.id.action_loginFragment_to_homeFragment,
                     initializerBundle = EmaInitializerBundle(
                         mapToHomeInitializer(navigationEvent),
-                        KSerializationBundleStrategy(HomeInitializer.serializer())
+                        BundleSerializerStrategy.kSerialization(HomeInitializer.serializer())
                     )
                 )
             }

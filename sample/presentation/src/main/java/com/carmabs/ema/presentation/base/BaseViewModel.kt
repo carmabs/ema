@@ -4,14 +4,9 @@ import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
-import com.carmabs.ema.core.state.EmaExtraDialogData
-import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.carmabs.ema.core.viewmodel.EmaViewModelAction
-import com.carmabs.ema.presentation.dialog.error.ErrorDialogData
-import com.carmabs.ema.presentation.dialog.error.ErrorDialogListener
-import com.carmabs.ema.presentation.dialog.loading.LoadingDialogData
-import com.carmabs.ema.presentation.dialog.simple.SimpleDialogData
-import com.carmabs.ema.presentation.dialog.simple.SimpleDialogListener
+import com.carmabs.ema.presentation.dialog.error.ErrorDialogAction
+import com.carmabs.ema.presentation.dialog.simple.SimpleDialogAction
 
 /**
  *  *<p>
@@ -22,36 +17,37 @@ import com.carmabs.ema.presentation.dialog.simple.SimpleDialogListener
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
-abstract class BaseViewModel<S:EmaDataState,A:EmaAction.Screen, N : EmaNavigationEvent>(
+abstract class BaseViewModel<S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent>(
     initialDataState: S
-) : EmaViewModelAction<S,A, N>(initialDataState) {
+) : EmaViewModelAction<S, A, N>(initialDataState) {
 
-    companion object{
+    companion object {
         const val OVERLAPPED_ERROR = "OVERLAPPED_ERROR"
         const val OVERLAPPED_DIALOG = "OVERLAPPED_DIALOG"
         const val OVERLAPPED_LOADING = "OVERLAPPED_LOADING"
     }
-    fun showLoading(data: LoadingDialogData?=null){
-        updateToOverlappedState(EmaExtraData(OVERLAPPED_LOADING,data))
+
+    fun showLoading() {
+        updateToOverlappedState(EmaExtraData(OVERLAPPED_LOADING))
     }
 
-    fun showError(data: ErrorDialogData,listener:ErrorDialogListener){
-        updateToOverlappedState(EmaExtraData(OVERLAPPED_ERROR,EmaExtraDialogData(data,listener)))
+    fun showError(data: Any) {
+        updateToOverlappedState(EmaExtraData(id = OVERLAPPED_ERROR, data = data))
     }
 
-    fun showDialog(data: SimpleDialogData,listener: SimpleDialogListener){
-        updateToOverlappedState(EmaExtraData(OVERLAPPED_DIALOG,EmaExtraDialogData(data,listener)))
+    fun showSimpleDialog(data: Any) {
+        updateToOverlappedState(EmaExtraData(OVERLAPPED_DIALOG, data = data))
     }
 
-    fun hideError(){
+    fun hideError() {
         updateToNormalState()
     }
 
-    fun hideLoading(){
+    fun hideLoading() {
         updateToNormalState()
     }
 
-    fun hideDialog(){
+    fun hideDialog() {
         updateToNormalState()
     }
 }

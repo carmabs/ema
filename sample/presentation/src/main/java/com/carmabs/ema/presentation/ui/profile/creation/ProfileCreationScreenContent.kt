@@ -20,10 +20,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carmabs.domain.model.Role
+import com.carmabs.ema.android.extension.toEmaText
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcherEmpty
+import com.carmabs.ema.compose.extension.toComposePainter
+import com.carmabs.ema.compose.extension.toComposeString
 import com.carmabs.ema.core.action.EmaActionDispatcher
-import com.carmabs.ema.core.action.EmaActionDispatcherEmpty
 import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.presentation.base.compose.BaseScreenComposable
@@ -100,13 +102,53 @@ class ProfileCreationScreenContent :
     }
 
     @Composable
-    override fun onOverlapped(extra: EmaExtraData, actions: EmaActionDispatcher<ProfileCreationAction>) {
-        when (extra.id) {
-            ProfileCreationViewModel.OVERLAPPED_DIALOG_CONFIRMATION -> {
-                val dialogData = extra.data as SimpleDialogData
-                SimpleDialogComposable(
-                    dialogData = dialogData,
-                    dialogListener = object : SimpleDialogListener {
+    override fun onOverlappedDialog(
+        data: Any?,
+        actions: EmaImmutableActionDispatcher<ProfileCreationAction>
+    ) {
+        when (val dialog = data as ProfileCreationOverlap) {
+            ProfileCreationOverlap.DialogBackConfirmation -> {
+                ShowDialog(
+                    data = SimpleDialogData(
+                        title = EmaText.id(R.string.profile_creation_user_exit_title),
+                        message = EmaText.id(R.string.profile_creation_user_exit_message),
+                        proportionWidth = 0.8f,
+                        showCancel = true,
+                        image = R.drawable.ic_exit
+                    ),
+                    listener = object : SimpleDialogListener {
+                        override fun onCancelClicked() {
+                            actions.dispatch(ProfileCreationAction.DialogCancelClicked)
+                        }
+
+                        override fun onConfirmClicked() {
+                            actions.dispatch(ProfileCreationAction.DialogCancelClicked)
+                        }
+
+                        override fun onBackPressed() {
+                            actions.dispatch(ProfileCreationAction.DialogCancelClicked)
+                        }
+                    }
+                )
+            }
+
+            is ProfileCreationOverlap.DialogUserCreated -> {
+                val image = when (dialog.role) {
+                    Role.ADMIN -> R.drawable.ic_admin
+                    Role.BASIC -> R.drawable.ic_user
+                }
+                val title = when (dialog.role) {
+                    Role.ADMIN -> R.string.profile_creation_user_admin_title
+                    Role.BASIC -> R.string.profile_creation_user_basic_title
+                }
+                ShowDialog(data = SimpleDialogData(
+                    title = EmaText.id(title),
+                    message = R.string.profile_creation_user_message.toEmaText(),
+                    showCancel = true,
+                    image = image,
+                    proportionWidth = 0.9f
+                ),
+                    listener = object : SimpleDialogListener {
                         override fun onCancelClicked() {
                             actions.dispatch(ProfileCreationAction.DialogCancelClicked)
                         }
@@ -121,7 +163,6 @@ class ProfileCreationScreenContent :
 
                     })
             }
-
         }
     }
 
@@ -143,26 +184,13 @@ class ProfileCreationScreenContent :
     private fun OverlappedPreview() {
         NormalPreview()
         ShowDialog(
-            SimpleDialogData(
+            data = SimpleDialogData(
                 title = EmaText.text("Test title"),
                 message = EmaText.text("test message"),
                 proportionWidth = 0.8f,
                 showCancel = true
             ),
-            object : SimpleDialogListener{
-                override fun onCancelClicked() {
-
-                }
-
-                override fun onConfirmClicked() {
-
-                }
-
-                override fun onBackPressed() {
-
-                }
-
-            }
+            listener = SimpleDialogListener.EMPTY
         )
     }
 }

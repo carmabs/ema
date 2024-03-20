@@ -1,7 +1,9 @@
 package com.carmabs.domain.repository
 
+import com.carmabs.domain.exception.LoginException
 import com.carmabs.domain.model.LoginRequest
 import com.carmabs.domain.model.User
+import com.carmabs.ema.core.model.EmaResult
 
 /**
  *  *<p>
@@ -14,6 +16,6 @@ import com.carmabs.domain.model.User
 
 interface Repository {
 
-    suspend fun login(loginRequest: LoginRequest): User
+    suspend fun login(loginRequest: LoginRequest): EmaResult<User,LoginException>
     suspend fun getFriendsList(): List<User>
 }

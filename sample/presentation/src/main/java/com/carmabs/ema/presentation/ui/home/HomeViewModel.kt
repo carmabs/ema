@@ -1,6 +1,5 @@
 package com.carmabs.ema.presentation.ui.home
 
-import com.carmabs.domain.model.Role
 import com.carmabs.domain.model.User
 import com.carmabs.domain.usecase.GetUserFriendsUseCase
 import com.carmabs.ema.core.broadcast.broadcastId
@@ -14,22 +13,25 @@ class HomeViewModel(
 ) : BaseViewModel<HomeState, HomeAction, HomeNavigationEvent>(initialDataState) {
 
     private var admin: User? = null
-
     override fun onStateCreated(initializer: EmaInitializer?) {
-        when (val homeInitializer = initializer as HomeInitializer) {
-            is HomeInitializer.Admin -> {
-                admin = homeInitializer.admin
-                updateState {
-                    copy(
-                        userData = HomeState.UserData.Admin(homeInitializer.admin.name),
-                        userList = emptyList()
-                    )
+        sideEffect {
+            val friends = getUserFriendsUseCase(Unit)
+            when (val homeInitializer = initializer as HomeInitializer) {
+                is HomeInitializer.Admin -> {
+                    admin = homeInitializer.admin
+                    updateState {
+                        copy(
+                            userData = HomeState.UserData.Admin(
+                                homeInitializer.admin.name,
+                                homeInitializer.admin.surname
+                            ),
+                            userList = friends
+                        )
+                    }
                 }
-            }
 
-            HomeInitializer.BasicUser -> {
-                sideEffect {
-                    val friends = getUserFriendsUseCase(Unit)
+                HomeInitializer.BasicUser -> {
+
                     updateState {
                         copy(
                             userData = HomeState.UserData.Basic,
@@ -40,9 +42,8 @@ class HomeViewModel(
             }
         }
     }
-
     override fun onAction(action: HomeAction) {
-        when(action){
+        when (action) {
             HomeAction.ProfileClicked -> {
                 onActionCreateProfileClicked()
             }
@@ -51,7 +52,9 @@ class HomeViewModel(
 
     private fun onActionCreateProfileClicked() {
         navigate(
-            HomeNavigationEvent.ProfileClicked(admin ?: throw IllegalStateException("Admin cannot be null"))
+            HomeNavigationEvent.ProfileClicked(
+                admin ?: throw IllegalStateException("Admin cannot be null")
+            )
         )
     }
 

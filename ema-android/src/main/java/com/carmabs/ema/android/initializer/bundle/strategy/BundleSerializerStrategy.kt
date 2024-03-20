@@ -3,6 +3,7 @@ package com.carmabs.ema.android.initializer.bundle.strategy
 import android.os.Bundle
 import com.carmabs.ema.core.constants.STRING_EMPTY
 import com.carmabs.ema.core.initializer.EmaInitializer
+import kotlinx.serialization.KSerializer
 
 /**
  * Created by Carlos Mateo Benito on 19/3/24.
@@ -29,5 +30,7 @@ interface BundleSerializerStrategy {
 
             override fun restore(bundle: Bundle): EmaInitializer? = null
         }
+
+        fun <I:EmaInitializer>kSerialization(serializer: KSerializer<I>) = KSerializationBundleStrategy(serializer = serializer)
     }
 }
