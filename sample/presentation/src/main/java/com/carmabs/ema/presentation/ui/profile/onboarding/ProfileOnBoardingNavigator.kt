@@ -3,6 +3,8 @@ package com.carmabs.ema.presentation.ui.profile.onboarding
 import androidx.activity.ComponentActivity
 import androidx.navigation.NavController
 import com.carmabs.domain.model.Role
+import com.carmabs.ema.android.initializer.EmaInitializerBundle
+import com.carmabs.ema.android.initializer.bundle.strategy.KSerializationBundleStrategy
 import com.carmabs.ema.compose.extension.navigate
 import com.carmabs.ema.compose.extension.routeId
 import com.carmabs.ema.compose.navigation.EmaComposableNavigator
@@ -21,7 +23,10 @@ class ProfileOnBoardingNavigator(
             is ProfileOnBoardingNavigationEvent.ProfileCreation -> {
                 navController.navigate(
                     route = ProfileCreationScreenContent::class.routeId,
-                    initializer = mapToCreationInitializer(navigationEvent.role)
+                    initializerBundle = EmaInitializerBundle(
+                        mapToCreationInitializer(navigationEvent.role),
+                        KSerializationBundleStrategy(ProfileCreationInitializer.serializer())
+                    )
                 )
             }
         }

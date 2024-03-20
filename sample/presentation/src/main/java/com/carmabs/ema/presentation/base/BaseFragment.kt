@@ -35,6 +35,7 @@ abstract class BaseFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel
         parametersOf(childFragmentManager)
     }
 
+
     final override fun B.onStateNormal(data: S) {
         hideLoading()
         hideError()

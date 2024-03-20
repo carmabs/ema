@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.carmabs.domain.model.User
 import com.carmabs.ema.android.di.injectDirect
-import com.carmabs.ema.android.extension.string
+import com.carmabs.ema.android.initializer.bundle.strategy.KSerializationSaveStateStrategy
+import com.carmabs.ema.android.initializer.bundle.strategy.BundleSerializerStrategy
+import com.carmabs.ema.android.initializer.bundle.strategy.KSerializationBundleStrategy
 import com.carmabs.ema.android.ui.EmaFragment
 import com.carmabs.ema.android.ui.recycler.EmaBaseRecyclerAdapter
 import com.carmabs.ema.core.navigator.EmaNavigator
@@ -20,6 +22,8 @@ class HomeFragment :
     EmaFragment<HomeFragmentBinding, HomeState, HomeViewModel, HomeNavigationEvent>() {
 
     private var adapter: EmaBaseRecyclerAdapter<User>? = null
+    override val initializerStrategy: BundleSerializerStrategy
+        get() = KSerializationBundleStrategy(HomeInitializer.serializer())
 
     override fun createViewBinding(
         inflater: LayoutInflater,

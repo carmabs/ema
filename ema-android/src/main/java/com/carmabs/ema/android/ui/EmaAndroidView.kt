@@ -2,7 +2,9 @@ package com.carmabs.ema.android.ui
 
 import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.carmabs.ema.android.initializer.savestate.SaveStateManager
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
@@ -20,29 +22,30 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-interface EmaAndroidView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> :
-    EmaView<S, VM, D> {
+interface EmaAndroidView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent> :
+    EmaView<S, VM, N> {
 
     fun initializeViewModel(
         activity: ComponentActivity,
         viewModelSeed: VM
-    ): VM {
+    ): EmaAndroidViewModel<S,N> {
         val emaFactory = EmaViewModelFactory(viewModelSeed)
         val vm = ViewModelProvider(
             activity,
             emaFactory
         )[viewModelSeed.id, EmaAndroidViewModel::class.java]
-
-
-        return vm.emaViewModel as VM
+        return vm as EmaAndroidViewModel<S, N>
     }
 
     fun initializeViewModel(
         fragment: Fragment,
-        viewModelSeed:VM,
-    ): VM {
+        viewModelSeed: VM
+    ): EmaAndroidViewModel<S,N> {
         val emaFactory = EmaViewModelFactory(viewModelSeed)
-        val vm = ViewModelProvider(fragment, emaFactory)[viewModelSeed.id, EmaAndroidViewModel::class.java]
-        return vm.emaViewModel as VM
+        val vm = ViewModelProvider(
+            fragment,
+            emaFactory
+        )[viewModelSeed.id, EmaAndroidViewModel::class.java]
+        return vm as EmaAndroidViewModel<S, N>
     }
 }

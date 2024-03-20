@@ -19,8 +19,8 @@ import kotlin.reflect.jvm.javaMethod
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-open class EmaAndroidViewModel<S:EmaDataState,D:EmaNavigationEvent>(
-    val emaViewModel:EmaViewModel<S,D>,
+open class EmaAndroidViewModel<S:EmaDataState,N:EmaNavigationEvent>(
+    val emaViewModel:EmaViewModel<S,N>,
     val savedStateHandle: SavedStateHandle = SavedStateHandle()
 ) : ViewModel() {
 

@@ -15,8 +15,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.carmabs.ema.android.extension.addOnBackPressedListener
+import com.carmabs.ema.android.initializer.savestate.SaveStateManager
 import com.carmabs.ema.android.navigation.EmaNavigationBackHandler
-import com.carmabs.ema.android.savestate.SaveStateManager
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcherEmpty
@@ -37,7 +37,6 @@ import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import com.carmabs.ema.core.viewmodel.EmaViewModelAction
 
 @Composable
 fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen> EmaComposableScreen(
@@ -66,7 +65,7 @@ fun <S : EmaDataState, D : EmaNavigationEvent, A : EmaAction.Screen> EmaComposab
             actions.toImmutable()
         }
 
-        renderScreen(
+        RenderScreen(
             initializer,
             screenContent,
             vm,
@@ -86,7 +85,7 @@ fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> EmaComposab
     onNavigationEvent: (N) -> Unit,
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     onAction: ((A) -> Unit)? = null,
-    saveStateManager: SaveStateManager<S, A, N>? = null,
+    saveStateManager: SaveStateManager<S, N>? = null,
     previewRenderState: S? = null
 ) {
     skipForPreview(
@@ -117,7 +116,7 @@ fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> EmaComposab
                 saveStateManager = saveStateManager
             )
 
-        renderScreen(
+        RenderScreen(
             initializerWithSaveStateSupport,
             screenContent,
             emaVm,
@@ -130,10 +129,10 @@ fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> EmaComposab
 }
 
 @Composable
-internal fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> handleSaveStateSupport(
+internal fun <S : EmaDataState, N : EmaNavigationEvent> handleSaveStateSupport(
     initializer: EmaInitializer?,
     androidViewModel: EmaAndroidViewModel<S, N>,
-    saveStateManager: SaveStateManager<S, A, N>?
+    saveStateManager: SaveStateManager<S, N>?
 ): EmaInitializer? = remember {
     saveStateManager?.also { handler ->
         initializer?.also {
@@ -143,13 +142,13 @@ internal fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> ha
     saveStateManager?.onSaveStateHandling(
         androidViewModel.viewModelScope,
         androidViewModel.savedStateHandle,
-        androidViewModel.emaViewModel as EmaViewModelAction<S, A, N>
+        androidViewModel.emaViewModel
     )
     initializer ?: saveStateManager?.restore(androidViewModel.savedStateHandle)
 }
 
 @Composable
-private fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> renderScreen(
+private fun <A : EmaAction.Screen, S : EmaDataState, N : EmaNavigationEvent> RenderScreen(
     initializer: EmaInitializer?,
     screenContent: EmaComposableScreenContent<S, A>,
     vm: EmaViewModel<S, N>,

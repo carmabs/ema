@@ -1,9 +1,10 @@
-package com.carmabs.ema.android.savestate
+package com.carmabs.ema.android.initializer.savestate
 
 import androidx.lifecycle.SavedStateHandle
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
+import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.carmabs.ema.core.viewmodel.EmaViewModelAction
 import kotlinx.coroutines.CoroutineScope
 
@@ -16,22 +17,22 @@ import kotlinx.coroutines.CoroutineScope
  *
  * @author <a href=“mailto:apps.carmabs@gmail.comm”>Carlos Mateo Benito</a>
  */
-interface SaveStateHandler<S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> {
+interface SaveStateHandler<S : EmaDataState, N : EmaNavigationEvent> {
     fun onSaveStateHandling(
         scope: CoroutineScope,
         saveStateHandle: SavedStateHandle,
-        viewModel: EmaViewModelAction<S, A, N>
+        viewModel: EmaViewModel<S, N>
     )
 }
 
-fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> emaSaveStateHandler(
-    onSaveStateHandling: (CoroutineScope, SavedStateHandle, EmaViewModelAction<S, A, N>) -> Unit
-): SaveStateHandler<S, A, N> {
-    return object : SaveStateHandler<S, A, N> {
+fun <S : EmaDataState, N : EmaNavigationEvent> emaSaveStateHandler(
+    onSaveStateHandling: (CoroutineScope, SavedStateHandle, EmaViewModel<S, N>) -> Unit
+): SaveStateHandler<S, N> {
+    return object : SaveStateHandler<S, N> {
         override fun onSaveStateHandling(
             scope: CoroutineScope,
             saveStateHandle: SavedStateHandle,
-            viewModel: EmaViewModelAction<S, A, N>
+            viewModel: EmaViewModel<S, N>
         ) {
             onSaveStateHandling.invoke(scope, saveStateHandle, viewModel)
         }

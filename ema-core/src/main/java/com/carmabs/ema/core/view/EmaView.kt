@@ -1,6 +1,6 @@
 package com.carmabs.ema.core.view
 
-import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.initializer.EmaInitializerSerializer
 import com.carmabs.ema.core.model.EmaEvent
 import com.carmabs.ema.core.model.onLaunched
 import com.carmabs.ema.core.navigator.EmaNavigationDirection
@@ -49,12 +49,12 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEv
     /**
      * The initializer from previous views when it is launched.
      */
-    val initializer: EmaInitializer?
+    val initializerSerializer:EmaInitializerSerializer?
 
     /**
      * The previous state of the View
      */
-    var previousEmaState: EmaState<S,N>?
+    var previousEmaState: EmaState<S, N>?
 
     val previousStateData: S?
         get() = previousEmaState?.data
@@ -69,7 +69,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEv
      * Called when view model trigger an update view event
      * @param state of the view
      */
-    private fun onDataUpdated(state: EmaState<S,N>) {
+    private fun onDataUpdated(state: EmaState<S, N>) {
 
         previousEmaState?.let { previousState ->
             if (previousState.javaClass.name != state.javaClass.name) {
@@ -86,7 +86,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEv
                     is EmaState.Normal -> {
                         onEmaStateTransition(
                             EmaStateTransition.OverlappedToNormal(
-                                (previousState as EmaState.Overlapped<S,N>).extraData,
+                                (previousState as EmaState.Overlapped<S, N>).extraData,
                                 state.data
                             )
                         )
@@ -187,7 +187,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEv
      * Called when view model trigger an only once notified event
      * @param event for extra information
      */
-    fun onSingleData(event : EmaEvent) {
+    fun onSingleData(event: EmaEvent) {
         event.onLaunched {
             onSingleEvent(it)
             viewModel.consumeSingleEvent()
@@ -250,7 +250,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEv
      * Called when view model trigger a navigation back event
      * @return True
      */
-    fun navigateBack(result:Any?=null): Boolean {
+    fun navigateBack(result: Any? = null): Boolean {
         return navigator?.navigateBack(result) ?: onBack(result)
     }
 
@@ -259,10 +259,10 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEv
     fun onCreate(viewModel: VM) {
         startTrigger?.also {
             it.triggerAction = {
-                viewModel.onCreated(initializer)
+                viewModel.onCreated(initializerSerializer?.restore())
             }
         } ?: also {
-            viewModel.onCreated(initializer)
+            viewModel.onCreated(initializerSerializer?.restore())
         }
     }
 

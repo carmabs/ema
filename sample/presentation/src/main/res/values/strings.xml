@@ -37,7 +37,7 @@
 
     <!--EMA HEADER-->
     <string name="ema_header_title">EMA</string>
-    <string name="ema_header_subtitle">MVVM Architecture, powered by Carmabs</string>
+    <string name="ema_header_subtitle">MVI Architecture, powered by Carmabs</string>
 
 
 

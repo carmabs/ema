@@ -14,15 +14,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.carmabs.ema.android.constants.EMA_RESULT_CODE
 import com.carmabs.ema.android.constants.EMA_RESULT_KEY
-import com.carmabs.ema.android.extension.generateViewModel
 import com.carmabs.ema.android.extension.addOnBackPressedListener
-import com.carmabs.ema.android.extension.getInitializer
+import com.carmabs.ema.android.extension.generateViewModel
+import com.carmabs.ema.android.initializer.bundle.BundleSerializer
+import com.carmabs.ema.android.initializer.bundle.strategy.BundleSerializerStrategy
 import com.carmabs.ema.android.navigation.EmaActivityBackDelegate
 import com.carmabs.ema.android.ui.EmaAndroidView
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
 import com.carmabs.ema.core.constants.INT_ZERO
-import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.initializer.EmaInitializerSerializer
 import com.carmabs.ema.core.model.EmaBackHandlerStrategy
 import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
@@ -63,19 +64,15 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         mutableListOf()
     }
 
+    @Suppress("UNCHECKED_CAST")
     override val viewModel: VM by lazy {
-        generateViewModel(provideViewModel())
+        generateViewModel(provideViewModel()).emaViewModel as VM
     }
+
     /**
      * Trigger to start viewmodel only when startViewModel is launched
      */
     override val startTrigger: EmaViewModelTrigger? = null
-
-    /**
-     * The incoming initializer in fragment instantiation. This is set up when other fragment/activity
-     * launches a fragment with arguments provided by Bundle
-     */
-    override val initializer: EmaInitializer? by lazy { getInitializer() }
 
     /**
      * The list which handles the extra view models attached, to unbind the observers
@@ -93,8 +90,12 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     abstract override val navigator: EmaNavigator<N>?
 
     abstract fun provideViewModel(): VM
+    final override val initializerSerializer: EmaInitializerSerializer?
+        get() = arguments?.let {bundle->
+            BundleSerializer(bundle,initializerStrategy)
+        }
 
-
+    abstract val initializerStrategy:BundleSerializerStrategy
     override val coroutineScope: CoroutineScope
         get() = lifecycleScope
 
@@ -152,6 +153,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
                 }
 
             }
+
         onCreate(viewModel)
     }
 
@@ -202,6 +204,7 @@ abstract class EmaCoreFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
      * @param observerFunction the observer of the view model attached
      * @return The view model attached
      */
+    @Suppress("UNCHECKED_CAST")
     fun <AVM : EmaViewModel<S, N>> addExtraViewModel(
         viewModelAttachedSeed: AVM,
         fragment: Fragment,
