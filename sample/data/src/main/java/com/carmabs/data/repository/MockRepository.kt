@@ -20,12 +20,9 @@ import kotlinx.coroutines.delay
  * Created by: Carlos Mateo Benito on 19/1/19.
  */
 class MockRepository : Repository {
-
-    private var userLogged: User? = null
-
     override suspend fun login(loginRequest: LoginRequest): EmaResult<User, LoginException> {
         delay(2000)
-        val result: EmaResult<User, LoginException> = when {
+        return when {
             (loginRequest.name.equals("Admin", true) && loginRequest.password == "1234") ->
                 EmaResult.success(User("Carmabs", "Ema Creator", Role.ADMIN))
 
@@ -37,14 +34,11 @@ class MockRepository : Repository {
                 EmaResult.failure(LoginException())
             }
         }
-        return result.onSuccess {
-            userLogged = it
-        }
     }
 
-    override suspend fun getFriendsList(): List<User> {
+    override suspend fun getFriendsList(user: User): List<User> {
         val userList = mutableListOf<User>()
-        if (userLogged?.role == Role.BASIC)
+        if (user.role == Role.BASIC)
             repeat(10) {
                 userList.add(User("User$it", "Surname$it", Role.BASIC))
             }

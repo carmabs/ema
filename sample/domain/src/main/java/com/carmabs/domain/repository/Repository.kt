@@ -17,5 +17,5 @@ import com.carmabs.ema.core.model.EmaResult
 interface Repository {
 
     suspend fun login(loginRequest: LoginRequest): EmaResult<User,LoginException>
-    suspend fun getFriendsList(): List<User>
+    suspend fun getFriendsList(user: User): List<User>
 }

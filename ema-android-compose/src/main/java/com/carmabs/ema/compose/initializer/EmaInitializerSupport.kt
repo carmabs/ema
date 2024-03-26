@@ -1,7 +1,6 @@
 package com.carmabs.ema.compose.initializer
 
 import com.carmabs.ema.android.initializer.bundle.strategy.BundleSerializerStrategy
-import com.carmabs.ema.android.initializer.bundle.strategy.KSerializationBundleStrategy
 import com.carmabs.ema.core.initializer.EmaInitializer
 import kotlinx.serialization.KSerializer
 
@@ -17,9 +16,15 @@ import kotlinx.serialization.KSerializer
 open class EmaInitializerSupport(
     val serializerStrategy: BundleSerializerStrategy,
     val overrideInitializer: EmaInitializer? = null
-)
+) {
+    companion object {
+        fun <I : EmaInitializer> kSerialization(
+            serializer: KSerializer<I>,
+            overrideInitializer: I? = null
+        ) = EmaInitializerSupport(
+            BundleSerializerStrategy.kSerialization(serializer),
+            overrideInitializer
+        )
+    }
 
-open class KSerializationSupport<I : EmaInitializer>(
-    serializer: KSerializer<I>,
-    overrideInitializer: I? = null
-) : EmaInitializerSupport(BundleSerializerStrategy.kSerialization(serializer), overrideInitializer)
+}

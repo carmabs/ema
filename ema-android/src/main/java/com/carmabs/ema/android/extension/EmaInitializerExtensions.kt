@@ -47,9 +47,9 @@ inline fun <reified I : EmaInitializer> Bundle.getInitializer(strategy: BundleSe
 /**
  * Get the incoming initializer from another activity by the initializer provided
  */
-inline fun <reified I : EmaInitializer> Activity.getInitializer(strategy: BundleSerializerStrategy): I? {
+inline fun <reified I : EmaInitializer> Activity.getInitializer(strategy: BundleSerializerStrategy,savedInstanceState:Bundle?): I? {
     return intent?.let {
-        it.extras?.let { bundle ->
+        (it.extras?:savedInstanceState)?.let { bundle ->
             BundleSerializer(bundle, strategy).restore() as? I
         }
     }

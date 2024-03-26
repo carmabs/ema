@@ -5,13 +5,11 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import com.carmabs.ema.android.base.EmaCoreActivity
-import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import kotlin.reflect.KClass
 
 
 /**
@@ -42,7 +40,7 @@ abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, N>, 
                     }
                     is EmaState.Overlapped<S,N> -> {
                         onStateNormal(data = emaState.data)
-                        onStateOverlayed(data = emaState.extraData)
+                        onStateOverlapped(extraData = emaState.extraData)
                         isFirstOverlayedExecution = false
                     }
 
@@ -54,10 +52,10 @@ abstract class EmaComposableActivity<S : EmaDataState, VM : EmaViewModel<S, N>, 
     abstract fun onStateNormal(data: S)
 
     @Composable
-    protected open fun onStateOverlayed(data: EmaExtraData) = Unit
+    protected open fun onStateOverlapped(extraData: EmaExtraData) = Unit
 
     // Discard these methods because they are called now by compose
     final override fun onEmaStateNormal(data: S) = Unit
 
-    final override fun onEmaStateOverlapped(extra: EmaExtraData) = Unit
+    final override fun onEmaStateOverlapped(extraData: EmaExtraData) = Unit
 }

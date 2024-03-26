@@ -1,8 +1,9 @@
 package com.carmabs.ema.presentation.ui.home
 
+import com.carmabs.domain.model.Role
 import com.carmabs.domain.model.User
 import com.carmabs.domain.usecase.GetUserFriendsUseCase
-import com.carmabs.ema.core.broadcast.broadcastId
+import com.carmabs.ema.core.broadcast.backBroadcastId
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.presentation.base.BaseViewModel
 import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationViewModel
@@ -12,30 +13,25 @@ class HomeViewModel(
     initialDataState: HomeState
 ) : BaseViewModel<HomeState, HomeAction, HomeNavigationEvent>(initialDataState) {
 
-    private var admin: User? = null
+    private lateinit var user: User
     override fun onStateCreated(initializer: EmaInitializer?) {
         sideEffect {
-            val friends = getUserFriendsUseCase(Unit)
             when (val homeInitializer = initializer as HomeInitializer) {
-                is HomeInitializer.Admin -> {
-                    admin = homeInitializer.admin
+                is HomeInitializer.HomeUser -> {
+                    user  = homeInitializer.user
+                    val friends = getUserFriendsUseCase(GetUserFriendsUseCase.Input(homeInitializer.user))
                     updateState {
                         copy(
-                            userData = HomeState.UserData.Admin(
-                                homeInitializer.admin.name,
-                                homeInitializer.admin.surname
-                            ),
-                            userList = friends
-                        )
-                    }
-                }
-
-                HomeInitializer.BasicUser -> {
-
-                    updateState {
-                        copy(
-                            userData = HomeState.UserData.Basic,
-                            userList = friends
+                            userData = when(user.role) {
+                                Role.ADMIN -> HomeState.UserData.Admin(
+                                    user.name,
+                                    user.surname
+                                )
+                                Role.BASIC -> HomeState.UserData.Basic
+                            },
+                            userList = userList.toMutableList().apply {
+                                addAll(friends)
+                            }
                         )
                     }
                 }
@@ -51,16 +47,13 @@ class HomeViewModel(
     }
 
     private fun onActionCreateProfileClicked() {
-        navigate(
-            HomeNavigationEvent.ProfileClicked(
-                admin ?: throw IllegalStateException("Admin cannot be null")
-            )
-        )
+        navigate(HomeNavigationEvent.ProfileClicked(user))
     }
 
     override fun onBroadcastListenerSetup() {
-        addOnBroadcastListener(ProfileCreationViewModel::class.broadcastId) {
+        registerBackBroadcastListener(ProfileCreationViewModel::class.backBroadcastId) {
             val user = it as User
+            setBackBroadcastData(user)
             updateState {
                 copy(userList = userList.toMutableList().apply {
                     add(user)

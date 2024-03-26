@@ -62,7 +62,7 @@ class ProfileCreationViewModel(
 
     private fun onActionDialogConfirmClicked() {
         updateToNormalState()
-        addBroadcast(User(stateData.name, stateData.surname, stateData.role))
+        setBackBroadcastData(User(stateData.name, stateData.surname, stateData.role))
         navigate(ProfileCreationNavigationEvent.DialogConfirmationAccepted)
     }
 

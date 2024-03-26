@@ -1,17 +1,15 @@
 package com.carmabs.ema.presentation.ui.login
 
-import com.carmabs.domain.model.LoginRequest
-import com.carmabs.domain.model.Role
 import com.carmabs.domain.model.User
 import com.carmabs.domain.usecase.LoginUseCase
-import com.carmabs.ema.core.broadcast.broadcastId
+import com.carmabs.ema.core.broadcast.backBroadcastId
 import com.carmabs.ema.core.constants.STRING_EMPTY
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.model.onFailure
 import com.carmabs.ema.core.model.onSuccess
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.presentation.base.BaseViewModel
-import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationViewModel
+import com.carmabs.ema.presentation.ui.home.HomeViewModel
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
@@ -62,11 +60,7 @@ class LoginViewModel(
     private var pendingUser: User? = null
 
     override fun onBroadcastListenerSetup() {
-        //When two or more resultReceived WITH THE SAME CODE are active, for example in this case,
-        //this receiver and the EmaHomeToolbarViewModel receiver, only the last one is executed.
-        //ActivityCreated -> EmaHomeToolbarViewModel added -> Fragment created -> EEmaHomeViewModel added->
-        //only this result received is executed.
-        addOnBroadcastListener(ProfileCreationViewModel::class.broadcastId) {
+        registerBackBroadcastListener(HomeViewModel::class.backBroadcastId) {
             pendingUser = it as User
 
         }
@@ -84,7 +78,7 @@ class LoginViewModel(
         sideEffect {
             showLoading()
             val userLogged =
-                loginUseCase.invoke(LoginRequest(stateData.userName, stateData.userPassword))
+                loginUseCase.invoke(LoginUseCase.Input(stateData.userName, stateData.userPassword))
             updateToNormalState()
             userLogged.onSuccess {user->
                 notifySingleEvent(
@@ -92,15 +86,7 @@ class LoginViewModel(
                         data = LoginSingleEvent.Message(user.name)
                     )
                 )
-                val userType = when (user.role) {
-                    Role.ADMIN -> LoginNavigationEvent.LoginSuccess.UserType.Admin(
-                        user = user
-                    )
-
-                    Role.BASIC ->
-                        LoginNavigationEvent.LoginSuccess.UserType.Basic
-                }
-                navigate(LoginNavigationEvent.LoginSuccess(userType))
+                navigate(LoginNavigationEvent.LoginSuccess(user))
             }.onFailure {
                 showError(LoginOverlap.ErrorBadCredentials)
             }

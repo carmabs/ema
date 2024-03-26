@@ -256,7 +256,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     }
 
 
-    override fun onEmaStateOverlapped(extra: EmaExtraData) = Unit
+    override fun onEmaStateOverlapped(extraData: EmaExtraData) = Unit
 
     override fun onSingleEvent(extra: EmaExtraData) = Unit
 

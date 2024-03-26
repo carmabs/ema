@@ -2,6 +2,7 @@ package com.carmabs.ema.compose.extension
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
@@ -77,17 +78,21 @@ fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> NavGraphBui
 
             val vm = androidVm.emaViewModel
 
-            val vmActions = vm.asActionDispatcher<A>().toImmutable()
+            val vmActions = remember {
+                vm.asActionDispatcher<A>().toImmutable()
+            }
 
             val initializer = initializerSupport?.let {
                 it.overrideInitializer?: backEntry.arguments?.getInitializer(it.serializerStrategy)
             }
 
-            saveStateHandler?.onSaveStateHandling(
-                androidVm.viewModelScope,
-                androidVm.savedStateHandle,
-                androidVm.emaViewModel
-            )
+            LaunchedEffect(key1 = Unit) {
+                saveStateHandler?.onSaveStateHandling(
+                    androidVm.viewModelScope,
+                    androidVm.savedStateHandle,
+                    androidVm.emaViewModel
+                )
+            }
             onViewModelInstance?.invoke(vm)
             val screenToDraw = @Composable {
                 EmaComposableScreen(

@@ -15,9 +15,15 @@ import com.carmabs.ema.core.usecase.EmaUseCase
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
-class LoginUseCase(private val repository: Repository) : EmaUseCase<LoginRequest, EmaResult<User,LoginException>>() {
+class LoginUseCase(private val repository: Repository) :
+    EmaUseCase<LoginUseCase.Input, EmaResult<User, LoginException>>() {
 
-    override suspend fun useCaseFunction(input: LoginRequest): EmaResult<User,LoginException> {
-        return repository.login(input)
+    override suspend fun useCaseFunction(input: Input): EmaResult<User, LoginException> {
+        return repository.login(LoginRequest(input.username, input.password))
     }
+
+    data class Input(
+        val username: String,
+        val password: String
+    )
 }

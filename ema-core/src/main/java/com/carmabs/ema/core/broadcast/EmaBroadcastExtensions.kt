@@ -12,8 +12,8 @@ import kotlin.reflect.KClass
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-val <T : EmaViewModel<*, *>> KClass<T>.broadcastId: BroadcastId
-    get() = BroadcastId("broadcast/${this.java.name}/${this.hashCode()}")
+val <T : EmaViewModel<*, *>> KClass<T>.backBroadcastId: BackBroadcastId
+    get() = BackBroadcastId("broadcast/${this.java.name}")
 
 @JvmInline
-value class BroadcastId internal constructor(val id: String)
+value class BackBroadcastId internal constructor(val id: String)

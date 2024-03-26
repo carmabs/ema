@@ -1,5 +1,7 @@
 package com.carmabs.ema.core.viewmodel
 
+import com.carmabs.ema.core.broadcast.BackBroadcastId
+
 /**
  * Created by Carlos Mateo Benito on 2019-11-03.
  *
@@ -19,14 +21,17 @@ internal class EmaResultHandler private constructor() {
     }
 
     private val resultMap: HashMap<String, EmaResultModel> = HashMap()
-    private val receiverMap: HashMap<String, HashMap<String, EmaReceiverModel>> = HashMap()
+    private val receiverMap: HashMap<String, EmaReceiverModel> = HashMap()
+    private val pendingResultMap by lazy {
+        HashMap<String,EmaResultModel>()
+    }
 
     /**
      * Used for notify result data between views
      * @param emaResultModel notified
      */
     fun addResult(emaResultModel: EmaResultModel) {
-        resultMap[emaResultModel.code] = emaResultModel
+        resultMap[emaResultModel.key] = emaResultModel
     }
 
     /**
@@ -36,22 +41,20 @@ internal class EmaResultHandler private constructor() {
     fun notifyResults(ownerId: String) {
         val keysToRemove = mutableListOf<String>()
 
-        //Map for avoid iteration exception if a result is added on receiver invocation
-        val receiverExecutions = mutableListOf<() -> Unit>()
-
         resultMap.forEach {
             if (it.value.ownerId == ownerId) {
                 val result = it.value
-                val code = result.code
-                receiverMap[code]?.forEach { entry ->
-                    val receiver = entry.value
+                val resultKey = result.key
+                val receiver = receiverMap[resultKey]
+                receiver?.also {
                     if (ownerId != receiver.ownerId) {
-                        receiverExecutions.add {
-                            receiver.function.invoke(result.data)
-                        }
+                        receiver.function.invoke(result.data)
+                        //If a receiver is attached we remove the result. Otherwise we keep it due to if process is killed and
+                        //is restarted it must be retained to be delivered when previous screen is shown due to it is created on demand
+                        keysToRemove.add(result.key)
                     }
-
-                    keysToRemove.add(result.code)
+                }?:also {
+                    pendingResultMap[resultKey] = result
                 }
             }
         }
@@ -59,11 +62,6 @@ internal class EmaResultHandler private constructor() {
         keysToRemove.forEach {
             resultMap.remove(it)
         }
-
-        receiverExecutions.forEach {
-            it.invoke()
-        }
-
         keysToRemove.clear()
     }
 
@@ -71,28 +69,34 @@ internal class EmaResultHandler private constructor() {
      * Add listener when result is notified
      */
     fun addResultReceiver(receiverModel: EmaReceiverModel) {
-        receiverMap[receiverModel.resultCode]?.apply {
-            put(receiverModel.ownerId, receiverModel)
-        } ?: also {
-            receiverMap[receiverModel.resultCode] = HashMap<String, EmaReceiverModel>().also {
-                it[receiverModel.ownerId] = receiverModel
-            }
-        }
+        if (receiverMap.containsKey(receiverModel.resultKey))
+            throw IllegalStateException("The key receiver has already been registered. Each receiver should have a unique key")
+        receiverMap[receiverModel.resultKey] = receiverModel
     }
 
     /**
      * Remove listener based on ownerId
      */
     fun removeResultListener(ownerId: String) {
-        val codeToClear = mutableSetOf<String>()
-        receiverMap.forEach {
-            val receiverOwners = it.value
-            receiverOwners.remove(ownerId)
-            if (receiverOwners.isEmpty())
-                codeToClear.add(it.key)
+        val receivers = receiverMap.filterValues {
+            it.ownerId == ownerId
         }
-        codeToClear.forEach {
+        receivers.map {
+            it.key
+        }.forEach {
             receiverMap.remove(it)
+            //We remove the result due to only one receiver is allowed, so the result wouldn't be needed
+            resultMap.remove(it)
         }
+    }
+
+    fun notifyPendingResults(ownerId: String,backBroadcastId: BackBroadcastId) {
+        pendingResultMap[backBroadcastId.id]?.also {
+            if(ownerId!=it.ownerId) {
+                receiverMap[backBroadcastId.id]?.function?.invoke(it.data)
+                pendingResultMap.remove(backBroadcastId.id)
+            }
+        }
+
     }
 }

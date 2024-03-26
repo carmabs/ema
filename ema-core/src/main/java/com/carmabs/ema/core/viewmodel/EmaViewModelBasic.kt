@@ -1,7 +1,7 @@
 package com.carmabs.ema.core.viewmodel
 
-import com.carmabs.ema.core.broadcast.BroadcastId
-import com.carmabs.ema.core.broadcast.broadcastId
+import com.carmabs.ema.core.broadcast.BackBroadcastId
+import com.carmabs.ema.core.broadcast.backBroadcastId
 import com.carmabs.ema.core.concurrency.EmaMainScope
 import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.extension.distinctNavigationChanges
@@ -114,10 +114,10 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
                 throw java.lang.IllegalStateException("The EmaDataState class must be a data class")
             }
             hasBeenInitialized = true
-            onBroadcastListenerSetup()
             if (updateOnInitialization)
                 dataObservableState.tryEmit(state)
             onStateCreated(initializer)
+            onBroadcastListenerSetup()
         }
     }
 
@@ -295,7 +295,7 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
 
 
     /**
-     * Here should implement the listener for result data from other views through [addOnBroadcastListener] method
+     * Here should implement the listener for result data from other views through [registerBackBroadcastListener] method
      */
     protected open fun onBroadcastListenerSetup() = Unit
 
@@ -365,10 +365,10 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
     /**
      * Set a result for previous view when the current one is destroyed
      */
-    protected fun addBroadcast(data: Any?) {
+    protected fun setBackBroadcastData(data: Any?) {
         emaResultHandler.addResult(
             EmaResultModel(
-                code = this::class.broadcastId.id,
+                key = this::class.backBroadcastId.id,
                 ownerId = id,
                 data = data
             )
@@ -379,17 +379,18 @@ abstract class EmaViewModelBasic<S : EmaDataState, N : EmaNavigationEvent>(
      * Set the listener for back data when the result view is destroyed. To select the resultId use the EmaViewModel::class.resultId() method
      * of the selected implementation of EmaViewModel whose result is required. Example SampleEmaViewModel::class.resultId()
      */
-    protected fun addOnBroadcastListener(
-        broadcastId: BroadcastId,
+    protected fun registerBackBroadcastListener(
+        backBroadcastId: BackBroadcastId,
         receiver: (Any?) -> Unit
     ) {
         emaResultHandler.addResultReceiver(
             EmaReceiverModel(
-                resultCode = broadcastId.id,
+                resultKey = backBroadcastId.id,
                 ownerId = id,
                 function = receiver
             )
         )
+        emaResultHandler.notifyPendingResults(id,backBroadcastId)
     }
 
     /**

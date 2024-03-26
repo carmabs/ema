@@ -7,8 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.javaMethod
 
 /**
  * Created by Carlos Mateo Benito on 13/02/2021.
@@ -21,7 +19,7 @@ import kotlin.reflect.jvm.javaMethod
  */
 open class EmaAndroidViewModel<S:EmaDataState,N:EmaNavigationEvent>(
     val emaViewModel:EmaViewModel<S,N>,
-    val savedStateHandle: SavedStateHandle = SavedStateHandle()
+    val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     init {
