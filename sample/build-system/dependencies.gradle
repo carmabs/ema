@@ -2,7 +2,7 @@ rootProject.ext {
 
     coroutinesVersion = "1.6.4"
 
-    kotlinVersion = '1.8.0'
+    kotlinVersion = '1.9.0'
 
     emaLibraries = [
             emaAndroid       : project(':ema-android'),

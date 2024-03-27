@@ -21,20 +21,20 @@ Add the maven repository:
 Add the **EMA** dependencies, it include ema-core library and its library dependencies.
 
     dependencies {
-          implementation 'com.github.carlosmateo89.Ema:ema-android:2.3.0'
+          implementation 'com.github.carmabs.ema:ema-android:6.0.0'
     }
 
 For compose support you can add the following.
 
     dependencies {
-          implementation 'com.github.carlosmateo89.Ema:ema-android:2.3.0'
+          implementation 'com.github.carmabs.ema:ema-compose:6.0.0'
     }
 
 If the module is pure kotlin, add the ema-core library
   
 
     dependencies {
-	      implementation 'com.github.carlosmateo89.Ema:ema-core:2.3.0'
+	      implementation 'com.github.carmabs.ema:ema-core:6.0.0'
     }
 
 
