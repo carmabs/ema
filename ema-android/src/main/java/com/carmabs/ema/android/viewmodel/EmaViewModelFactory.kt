@@ -1,5 +1,6 @@
 package com.carmabs.ema.android.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 
 /**
@@ -7,11 +8,18 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-class EmaViewModelFactory<VM:EmaViewModel<*,*>>(private val viewModelSeed: VM) : EmaFactory<VM>() {
+class EmaViewModelFactory<VM : EmaViewModel<*, *>>(
+    private val viewModel: VM,
+    private val savedStateHandle: SavedStateHandle? = null
+) : EmaFactory<VM>() {
     /**
      * @return View model instance
      */
     override fun createViewModel(): VM {
-        return viewModelSeed
+        return viewModel
+    }
+
+    override fun provideSavedStateHandle(): SavedStateHandle? {
+        return savedStateHandle
     }
 }

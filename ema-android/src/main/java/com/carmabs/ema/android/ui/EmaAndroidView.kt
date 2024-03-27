@@ -2,9 +2,7 @@ package com.carmabs.ema.android.ui
 
 import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.carmabs.ema.android.initializer.savestate.SaveStateManager
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
 import com.carmabs.ema.core.navigator.EmaNavigationEvent

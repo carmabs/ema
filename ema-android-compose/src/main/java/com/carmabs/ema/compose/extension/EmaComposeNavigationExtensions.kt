@@ -20,7 +20,7 @@ import com.carmabs.ema.android.extension.findComponentActivity
 import com.carmabs.ema.android.extension.getInitializer
 import com.carmabs.ema.android.initializer.EmaInitializerBundle
 import com.carmabs.ema.android.initializer.bundle.strategy.BundleSerializerStrategy
-import com.carmabs.ema.android.initializer.savestate.SaveStateHandler
+import com.carmabs.ema.android.savestate.SaveStateManager
 import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.action.toImmutable
 import com.carmabs.ema.compose.initializer.EmaInitializerSupport
@@ -62,19 +62,23 @@ fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> NavGraphBui
     onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
     routeId: String = screenContent::class.routeId,
     initializerSupport: EmaInitializerSupport? = null,
-    saveStateHandler: SaveStateHandler<S, N>? = null,
+    saveStateManager: SaveStateManager<S, N>? = null,
     onViewModelInstance: (@Composable (EmaViewModel<S, N>) -> Unit)? = null,
     fullScreenDialogMode: Boolean = false,
     transitionAnimation: EmaComposableTransitions = EmaComposableTransitions(),
     decoration: @Composable ((content: @Composable () -> Unit, dispatcher: EmaImmutableActionDispatcher<A>) -> Unit)? = null,
     previewRenderState: S? = null
 ) {
+
     val content: @Composable (NavGraphBuilder.(NavBackStackEntry) -> Unit) =
         @Composable { backEntry ->
 
-            val androidVm = EmaScreenProvider.provideComposableViewModel(viewModel = remember {
-                viewModel.invoke()
-            })
+            //We use savedStateHandle of backEntry due to SavedStateHandled of viewmodel is attached to
+            //navController and is restarted on kill process.
+            //With backEntry.savedStateHandle data is rightly persisted
+            val androidVm =  EmaScreenProvider.provideComposableViewModel(viewModel = remember {
+                    viewModel.invoke()
+                }, backEntry.savedStateHandle) 
 
             val vm = androidVm.emaViewModel
 
@@ -83,11 +87,11 @@ fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> NavGraphBui
             }
 
             val initializer = initializerSupport?.let {
-                it.overrideInitializer?: backEntry.arguments?.getInitializer(it.serializerStrategy)
+                it.overrideInitializer ?: backEntry.arguments?.getInitializer(it.serializerStrategy)
             }
 
             LaunchedEffect(key1 = Unit) {
-                saveStateHandler?.onSaveStateHandling(
+                saveStateManager?.onSaveStateHandling(
                     androidVm.viewModelScope,
                     androidVm.savedStateHandle,
                     androidVm.emaViewModel

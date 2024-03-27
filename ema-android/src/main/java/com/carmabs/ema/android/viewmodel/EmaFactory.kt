@@ -3,8 +3,6 @@ package com.carmabs.ema.android.viewmodel
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.carmabs.ema.core.navigator.EmaNavigationEvent
-import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 
 
@@ -25,8 +23,10 @@ abstract class EmaFactory<VM : EmaViewModel<*, *>> : AbstractSavedStateViewModel
         modelClass: Class<T>,
         handle: SavedStateHandle
     ): T {
-        return EmaAndroidViewModel(createViewModel(), handle) as T
+        return EmaAndroidViewModel(createViewModel(), provideSavedStateHandle() ?: handle) as T
     }
 
     abstract fun createViewModel(): VM
+
+    abstract fun provideSavedStateHandle(): SavedStateHandle?
 }
