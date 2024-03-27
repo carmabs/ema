@@ -19,14 +19,17 @@ android {
     }
 
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
+    def javaVersion= JavaVersion.VERSION_17
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
+
+    kotlinOptions {
+        jvmTarget = javaVersion.toString()
+    }
+
     namespace 'com.carmabs.ema.sample.data'
 
 }

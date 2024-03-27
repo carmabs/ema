@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.carmabs.ema.android.ui.EmaAndroidView
 import com.carmabs.ema.android.ui.EmaFragment
-import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
+import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaState

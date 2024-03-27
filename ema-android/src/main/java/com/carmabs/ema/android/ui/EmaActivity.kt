@@ -54,8 +54,8 @@ abstract class EmaActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
         isFirstNormalExecution = false
     }
 
-    final override fun onEmaStateOverlapped(extra: EmaExtraData) {
-        binding.onStateOverlayed(extra)
+    final override fun onEmaStateOverlapped(extraData: EmaExtraData) {
+        binding.onStateOverlayed(extraData)
         isFirstOverlayedExecution = false
     }
 

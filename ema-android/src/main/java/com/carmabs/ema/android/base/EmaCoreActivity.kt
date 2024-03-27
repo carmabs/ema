@@ -12,7 +12,8 @@ import com.carmabs.ema.android.constants.EMA_RESULT_CODE
 import com.carmabs.ema.android.constants.EMA_RESULT_KEY
 import com.carmabs.ema.android.extension.addOnBackPressedListener
 import com.carmabs.ema.android.extension.generateViewModel
-import com.carmabs.ema.android.extension.getInitializer
+import com.carmabs.ema.android.initializer.bundle.BundleSerializer
+import com.carmabs.ema.android.initializer.bundle.strategy.BundleSerializerStrategy
 import com.carmabs.ema.android.navigation.EmaActivityBackDelegate
 import com.carmabs.ema.android.navigation.EmaActivityNavControllerNavigator
 import com.carmabs.ema.android.navigation.EmaNavControllerNavigator
@@ -21,6 +22,7 @@ import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
 import com.carmabs.ema.core.constants.INT_ZERO
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.initializer.EmaInitializerSerializer
 import com.carmabs.ema.core.model.EmaBackHandlerStrategy
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
@@ -46,10 +48,12 @@ import org.koin.core.scope.Scope
 abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent> :
     AppCompatActivity(), EmaAndroidView<S, VM, N>, AndroidScopeComponent, EmaActivityBackDelegate {
 
+
     final override val scope: Scope by activityScope()
 
 
     override val ownsBackDelegate = false
+
     /**
      * The onCreate base will set the view specified in [.getLayout] and will
      * inject dependencies and views.
@@ -60,7 +64,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         super<AppCompatActivity>.onCreate(savedInstanceState)
         //Call scope to call scope to enable injection
         scope
-        if(!ownsBackDelegate){
+        if (!ownsBackDelegate) {
             addOnBackPressedListener {
                 onBackDelegate()
             }
@@ -69,7 +73,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         onCreate(viewModel)
     }
 
-    final override fun onBackDelegate():EmaBackHandlerStrategy {
+    final override fun onBackDelegate(): EmaBackHandlerStrategy {
         viewModel.onActionBackHardwarePressed()
         //Cancel because we are handling manually the navigation with onActionBackHardwarePressed()
         return EmaBackHandlerStrategy.Cancelled
@@ -78,7 +82,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     @CallSuper
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        (navigator as? EmaActivityNavControllerNavigator)?.setup(overrideDestinationInitializer())
+        (navigator as? EmaActivityNavControllerNavigator)?.setup(overrideDestinationInitializer(), initializerStrategy)
     }
 
     /**
@@ -95,8 +99,9 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         get() = lifecycleScope
 
 
+    @Suppress("UNCHECKED_CAST")
     override val viewModel: VM by lazy {
-        generateViewModel(provideViewModel())
+        generateViewModel(provideViewModel()).emaViewModel as VM
     }
 
 
@@ -106,7 +111,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
      * The map which handles the view model attached with their respective scopes, to unbind the observers
      * when the view activity is destroyed
      */
-    private val extraViewModelList: MutableList<EmaViewModel<S,N>> by lazy { mutableListOf() }
+    private val extraViewModelList: MutableList<EmaViewModel<S, N>> by lazy { mutableListOf() }
 
     private val extraViewJobs: MutableList<Job> by lazy {
         mutableListOf()
@@ -121,8 +126,14 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
      * The incoming initializer in activity instantiation. This is set up when other fragment/activity
      * launches an activity with arguments provided by Bundle
      */
-    override val initializer: EmaInitializer? by lazy { getInitializer() }
+    final override val initializerSerializer: EmaInitializerSerializer?
+        get() = intent?.let {
+            it.extras?.let { bundle ->
+                BundleSerializer(bundle, initializerStrategy)
+            }
+        }
 
+    abstract val initializerStrategy: BundleSerializerStrategy
 
     /**
      * Initialize ViewModel on activity creation
@@ -144,7 +155,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
         //could be launched.
         //On restoreInstanceState is called between onStart and onResume, on re-initialization, so binding the views here, guarantees the state of
         //savedInstances has been restored
-        if(viewJob == null){
+        if (viewJob == null) {
             viewJob = onBindView(this.lifecycleScope, viewModel)
         }
         super.onResume()
@@ -163,7 +174,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     /**
      * Previous state for comparing state properties update
      */
-    final override var previousEmaState: EmaState<S,N>? = null
+    final override var previousEmaState: EmaState<S, N>? = null
 
 
     /**
@@ -174,10 +185,11 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
      * @param observerFunction the observer of the view model attached
      * @return The view model attached
      */
-    fun <AVM : EmaViewModel<S,N>> addExtraViewModel(
+    @Suppress("UNCHECKED_CAST")
+    fun <AVM : EmaViewModel<S, N>> addExtraViewModel(
         viewModelAttachedSeed: AVM,
         fragment: Fragment? = null,
-        observerFunction: ((attachedState: EmaState<*,*>) -> Unit)? = null
+        observerFunction: ((attachedState: EmaState<*, *>) -> Unit)? = null
     ): AVM {
 
         val viewModel =
@@ -185,12 +197,12 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
                 ViewModelProvider(
                     it,
                     EmaViewModelFactory(viewModelAttachedSeed)
-                )[viewModelAttachedSeed.id,EmaAndroidViewModel::class.java]
+                )[viewModelAttachedSeed.id, EmaAndroidViewModel::class.java]
             }
                 ?: ViewModelProvider(
                     this,
                     EmaViewModelFactory(viewModelAttachedSeed)
-                )[viewModelAttachedSeed.id,EmaAndroidViewModel::class.java]
+                )[viewModelAttachedSeed.id, EmaAndroidViewModel::class.java]
 
         observerFunction?.also {
             extraViewJobs.add(coroutineScope.launch {
@@ -200,7 +212,7 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
             }
             )
         }
-        extraViewModelList.add(viewModel.emaViewModel as EmaViewModel<S,N>)
+        extraViewModelList.add(viewModel.emaViewModel as EmaViewModel<S, N>)
 
         return viewModel.emaViewModel as AVM
     }
@@ -244,12 +256,11 @@ abstract class EmaCoreActivity<S : EmaDataState, VM : EmaViewModel<S, N>, N : Em
     }
 
 
-
-    override fun onEmaStateOverlapped(extra: EmaExtraData) = Unit
+    override fun onEmaStateOverlapped(extraData: EmaExtraData) = Unit
 
     override fun onSingleEvent(extra: EmaExtraData) = Unit
 
-    final override fun onBack(result:Any?): Boolean {
+    final override fun onBack(result: Any?): Boolean {
         result?.also {
             setResult(EMA_RESULT_CODE, Intent().putExtra(EMA_RESULT_KEY, Gson().toJson(result)))
         }

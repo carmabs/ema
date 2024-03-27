@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import com.carmabs.ema.android.base.EmaCoreFragment
+import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
@@ -42,11 +43,12 @@ abstract class EmaComposableFragment<S : EmaDataState, VM : EmaViewModel<S, N>, 
                 val state = viewModel.subscribeStateUpdates()
                     .collectAsState(initial = EmaState.Normal(object : EmaDataState {} as S))
                 when (val emaState = state.value) {
-                    is EmaState.Normal<S,N> -> {
+                    is EmaState.Normal<S, N> -> {
                         onStateNormal(data = emaState.data)
                         isFirstNormalExecution = false
                     }
-                    is EmaState.Overlapped<S,N> -> {
+
+                    is EmaState.Overlapped<S, N> -> {
                         onStateNormal(data = emaState.data)
                         onStateOverlapped(data = emaState.extraData)
                         isFirstOverlayedExecution = false

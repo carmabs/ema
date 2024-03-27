@@ -13,16 +13,15 @@ import java.io.Serializable
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 sealed class EmaText(open val data: Array<out Any>? = null) : Serializable {
-
     companion object {
         fun text(text: String, vararg data: Any) = Text(text, data)
         fun empty() = Text(STRING_EMPTY)
         fun id(id: Int, vararg data: Any) = Id(id, data)
         fun plural(id: Int, quantity: Int, vararg data: Any) = Plural(id, quantity, data)
-        fun composable(vararg texts: EmaText) = Composition(listOf(*texts))
+        fun composition(vararg texts: EmaText) = Composition(listOf(*texts))
     }
 
-    data class Composition(val texts:List<EmaText>) : EmaText(null) {
+    data class Composition internal constructor(val texts:List<EmaText>) : EmaText(null) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -46,7 +45,7 @@ sealed class EmaText(open val data: Array<out Any>? = null) : Serializable {
 
     }
 
-    data class Text(val text: String, override val data: Array<out Any>?=null) : EmaText(data) {
+    data class Text internal constructor(val text: String, override val data: Array<out Any>?=null) : EmaText(data) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -66,7 +65,7 @@ sealed class EmaText(open val data: Array<out Any>? = null) : Serializable {
         }
     }
 
-    data class Id(val id: Int, override val data: Array<out Any>?=null) : EmaText(data) {
+    data class Id internal constructor(val id: Int, override val data: Array<out Any>?=null) : EmaText(data) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -89,7 +88,7 @@ sealed class EmaText(open val data: Array<out Any>? = null) : Serializable {
 
     }
 
-    data class Plural(val id: Int, val quantity: Int, override val data: Array<out Any>?) :
+    data class Plural internal constructor(val id: Int, val quantity: Int, override val data: Array<out Any>?) :
         EmaText(data) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

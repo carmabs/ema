@@ -1,36 +1,22 @@
 package com.carmabs.ema.presentation.ui.profile.onboarding
 
-import com.carmabs.ema.core.action.EmaActionDispatcher
+import com.carmabs.domain.model.Role
+import com.carmabs.domain.model.User
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.presentation.base.BaseViewModel
-import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationInitializer
 
-class ProfileOnBoardingViewModel :
-    BaseViewModel<ProfileOnBoardingState, ProfileOnBoardingDestination>(),
-    EmaActionDispatcher<ProfileOnBoardingActions> {
+class ProfileOnBoardingViewModel(initialDataState: ProfileOnBoardingState) : BaseViewModel<ProfileOnBoardingState, ProfileOnBoardingActions, ProfileOnBoardingNavigationEvent>(
+        initialDataState
+    ){
 
-    override suspend fun onCreateState(initializer: EmaInitializer?): ProfileOnBoardingState {
-        return when (val onBoardingInitializer = initializer as? ProfileOnBoardingInitializer) {
+    override fun onStateCreated(initializer: EmaInitializer?) {
+        when (val onBoardingInitializer = initializer as ProfileOnBoardingInitializer) {
             is ProfileOnBoardingInitializer.Default -> {
-                ProfileOnBoardingState(user = onBoardingInitializer.admin)
+                updateState {
+                    copy(user = User(onBoardingInitializer.admin))
+                }
             }
-            null -> ProfileOnBoardingState()
         }
-    }
-
-
-    private fun onActionAdminClicked() {
-        navigate(
-            ProfileOnBoardingDestination.ProfileCreation()
-                .setInitializer(ProfileCreationInitializer.Admin)
-        )
-    }
-
-    private fun onActionUserClicked() {
-        navigate(
-            ProfileOnBoardingDestination.ProfileCreation()
-                .setInitializer(ProfileCreationInitializer.User)
-        )
     }
 
     override fun onAction(action: ProfileOnBoardingActions) {
@@ -39,6 +25,15 @@ class ProfileOnBoardingViewModel :
             ProfileOnBoardingActions.UserClicked -> onActionUserClicked()
         }
     }
+    private fun onActionAdminClicked() {
+        navigate(
+            ProfileOnBoardingNavigationEvent.ProfileCreation(Role.ADMIN)
+        )
+    }
 
-
+    private fun onActionUserClicked() {
+        navigate(
+            ProfileOnBoardingNavigationEvent.ProfileCreation(Role.BASIC)
+        )
+    }
 }

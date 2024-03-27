@@ -1,6 +1,9 @@
 package com.carmabs.ema.android.extension
 
 import android.content.Context
+import androidx.annotation.DrawableRes
+import androidx.annotation.PluralsRes
+import androidx.annotation.StringRes
 import com.carmabs.ema.core.constants.STRING_EMPTY
 import com.carmabs.ema.core.model.EmaText
 
@@ -28,6 +31,7 @@ fun EmaText.string(context: Context): String {
                 quantity
             )
         }
+
         is EmaText.Text -> data?.let { String.format(text, *it) } ?: text
         is EmaText.Composition -> {
             texts.fold(STRING_EMPTY) { acc, emaText ->
@@ -35,4 +39,10 @@ fun EmaText.string(context: Context): String {
             }
         }
     }
+}
+fun @receiver:StringRes Int.toEmaText(vararg data: Any): EmaText {
+    return EmaText.id(id = this, data = data)
+}
+fun @receiver:PluralsRes Int.toEmaText(quantity: Int, vararg data: Any): EmaText {
+    return EmaText.plural(id = this, quantity = quantity, data = data)
 }

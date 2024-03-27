@@ -20,10 +20,10 @@ import kotlinx.coroutines.flow.Flow
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-abstract class EmaViewModelAction<A : EmaAction.Screen,S : EmaDataState,D : EmaNavigationEvent,>(
+abstract class EmaViewModelAction<S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent>(
     initialDataState: S,
     scope: CoroutineScope = EmaMainScope()
-) : EmaViewModelBasic<S, D>(initialDataState, scope), EmaActionDispatcher<A> {
+) : EmaViewModelBasic<S, N>(initialDataState, scope), EmaActionDispatcher<A> {
 
     private val observableAction = emaFlowSingleEvent<A>()
 

@@ -1,6 +1,7 @@
 package com.carmabs.domain.model
 
 import com.carmabs.ema.core.constants.STRING_EMPTY
+import kotlinx.serialization.Serializable
 
 /**
  *  *<p>
@@ -11,7 +12,9 @@ import com.carmabs.ema.core.constants.STRING_EMPTY
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
+@Serializable
 data class User(
     val name: String = STRING_EMPTY,
     val surname: String = STRING_EMPTY,
-    val role: Role = Role.BASIC):java.io.Serializable
+    val role: Role = Role.BASIC
+)

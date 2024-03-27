@@ -5,5 +5,5 @@ import kotlin.reflect.KClass
 
 
 val <T : EmaComposableScreenContent<*, *>> KClass<T>.routeId: String
-    get() = "screen/${this.java.name}/${this.hashCode()}"
+    get() = "screen/${this.java.name}"
 

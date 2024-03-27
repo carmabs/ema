@@ -1,125 +1,105 @@
 package com.carmabs.ema.presentation.ui.login
 
-import com.carmabs.domain.manager.ResourceManager
-import com.carmabs.domain.model.LoginRequest
-import com.carmabs.domain.model.Role
 import com.carmabs.domain.model.User
 import com.carmabs.domain.usecase.LoginUseCase
+import com.carmabs.ema.core.broadcast.backBroadcastId
 import com.carmabs.ema.core.constants.STRING_EMPTY
-import com.carmabs.ema.core.extension.resultId
 import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.model.onFailure
+import com.carmabs.ema.core.model.onSuccess
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.presentation.base.BaseViewModel
-import com.carmabs.ema.presentation.dialog.error.ErrorDialogData
-import com.carmabs.ema.presentation.dialog.error.ErrorDialogListener
-import com.carmabs.ema.presentation.ui.home.HomeInitializer
-import com.carmabs.ema.presentation.ui.profile.creation.ProfileCreationViewModel
+import com.carmabs.ema.presentation.ui.home.HomeViewModel
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
-    private val resourceManager: ResourceManager
-) : BaseViewModel<LoginState, LoginDestination>() {
+    initialDataState: LoginState
+) : BaseViewModel<LoginState, LoginAction, LoginNavigationEvent>(initialDataState) {
+    override fun onStateCreated(initializer: EmaInitializer?) = Unit
+    override fun onAction(action: LoginAction) {
+        when (action) {
+            LoginAction.DeleteUser -> {
+                onActionDeleteUser()
+            }
 
-    companion object {
-        const val EVENT_MESSAGE = "EVENT_MESSAGE"
-        const val EVENT_LAST_USER_ADDED = "EVENT_LAST_USER_ADDED"
+            LoginAction.Login -> {
+                onActionLogin()
+            }
+
+            is LoginAction.PasswordWritten -> {
+                onActionPasswordWrite(action.password)
+            }
+
+            is LoginAction.UserNameWritten -> {
+                onActionUserWrite(action.user)
+            }
+
+            LoginAction.Error.BadCredentialsAccepted -> onActionBadCredentialsAccepted()
+            LoginAction.Error.BackPressed -> onActionErrorBackPressed()
+            LoginAction.Error.PasswordEmptyAccepted -> onActionErrorPasswordEmptyAccepted()
+            LoginAction.Error.UserEmptyAccepted -> onActionErrorUserEmptyAccepted()
+        }
     }
 
-    override suspend fun onCreateState(initializer: EmaInitializer?): LoginState {
-        return LoginState()
+    private fun onActionErrorUserEmptyAccepted() {
+        updateToNormalState()
     }
 
-    private var pendingUser:User?=null
-    override fun onResultListenerSetup() {
-        //When two or more resultReceived WITH THE SAME CODE are active, for example in this case,
-        //this receiver and the EmaHomeToolbarViewModel receiver, only the last one is executed.
-        //ActivityCreated -> EmaHomeToolbarViewModel added -> Fragment created -> EEmaHomeViewModel added->
-        //only this result received is executed.
+    private fun onActionErrorPasswordEmptyAccepted() {
+        updateToNormalState()
+    }
 
-        addOnResultListener(ProfileCreationViewModel::class.resultId()){
-            pendingUser  = it as User
+    private fun onActionBadCredentialsAccepted() {
+        updateToNormalState()
+    }
+
+    private fun onActionErrorBackPressed() {
+        updateToNormalState()
+    }
+
+    private var pendingUser: User? = null
+
+    override fun onBroadcastListenerSetup() {
+        registerBackBroadcastListener(HomeViewModel::class.backBroadcastId) {
+            pendingUser = it as User
 
         }
-
     }
 
     override fun onViewResumed() {
         super.onViewResumed()
-        pendingUser?.also{
-            notifySingleEvent(EmaExtraData(EVENT_LAST_USER_ADDED,data = it))
+        pendingUser?.also {
+            notifySingleEvent(EmaExtraData(data = LoginSingleEvent.LastUserAdded(it)))
         }
         pendingUser = null
     }
 
     private fun doLogin() {
-        executeUseCase {
+        sideEffect {
             showLoading()
-            val user =
-                loginUseCase.invoke(LoginRequest(stateData.userName, stateData.userPassword))
+            val userLogged =
+                loginUseCase.invoke(LoginUseCase.Input(stateData.userName, stateData.userPassword))
             updateToNormalState()
-            notifySingleEvent(
-                EmaExtraData(
-                    EVENT_MESSAGE,
-                    resourceManager.getCongratulations(user.name)
+            userLogged.onSuccess {user->
+                notifySingleEvent(
+                    EmaExtraData(
+                        data = LoginSingleEvent.Message(user.name)
+                    )
                 )
-            )
-            val initializerHome = when (user.role) {
-                Role.ADMIN -> HomeInitializer.Admin(
-                    admin = user
-                )
-                Role.BASIC ->
-                    HomeInitializer.BasicUser
+                navigate(LoginNavigationEvent.LoginSuccess(user))
+            }.onFailure {
+                showError(LoginOverlap.ErrorBadCredentials)
             }
-            navigate(LoginDestination.Home().setInitializer(initializerHome))
 
-        }.onError {
-            showError(ErrorDialogData(
-                resourceManager.getErrorTitle(),
-                resourceManager.getErrorLogin()
-            ),
-                object : ErrorDialogListener {
-                    override fun onConfirmClicked() {
-                        updateToNormalState()
-                    }
-
-                    override fun onBackPressed() {
-                        updateToNormalState()
-                    }
-
-                })
         }
     }
 
     fun onActionLogin() {
         when {
-            stateData.userName.isEmpty() ->  showError(ErrorDialogData(
-                resourceManager.getErrorTitle(),
-                resourceManager.getErrorLoginUserEmpty()
-            ),
-                object : ErrorDialogListener {
-                    override fun onConfirmClicked() {
-                        updateToNormalState()
-                    }
+            stateData.userName.isEmpty() -> showError(LoginOverlap.ErrorUserEmpty)
 
-                    override fun onBackPressed() {
-                        updateToNormalState()
-                    }
+            stateData.userPassword.isEmpty() -> showError(LoginOverlap.ErrorPasswordEmpty)
 
-                })
-            stateData.userPassword.isEmpty() ->  showError(ErrorDialogData(
-                resourceManager.getErrorTitle(),
-                resourceManager.getErrorLoginPasswordEmpty()
-            ),
-                object : ErrorDialogListener {
-                    override fun onConfirmClicked() {
-                        updateToNormalState()
-                    }
-
-                    override fun onBackPressed() {
-                        updateToNormalState()
-                    }
-
-                })
             else -> doLogin()
         }
     }
@@ -138,13 +118,13 @@ class LoginViewModel(
         //We only want to update the data of the view without notifying it, it has the edit text updated with
         //text when you write on it, but you need to save the state if for example, there is a device
         //rotation and the view is recreated, to set the text with last value saved on state
-        updateDataState {
+        updateState {
             copy(userName = user)
         }
     }
 
     fun onActionPasswordWrite(password: String) {
-        updateDataState {
+        updateState {
             copy(userPassword = password)
         }
     }

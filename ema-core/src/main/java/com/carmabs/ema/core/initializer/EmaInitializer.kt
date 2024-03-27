@@ -13,14 +13,10 @@ import kotlinx.serialization.Serializable
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-@Serializable(
-    with = PolymorphicSerializer::class)
-interface EmaInitializer : EmaAction.Initializer,java.io.Serializable {
+interface EmaInitializer : EmaAction.Initializer{
     companion object {
-
         const val KEY = "EmaInitializer"
     }
-
-    object EMPTY : EmaInitializer
+    data object EMPTY : EmaInitializer
 }
 

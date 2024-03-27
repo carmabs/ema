@@ -23,7 +23,7 @@
 
     <!--EMA HEADER-->
     <string name="ema_header_title">EMA</string>
-    <string name="ema_header_subtitle">MVVM Architecture, powered by Carmabs</string>
+    <string name="ema_header_subtitle">MVI Architecture, powered by Carmabs</string>
     <string name="home_admin_title">Administrator panel of %s %s</string>
     <string name="home_user_title">Friends</string>
 

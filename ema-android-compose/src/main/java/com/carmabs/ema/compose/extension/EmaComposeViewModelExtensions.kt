@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.carmabs.ema.compose.extension
 
 import com.carmabs.ema.core.action.EmaAction
@@ -16,12 +18,12 @@ import com.carmabs.ema.core.viewmodel.EmaViewModelAction
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-fun <A:EmaAction.Screen,S:EmaDataState,D:EmaNavigationEvent>EmaViewModel<S,D>.asViewModelAction():EmaViewModelAction<A,S, D>{
-    return (this as? EmaViewModelAction<A,S, D>)
-        ?:throw java.lang.IllegalStateException("${this::class} must inherit form EmaViewModelAction class")
+fun <A : EmaAction.Screen, S : EmaDataState, D : EmaNavigationEvent> EmaViewModel<S, D>.asViewModelAction(): EmaViewModelAction<S, A, D> {
+    return (this as? EmaViewModelAction<S, A, D>)
+        ?: throw java.lang.IllegalStateException("${this::class} must inherit form EmaViewModelAction class")
 }
 
-fun <A:EmaAction.Screen>EmaViewModel<*,*>.asActionDispatcher():EmaActionDispatcher<A>{
+fun <A : EmaAction.Screen> EmaViewModel<*, *>.asActionDispatcher(): EmaActionDispatcher<A> {
     return (this as? EmaActionDispatcher<A>)
-        ?:throw java.lang.IllegalStateException("${this::class} must implement EmaActionDispatcher with the proper action")
+        ?: throw java.lang.IllegalStateException("${this::class} must implement EmaActionDispatcher with the proper action")
 }

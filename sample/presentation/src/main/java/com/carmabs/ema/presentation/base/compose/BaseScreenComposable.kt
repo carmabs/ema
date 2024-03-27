@@ -1,13 +1,13 @@
 package com.carmabs.ema.presentation.base.compose
 
 import androidx.compose.runtime.Composable
+import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
 import com.carmabs.ema.compose.ui.EmaComposableScreenContent
 import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.action.EmaActionDispatcher
 import com.carmabs.ema.core.model.EmaText
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
-import com.carmabs.ema.core.state.EmaExtraDialogData
 import com.carmabs.ema.presentation.base.BaseViewModel
 import com.carmabs.ema.presentation.dialog.error.ErrorDialogData
 import com.carmabs.ema.presentation.dialog.error.ErrorDialogListener
@@ -19,32 +19,26 @@ import com.carmabs.ema.presentation.ui.compose.LoadingDialogComposable
 import com.carmabs.ema.presentation.ui.compose.SimpleDialogComposable
 import com.carmabs.ema.sample.ema.R
 
-abstract class BaseScreenComposable<S : EmaDataState, A : EmaAction> :
+abstract class BaseScreenComposable<S : EmaDataState, A : EmaAction.Screen> :
     EmaComposableScreenContent<S, A> {
 
     @Composable
-    final override fun onStateNormal(state: S, actions: EmaActionDispatcher<A>) {
+    final override fun onStateNormal(state: S, actions: EmaImmutableActionDispatcher<A>) {
         onNormal(state = state, actions = actions)
     }
 
     @Composable
-    final override fun onStateOverlapped(extra: EmaExtraData, actions: EmaActionDispatcher<A>) {
+    final override fun onStateOverlapped(extra: EmaExtraData, actions: EmaImmutableActionDispatcher<A>) {
         super.onStateOverlapped(extra, actions)
         when (extra.id) {
             BaseViewModel.OVERLAPPED_LOADING -> {
-                showLoading(extra.data as? LoadingDialogData)
+                onOverlappedLoading(extra.data,actions)
             }
             BaseViewModel.OVERLAPPED_ERROR -> {
-                val dialogData = extra.data as EmaExtraDialogData
-                val data = dialogData.data as ErrorDialogData
-                val listener = dialogData.listener as ErrorDialogListener
-                showError(data, listener)
+                onOverlappedError(extra.data,actions)
             }
             BaseViewModel.OVERLAPPED_DIALOG -> {
-                val dialogData = extra.data as EmaExtraDialogData
-                val data = dialogData.data as SimpleDialogData
-                val listener = dialogData.listener as SimpleDialogListener
-                showDialog(data, listener)
+                onOverlappedDialog(extra.data,actions)
             }
             else -> {
                 onOverlapped(extra,actions)
@@ -53,23 +47,30 @@ abstract class BaseScreenComposable<S : EmaDataState, A : EmaAction> :
     }
 
     @Composable
+    protected open fun onOverlappedError(data: Any?, actions: EmaImmutableActionDispatcher<A>) = Unit
+    @Composable
+    protected open fun onOverlappedDialog(data: Any?, actions: EmaImmutableActionDispatcher<A>) = Unit
+    @Composable
+    protected open fun onOverlappedLoading(data: Any?, actions: EmaImmutableActionDispatcher<A>) = Unit
+
+    @Composable
     open fun onOverlapped(extra: EmaExtraData,actions: EmaActionDispatcher<A>) = Unit
 
     @Composable
     abstract fun onNormal(state: S, actions: EmaActionDispatcher<A>)
 
     @Composable
-    protected fun showDialog(data: SimpleDialogData, listener: SimpleDialogListener) {
-        SimpleDialogComposable(dialogData = data, dialogListener = listener)
+    protected fun ShowDialog(data: SimpleDialogData,listener: SimpleDialogListener) {
+        SimpleDialogComposable(dialogData = data, listener)
     }
 
     @Composable
-    protected fun showError(data: ErrorDialogData, listener: ErrorDialogListener) {
+    protected fun ShowError(data: ErrorDialogData, listener: ErrorDialogListener) {
         ErrorDialogComposable(dialogData = data, dialogListener = listener)
     }
 
     @Composable
-    protected fun showLoading(loadingDialogData: LoadingDialogData?) {
+    protected fun ShowLoading(loadingDialogData: LoadingDialogData?=null) {
         LoadingDialogComposable(
             dialogData = loadingDialogData ?: LoadingDialogData(
                 title = EmaText.id(id = R.string.dialog_loading_title),

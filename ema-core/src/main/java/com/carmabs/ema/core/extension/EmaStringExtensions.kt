@@ -25,10 +25,6 @@ fun String.getFormattedString(vararg data: Any?): String {
     return String.format(this, *data)
 }
 
-fun String.toEmaText(): EmaText {
-    return EmaText.text(this)
-}
-
 fun String.replaceLast(delimiter: Char, newString: String): String {
     val startString = substringBeforeLast(delimiter).trim()
     val endString = substringAfterLast(delimiter).trim()

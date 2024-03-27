@@ -2,7 +2,8 @@ package com.carmabs.ema.presentation.base
 
 import androidx.viewbinding.ViewBinding
 import com.carmabs.ema.android.ui.EmaActivity
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.viewmodel.EmaViewModel
@@ -15,7 +16,7 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
-abstract class BaseActivity<B:ViewBinding,S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> : EmaActivity<B,S,VM,D>(){
+abstract class BaseActivity<B:ViewBinding,S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent> : EmaActivity<B,S,VM,N>(){
     final override fun B.onStateNormal(data: S) {
         onNormal(data)
     }

@@ -11,10 +11,10 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.fragment.FragmentNavigator
 import com.carmabs.ema.android.extension.setInitializer
+import com.carmabs.ema.android.initializer.EmaInitializerBundle
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigator
-import java.io.Serializable
 
 /**
  *  *<p>
@@ -32,21 +32,6 @@ interface EmaNavControllerNavigator<D : EmaNavigationEvent> : EmaNavigator<D> {
 
     val activity: Activity
 
-
-    /**
-     * Set the initializer for the incoming fragment.
-     * @param initializer for the incoming view
-     */
-    @Deprecated( "Use extension EmaInitializer.toBundle() instead", ReplaceWith(
-        "initializer.toBundle()",
-        "android.os.Bundle",
-        "com.carmabs.ema.android.extension.toBundle"
-    )
-    )
-    fun setInitializer(
-        initializer: EmaInitializer
-    ): Bundle =
-        Bundle().setInitializer(initializer)
 
     /**
      * Navigate with android architecture components within action ID
@@ -70,16 +55,14 @@ interface EmaNavControllerNavigator<D : EmaNavigationEvent> : EmaNavigator<D> {
      * @param initializer is the data you want to pass to next activity. It will be handled in viewmodel
      * @param finishMain if [activity] must be finished when [destinationActivity] is launched
      */
-    fun navigateToActivity(
+    fun <I>navigateToActivity(
         destinationActivity: Class<out ComponentActivity>,
-        initializer: EmaInitializer? = null,
+        initializerData: EmaInitializerBundle? = null,
         finishMain: Boolean = false
     ) {
         activity.startActivity(
-            Intent(activity.applicationContext, destinationActivity).apply {
-                initializer?.also {
-                    putExtra(EmaInitializer.KEY,it)
-                }
+            Intent(activity.applicationContext, destinationActivity).run {
+                initializerData?.let { setInitializer<EmaInitializer>(initializerData.initializer,initializerData.serializer) } ?: this
             },
         )
         if (finishMain) {

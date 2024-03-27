@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.carmabs.ema.android.constants.EMA_RESULT_CODE
 import com.carmabs.ema.android.constants.EMA_RESULT_KEY
 import com.carmabs.ema.android.extension.toBundle
+import com.carmabs.ema.android.initializer.bundle.strategy.BundleSerializerStrategy
 import com.carmabs.ema.core.initializer.EmaInitializer
 import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.google.gson.Gson
@@ -36,9 +37,9 @@ abstract class EmaActivityNavControllerNavigator<D : EmaNavigationEvent>(
     private val gson by lazy {
         Gson()
     }
-    internal fun setup(initializer: EmaInitializer?) {
+    internal fun setup(initializer: EmaInitializer?,serializerStrategy: BundleSerializerStrategy) {
         navController.setGraph(graphId, initializer?.let {
-            it.toBundle()
+            it.toBundle(serializerStrategy)
         } ?: activity.intent.extras)
     }
 

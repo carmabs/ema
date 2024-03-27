@@ -1,11 +1,8 @@
 package com.carmabs.app.di
 
 
-import com.carmabs.data.manager.AndroidResourceManager
 import com.carmabs.data.repository.MockRepository
-import com.carmabs.domain.manager.ResourceManager
 import com.carmabs.domain.repository.Repository
-import com.carmabs.domain.usecase.LoginUseCase
 import org.koin.dsl.module
 
 /**
@@ -23,9 +20,4 @@ val dataModule = module {
    single<Repository> {
       MockRepository()
    }
-
-   single<ResourceManager> {
-      AndroidResourceManager()
-   }
-
 }
