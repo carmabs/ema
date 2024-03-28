@@ -1,7 +1,6 @@
 package com.carmabs.ema.compose.extension
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.res.pluralStringResource
 import com.carmabs.ema.core.model.EmaText
 
@@ -18,19 +17,22 @@ import com.carmabs.ema.core.model.EmaText
 /**
  * Transform ema text to string value.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EmaText.stringResource(): String {
     return when (this) {
-        is EmaText.Id -> data?.let { androidx.compose.ui.res.stringResource(id, *it) } ?: androidx.compose.ui.res.stringResource(id)
+        is EmaText.Id -> data?.let { androidx.compose.ui.res.stringResource(id, *it) }
+            ?: androidx.compose.ui.res.stringResource(id)
         is EmaText.Plural -> {
             data?.let {
-                pluralStringResource(id, quantity,*it)
-            }?: pluralStringResource(
-                    id,
-                   quantity
-                )
+                pluralStringResource(id, quantity, *it)
+            } ?: pluralStringResource(
+                id,
+                quantity
+            )
         }
         is EmaText.Text -> data?.let { String.format(text, *it) } ?: text
+        is EmaText.Composition -> texts.map { it.stringResource() }.reduce { acc, string ->
+            acc + string
+        }
     }
 }

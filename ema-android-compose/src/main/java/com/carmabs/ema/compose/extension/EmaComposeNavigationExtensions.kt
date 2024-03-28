@@ -1,7 +1,12 @@
 package com.carmabs.ema.compose.extension
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.window.DialogProperties
+import androidx.core.net.toUri
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -9,113 +14,162 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.Navigator
 import androidx.navigation.compose.composable
-import com.carmabs.ema.android.extension.findActivity
-import com.carmabs.ema.android.navigation.EmaEmptyNavigator
-import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
-import com.carmabs.ema.compose.action.EmaComposableScreenActions
+import androidx.navigation.compose.dialog
+import androidx.navigation.navArgument
+import com.carmabs.ema.android.extension.findComponentActivity
+import com.carmabs.ema.android.extension.getInitializer
+import com.carmabs.ema.android.initializer.EmaInitializerBundle
+import com.carmabs.ema.android.initializer.bundle.strategy.BundleSerializerStrategy
+import com.carmabs.ema.android.savestate.SaveStateManager
+import com.carmabs.ema.compose.action.EmaImmutableActionDispatcher
+import com.carmabs.ema.compose.action.toImmutable
+import com.carmabs.ema.compose.initializer.EmaInitializerSupport
+import com.carmabs.ema.compose.navigation.EmaComposableTransitions
+import com.carmabs.ema.compose.navigation.EmaInitializerNavType
 import com.carmabs.ema.compose.provider.EmaScreenProvider
 import com.carmabs.ema.compose.ui.EmaComposableScreen
 import com.carmabs.ema.compose.ui.EmaComposableScreenContent
-import com.carmabs.ema.core.constants.INT_ZERO
+import com.carmabs.ema.core.action.EmaAction
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.navigator.EmaDestination
-import com.carmabs.ema.core.navigator.EmaEmptyDestination
-import com.carmabs.ema.core.navigator.EmaNavigator
+import com.carmabs.ema.core.model.EmaBackHandlerStrategy
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 
-
-private var mapInitializer: HashMap<String, EmaInitializer>? = null
-
 fun NavController.navigate(
     route: String,
-    initializer: EmaInitializer? = null,
+    initializerBundle: EmaInitializerBundle?,
     navOptionsBuilder: (NavOptionsBuilder.() -> Unit)
 ) {
-    initializer?.also {
-        putInitializer(route, initializer)
-    }
-    navigate(route, navOptionsBuilder)
+    val routeParsed = routeWithInitializer(route, initializerBundle)
+    navigate(routeParsed, navOptionsBuilder)
 }
 
 fun NavController.navigate(
     route: String,
-    initializer: EmaInitializer? = null,
+    initializerBundle: EmaInitializerBundle?,
     navOptions: NavOptions? = null,
     navigatorExtras: Navigator.Extras? = null
 ) {
-    initializer?.also {
-        putInitializer(route, initializer)
-    }
-    navigate(route, navOptions, navigatorExtras)
+    val routeParsed = routeWithInitializer(route, initializerBundle)
+    navigate(routeParsed, navOptions, navigatorExtras)
 }
 
-fun <S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination, A : EmaComposableScreenActions> NavGraphBuilder.createComposableScreen(
-    defaultState: S,
+fun <S : EmaDataState, A : EmaAction.Screen, N : EmaNavigationEvent> NavGraphBuilder.createComposableScreen(
     screenContent: EmaComposableScreenContent<S, A>,
-    navigator: @Composable ((NavBackStackEntry) -> EmaNavigator<D>),
-    routeId: String = screenContent::class.routeId(),
-    overrideInitializer: EmaInitializer? = null,
-    androidViewModel: @Composable () -> EmaAndroidViewModel,
+    viewModel: () -> EmaViewModel<S, N>,
+    onNavigationEvent: (N) -> Unit,
+    onBackEvent: ((Any?, EmaImmutableActionDispatcher<A>) -> EmaBackHandlerStrategy)? = null,
+    routeId: String = screenContent::class.routeId,
+    initializerSupport: EmaInitializerSupport? = null,
+    saveStateManager: SaveStateManager<S, N>? = null,
+    onViewModelInstance: (@Composable (EmaViewModel<S, N>) -> Unit)? = null,
+    fullScreenDialogMode: Boolean = false,
+    transitionAnimation: EmaComposableTransitions = EmaComposableTransitions(),
+    decoration: @Composable ((content: @Composable () -> Unit, dispatcher: EmaImmutableActionDispatcher<A>) -> Unit)? = null,
+    previewRenderState: S? = null
 ) {
-    composable(routeId) { navBack ->
-        val creator =
-            EmaScreenProvider<VM, A>().provide(androidViewModel = androidViewModel.invoke())
-        EmaComposableScreen(
-            initializer = overrideInitializer ?: getAndReleaseInitializer(routeId),
-            defaultState = defaultState,
-            navigator = navigator.invoke(navBack),
-            vm = creator.first,
-            screenContent = screenContent,
-            actions = creator.second
-        )
+
+    val content: @Composable (NavGraphBuilder.(NavBackStackEntry) -> Unit) =
+        @Composable { backEntry ->
+
+            //We use savedStateHandle of backEntry due to SavedStateHandled of viewmodel is attached to
+            //navController and is restarted on kill process.
+            //With backEntry.savedStateHandle data is rightly persisted
+            val androidVm =  EmaScreenProvider.provideComposableViewModel(viewModel = remember {
+                    viewModel.invoke()
+                }, backEntry.savedStateHandle) 
+
+            val vm = androidVm.emaViewModel
+
+            val vmActions = remember {
+                vm.asActionDispatcher<A>().toImmutable()
+            }
+
+            val initializer = initializerSupport?.let {
+                it.overrideInitializer ?: backEntry.arguments?.getInitializer(it.serializerStrategy)
+            }
+
+            LaunchedEffect(key1 = Unit) {
+                saveStateManager?.onSaveStateHandling(
+                    androidVm.viewModelScope,
+                    androidVm.savedStateHandle,
+                    androidVm.emaViewModel
+                )
+            }
+            onViewModelInstance?.invoke(vm)
+            val screenToDraw = @Composable {
+                EmaComposableScreen(
+                    initializer = initializer,
+                    onNavigationEvent = onNavigationEvent,
+                    onBackEvent = onBackEvent,
+                    vm = vm,
+                    actions = vmActions,
+                    screenContent = screenContent,
+                    previewRenderState = previewRenderState
+                )
+            }
+            decoration?.also {
+                it.invoke(screenToDraw, vmActions)
+            } ?: also {
+                screenToDraw()
+            }
+        }
+    if (fullScreenDialogMode) {
+        dialog(route = routeId, dialogProperties = DialogProperties()) {
+            content(it)
+        }
+    } else {
+        composable(
+            route = parseRouteWithInitializerSupport(routeId),
+            arguments = listOf(navArgument(EmaInitializer.KEY) {
+                initializerSupport?.also {
+                    type = EmaInitializerNavType(it.serializerStrategy)
+                }
+                nullable = true
+            }),
+            enterTransition = transitionAnimation.enterTransition,
+            exitTransition = transitionAnimation.exitTransition,
+            popEnterTransition = transitionAnimation.popEnterTransition,
+            popExitTransition = transitionAnimation.popExitTransition
+        ) {
+            content(it)
+        }
     }
 }
 
-fun <S : EmaDataState, VM : EmaViewModel<S, EmaEmptyDestination>, A : EmaComposableScreenActions> NavGraphBuilder.createComposableScreen(
-    defaultState: S,
-    screenContent: EmaComposableScreenContent<S, A>,
-    navController: NavController,
-    routeId: String = screenContent::class.routeId(),
-    overrideInitializer: EmaInitializer? = null,
-    androidViewModel: @Composable () -> EmaAndroidViewModel,
-) {
-    composable(routeId) {
-        val creator =
-            EmaScreenProvider<VM, A>().provide(androidViewModel = androidViewModel.invoke())
-        EmaComposableScreen(
-            initializer = overrideInitializer ?: getAndReleaseInitializer(routeId),
-            defaultState = defaultState,
-            navigator = EmaEmptyNavigator(
-                LocalContext.current.findActivity(),
-                navController
-            ),
-            vm = creator.first,
-            screenContent = screenContent,
-            actions = creator.second
-        )
-    }
+fun routeWithInitializer(
+    route: String,
+    initializerBundle: EmaInitializerBundle?,
+) = initializerBundle?.let {
+    routeWithInitializer(route, it.initializer, it.serializer)
+} ?: route
+
+private fun parseRouteWithInitializerSupport(routeId: String): String {
+    return "$routeId?${EmaInitializer.KEY}={${EmaInitializer.KEY}}"
+}
+
+fun routeWithInitializer(
+    routeId: String,
+    initializer: EmaInitializer,
+    serializer: BundleSerializerStrategy
+): String {
+    return "$routeId?${EmaInitializer.KEY}=${serializer.toStringValue(initializer)}"
+}
+
+fun NavController.navigateBack(closeActivityWhenBackstackIsEmpty: Boolean = true): Boolean {
+    val hasMoreBackScreens = popBackStack()
+    if (!hasMoreBackScreens && closeActivityWhenBackstackIsEmpty)
+        this.context.findComponentActivity().finish()
+
+    return hasMoreBackScreens
+}
+
+fun NavController.navigateToExternalLink(url: String): Boolean {
+    return kotlin.runCatching {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        context.findComponentActivity().startActivity(intent)
+    }.map { true }.getOrElse { false }
 }
 
 
-fun NavController.getInitializer(route: String? = null): EmaInitializer? {
-    return currentDestination?.route?.let {
-        getAndReleaseInitializer(it)
-    }
-}
-
-private fun putInitializer(route: String, initializer: EmaInitializer) {
-    val map = mapInitializer ?: hashMapOf<String, EmaInitializer>().apply {
-        mapInitializer = this
-    }
-    map[route] = initializer
-}
-
-private fun getAndReleaseInitializer(route: String): EmaInitializer? {
-    val initializer = mapInitializer?.remove(route)
-    if (mapInitializer?.size == INT_ZERO) {
-        mapInitializer = null
-    }
-    return initializer
-
-}

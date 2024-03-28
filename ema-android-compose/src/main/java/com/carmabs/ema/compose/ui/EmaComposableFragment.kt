@@ -8,7 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import com.carmabs.ema.android.base.EmaCoreFragment
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
@@ -20,8 +21,8 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaComposableFragment<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
-    : EmaCoreFragment<S, VM, D>() {
+abstract class EmaComposableFragment<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent>
+    : EmaCoreFragment<S, VM, N>() {
 
     protected var isFirstNormalExecution: Boolean = true
         private set
@@ -39,16 +40,17 @@ abstract class EmaComposableFragment<S : EmaDataState, VM : EmaViewModel<S, D>, 
         isFirstOverlayedExecution = true
         return ComposeView(requireContext()).apply {
             setContent {
-                val state = vm.getObservableState()
+                val state = viewModel.subscribeStateUpdates()
                     .collectAsState(initial = EmaState.Normal(object : EmaDataState {} as S))
                 when (val emaState = state.value) {
-                    is EmaState.Normal<S> -> {
+                    is EmaState.Normal<S, N> -> {
                         onStateNormal(data = emaState.data)
                         isFirstNormalExecution = false
                     }
-                    is EmaState.Overlapped<S> -> {
+
+                    is EmaState.Overlapped<S, N> -> {
                         onStateNormal(data = emaState.data)
-                        onStateOverlapped(data = emaState.dataOverlapped)
+                        onStateOverlapped(data = emaState.extraData)
                         isFirstOverlayedExecution = false
                     }
 

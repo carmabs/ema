@@ -5,8 +5,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.carmabs.ema.android.ui.EmaAndroidView
 import com.carmabs.ema.android.ui.EmaFragment
-import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
+import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
+import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaState
+import com.carmabs.ema.core.viewmodel.EmaViewModel
 import kotlin.reflect.KProperty
 
 /**
@@ -19,13 +22,13 @@ import kotlin.reflect.KProperty
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
 @Suppress("ClassName")
-class emaViewModelSharedDelegate<VM : EmaAndroidViewModel>(
-    private val viewModelSeed:()-> VM,
-    private val observerFunction: ((attachedState: EmaState<*>) -> Unit)? = null,
+class emaViewModelSharedDelegate<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent>(
+    private val viewModelSeed: () -> VM,
+    private val observerFunction: ((attachedState: EmaState<S,N>) -> Unit)? = null,
 
-) {
+    ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): VM {
-        val emaView = (thisRef as? EmaAndroidView<*, *, *>)
+        val emaView = (thisRef as? EmaAndroidView<S, EmaViewModel<S,N>, N>)
             ?: throw IllegalAccessException(
                 "You must use this delegate " +
                         "in an object that inherits from EmaView"
@@ -38,7 +41,7 @@ class emaViewModelSharedDelegate<VM : EmaAndroidViewModel>(
         }
 
         return when (emaView) {
-            is EmaFragment<*,*,*,*> -> {
+            is EmaFragment<*, S,EmaViewModel<S,N>, N> -> {
                 emaView.addExtraViewModel(
                     viewModelSeed.invoke(),
                     emaView,
@@ -46,6 +49,7 @@ class emaViewModelSharedDelegate<VM : EmaAndroidViewModel>(
                     observerFunction
                 )
             }
+
             else -> throw IllegalAccessException("The view must be a EmaFragment")
         }
     }

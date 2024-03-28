@@ -1,16 +1,20 @@
 package com.carmabs.ema.android.extension
 
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.util.TypedValue
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.carmabs.ema.core.constants.FLOAT_ONE
+import com.carmabs.ema.core.constants.INT_ONE
 import com.carmabs.ema.core.constants.INT_ZERO
+import com.carmabs.ema.core.value.EmaUriRes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -49,6 +53,21 @@ fun @receiver:FontRes Int.getTypeface(context: Context): Typeface {
     return ResourcesCompat.getFont(context, this)!!
 }
 
+fun Drawable.getProportionalDimensions(targetWidth: Int?, targetHeight: Int?): Pair<Int, Int> {
+    val whRation = intrinsicWidth / intrinsicHeight.toFloat()
+    val endWidth = if (whRation < INT_ONE)
+        (targetHeight ?: intrinsicHeight) * whRation
+    else
+        targetWidth ?: intrinsicWidth
+
+    val endHeight = if (whRation < INT_ONE)
+        (targetHeight ?: intrinsicHeight)
+    else
+        (targetWidth ?: intrinsicWidth) / whRation
+
+    return Pair(endWidth.toInt(), endHeight.toInt())
+}
+
 
 /**
  * Get color from a @ColorRes
@@ -77,8 +96,8 @@ fun @receiver:DimenRes Int.getDimension(context: Context): Float {
     return context.resources.getDimension(this)
 }
 
-fun @receiver:FontRes Int.getFont(context:Context): Typeface {
-   return ResourcesCompat.getFont(context,this)!!
+fun @receiver:FontRes Int.getFont(context: Context): Typeface {
+    return ResourcesCompat.getFont(context, this)!!
 }
 
 fun @receiver:DrawableRes Int.getBitmap(
@@ -90,12 +109,15 @@ fun @receiver:DrawableRes Int.getBitmap(
         width != null && height != null -> {
             ContextCompat.getDrawable(context, this)!!.toBitmap(width = width, height = height)
         }
+
         width != null -> {
             ContextCompat.getDrawable(context, this)!!.toBitmap(width = width)
         }
+
         height != null -> {
             ContextCompat.getDrawable(context, this)!!.toBitmap(height = height)
         }
+
         else -> {
             ContextCompat.getDrawable(context, this)!!.toBitmap()
         }
@@ -111,7 +133,7 @@ fun @receiver:DrawableRes Int.getByteArray(context: Context): ByteArray {
     return stream.toByteArray()
 }
 
-fun @receiver:ColorInt Int.toHex(): String = String.format("#%06X", (0xFFFFFF and  this))
+fun @receiver:ColorInt Int.toHex(): String = String.format("#%06X", (0xFFFFFF and this))
 
 suspend fun @receiver:DrawableRes Int.getBitmapFromResource(
     context: Context,
@@ -119,7 +141,7 @@ suspend fun @receiver:DrawableRes Int.getBitmapFromResource(
     height: Int? = null,
     @ColorInt color: Int? = null
 ): Bitmap {
-    return withContext(Dispatchers.Default){
+    return withContext(Dispatchers.Default) {
         ContextCompat.getDrawable(context, this@getBitmapFromResource)?.let {
             val drawable: Drawable = it
             val bitmap: Bitmap = Bitmap.createBitmap(
@@ -158,7 +180,26 @@ suspend fun @receiver:DrawableRes Int.getBitmapCropFromResource(
 ): Bitmap {
 
     return withContext(Dispatchers.Default) {
-        val bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, this@getBitmapCropFromResource)
+        val bitmap: Bitmap =
+            BitmapFactory.decodeResource(context.resources, this@getBitmapCropFromResource)
         bitmap.resizeCrop()
     }
+}
+
+fun @receiver:AnyRes Int.toUriRes(context: Context): EmaUriRes {
+    val resources = context.resources
+    val uriResource = Uri.Builder()
+        .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+        .authority(context.packageName) // Look up the resources in the application with its splits loaded
+        .appendPath(resources.getResourceTypeName(this))
+        .appendPath(
+            String.format(
+                "%s:%s",
+                resources.getResourcePackageName(this), // Look up the dynamic resource in the split namespace.
+                resources.getResourceEntryName(this)
+            )
+        )
+        .build()
+
+    return EmaUriRes(uriResource.toString())
 }

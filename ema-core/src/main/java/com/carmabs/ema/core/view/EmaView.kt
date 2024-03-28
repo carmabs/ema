@@ -1,8 +1,13 @@
 package com.carmabs.ema.core.view
 
-import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.initializer.EmaInitializerSerializer
+import com.carmabs.ema.core.model.EmaEvent
+import com.carmabs.ema.core.model.onLaunched
+import com.carmabs.ema.core.navigator.EmaNavigationDirection
+import com.carmabs.ema.core.navigator.EmaNavigationDirectionEvent
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigator
+import com.carmabs.ema.core.navigator.onNavigation
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.state.EmaState
@@ -20,11 +25,11 @@ import kotlin.reflect.KProperty
  * View to handle VM view logic states through [EmaState].
  * The user must provide in the constructor by template:
  *  - The view model class [EmaViewModel] is going to use the view
- *  - The navigation state class [EmaDestination] will handle the navigation
+ *  - The navigation state class [EmaNavigationEvent] will handle the navigation
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> {
+interface EmaView<S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent> {
 
     /**
      * Scope for flow updates
@@ -32,24 +37,24 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
     val coroutineScope: CoroutineScope
 
     /**
-     * The view mdeol seed [EmaViewModel] for the view
+     * The view model [EmaViewModel] for the view
      */
-    val viewModelSeed: VM
+    val viewModel: VM
 
     /**
      * The navigator [EmaNavigator]
      */
-    val navigator: EmaNavigator<D>?
+    val navigator: EmaNavigator<N>?
 
     /**
      * The initializer from previous views when it is launched.
      */
-    val initializer: EmaInitializer?
+    val initializerSerializer:EmaInitializerSerializer?
 
     /**
      * The previous state of the View
      */
-    var previousEmaState: EmaState<S>?
+    var previousEmaState: EmaState<S, N>?
 
     val previousStateData: S?
         get() = previousEmaState?.data
@@ -64,7 +69,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
      * Called when view model trigger an update view event
      * @param state of the view
      */
-    private fun onDataUpdated(state: EmaState<S>) {
+    private fun onDataUpdated(state: EmaState<S, N>) {
 
         previousEmaState?.let { previousState ->
             if (previousState.javaClass.name != state.javaClass.name) {
@@ -73,14 +78,15 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
                         onEmaStateTransition(
                             EmaStateTransition.NormalToOverlapped(
                                 previousState.data,
-                                state.dataOverlapped
+                                state.extraData
                             )
                         )
                     }
+
                     is EmaState.Normal -> {
                         onEmaStateTransition(
                             EmaStateTransition.OverlappedToNormal(
-                                (previousState as EmaState.Overlapped<S>).dataOverlapped,
+                                (previousState as EmaState.Overlapped<S, N>).extraData,
                                 state.data
                             )
                         )
@@ -92,8 +98,9 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
         onEmaStateNormal(state.data)
         when (state) {
             is EmaState.Overlapped -> {
-                onEmaStateOverlapped(state.dataOverlapped)
+                onEmaStateOverlapped(state.extraData)
             }
+
             else -> {
                 //DO NOTHING
             }
@@ -178,22 +185,33 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
 
     /**
      * Called when view model trigger an only once notified event
-     * @param data for extra information
+     * @param event for extra information
      */
-    fun onSingleData(data: EmaExtraData) {
-        onSingleEvent(data)
+    fun onSingleData(event: EmaEvent) {
+        event.onLaunched {
+            onSingleEvent(it)
+            viewModel.consumeSingleEvent()
+        }
+
     }
 
     /**
-     * Called when view model trigger an only once notified event for navigation
+     * Called when view model trigger a navigation event for navigation
      * @param navigation state with information about the destination
      */
-    fun onNavigation(navigation: D?) {
-        navigation?.let {
-            if (!it.isNavigated)
-                navigate(navigation)
-            it.setNavigated()
-        } ?: navigateBack()
+    fun onNavigation(navigation: EmaNavigationDirectionEvent) {
+        navigation.onNavigation {
+            when (val direction = it) {
+                is EmaNavigationDirection.Back -> {
+                    navigateBack(direction.result)
+                }
+
+                is EmaNavigationDirection.Forward -> {
+                    navigate(direction.navigationEvent as N)
+                }
+            }
+            viewModel.notifyOnNavigated()
+        }
     }
 
     /**
@@ -216,11 +234,11 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
 
     /**
      * Called when view model trigger a navigation event
-     * @param state with info about destination
+     * @param navigationEvent for the navigation event data
      */
-    @Suppress("UNCHECKED_CAST")
-    fun navigate(state: D) {
-        navigator?.navigate(state) ?: throwNavigationException()
+
+    fun navigate(navigationEvent: N) {
+        navigator?.navigate(navigationEvent) ?: throwNavigationException()
     }
 
     @Throws
@@ -232,11 +250,21 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
      * Called when view model trigger a navigation back event
      * @return True
      */
-    fun navigateBack(): Boolean {
-        return navigator?.navigateBack() ?: onBack()
+    fun navigateBack(result: Any? = null): Boolean {
+        return navigator?.navigateBack(result) ?: onBack(result)
     }
 
-    fun onBack(): Boolean
+    fun onBack(result: Any?): Boolean
+
+    fun onCreate(viewModel: VM) {
+        startTrigger?.also {
+            it.triggerAction = {
+                viewModel.onCreated(initializerSerializer?.restore())
+            }
+        } ?: also {
+            viewModel.onCreated(initializerSerializer?.restore())
+        }
+    }
 
     /**
      * Called when view model is started
@@ -244,10 +272,10 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
     fun onStartView(viewModel: VM) {
         startTrigger?.also {
             it.triggerAction = {
-                viewModel.onStart(initializer)
+                viewModel.onStartView()
             }
         } ?: also {
-            viewModel.onStart(initializer)
+            viewModel.onStartView()
         }
     }
 
@@ -269,7 +297,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
 
     fun onBindState(coroutineScope: CoroutineScope, viewModel: VM): Job {
         return coroutineScope.launch {
-            viewModel.getObservableState().collectLatest {
+            viewModel.subscribeStateUpdates().collectLatest {
                 onDataUpdated(it)
             }
         }
@@ -277,7 +305,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
 
     fun onBindNavigation(coroutineScope: CoroutineScope, viewModel: VM): Job {
         return coroutineScope.launch {
-            viewModel.getNavigationState().collectLatest {
+            viewModel.subscribeToNavigationEvents().collectLatest {
                 onNavigation(it)
             }
         }
@@ -285,7 +313,7 @@ interface EmaView<S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination>
 
     fun onBindSingle(coroutineScope: CoroutineScope, viewModel: VM): Job {
         return coroutineScope.launch {
-            viewModel.getSingleObservableState().collect {
+            viewModel.subscribeToSingleEvents().collect {
                 onSingleData(it)
             }
         }

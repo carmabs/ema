@@ -11,8 +11,9 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.fragment.FragmentNavigator
 import com.carmabs.ema.android.extension.setInitializer
+import com.carmabs.ema.android.initializer.EmaInitializerBundle
 import com.carmabs.ema.core.initializer.EmaInitializer
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.navigator.EmaNavigator
 
 /**
@@ -25,27 +26,12 @@ import com.carmabs.ema.core.navigator.EmaNavigator
  * Navigator to handle navigation through navController with navigation back support and no target navigation
  * Created by: Carlos Mateo Benito on 20/1/19.
  */
-interface EmaNavControllerNavigator<D : EmaDestination> : EmaNavigator<D> {
+interface EmaNavControllerNavigator<D : EmaNavigationEvent> : EmaNavigator<D> {
 
     val navController: NavController
 
     val activity: Activity
 
-
-    /**
-     * Set the initializer for the incoming fragment.
-     * @param initializer for the incoming view
-     */
-    @Deprecated( "Use extension EmaInitializer.toBundle() instead", ReplaceWith(
-        "initializer.toBundle()",
-        "android.os.Bundle",
-        "com.carmabs.ema.android.extension.toBundle"
-    )
-    )
-    fun setInitializer(
-        initializer: EmaInitializer
-    ): Bundle =
-        Bundle().setInitializer(initializer)
 
     /**
      * Navigate with android architecture components within action ID
@@ -69,16 +55,14 @@ interface EmaNavControllerNavigator<D : EmaDestination> : EmaNavigator<D> {
      * @param initializer is the data you want to pass to next activity. It will be handled in viewmodel
      * @param finishMain if [activity] must be finished when [destinationActivity] is launched
      */
-    fun navigateToActivity(
+    fun <I>navigateToActivity(
         destinationActivity: Class<out ComponentActivity>,
-        initializer: EmaInitializer? = null,
+        initializerData: EmaInitializerBundle? = null,
         finishMain: Boolean = false
     ) {
         activity.startActivity(
-            Intent(activity.applicationContext, destinationActivity).apply {
-                initializer?.also {
-                    putExtra(EmaInitializer.KEY,it)
-                }
+            Intent(activity.applicationContext, destinationActivity).run {
+                initializerData?.let { setInitializer<EmaInitializer>(initializerData.initializer,initializerData.serializer) } ?: this
             },
         )
         if (finishMain) {
@@ -103,19 +87,5 @@ interface EmaNavControllerNavigator<D : EmaDestination> : EmaNavigator<D> {
      */
     fun navigateWithDirections(navDirections: NavDirections, extras: Navigator.Extras) {
         navController.navigate(navDirections, extras)
-    }
-
-
-    /**
-     * Navigates back
-     * @return true if a fragment has been popped, false if backstack is empty, in that case, finish
-     * the activity provided.
-     */
-    override fun navigateBack(): Boolean {
-        val hasMoreFragments = navController.popBackStack()
-        if (!hasMoreFragments)
-            activity.finish()
-
-        return hasMoreFragments
     }
 }

@@ -12,7 +12,10 @@ import com.carmabs.ema.core.dialog.EmaDialogProvider
  *
  * @author <a href="mailto:apps.carmabs@gmail.com">Carlos Mateo Benito</a>
  */
-abstract class EmaAndroidDialogProvider constructor(private val fragmentManager: FragmentManager) :
+abstract class EmaAndroidDialogProvider constructor(
+    private val fragmentManager: FragmentManager,
+    private val dialogTag: String? = null
+) :
     EmaDialogProvider {
 
     private var dialog: EmaDialog<*, EmaDialogData>? = null
@@ -21,69 +24,68 @@ abstract class EmaAndroidDialogProvider constructor(private val fragmentManager:
 
     override fun show(dialogData: EmaDialogData?) {
 
-        fragmentManager.findFragmentByTag(getTag())?.also {
-            dialog = (it as EmaDialog<*,EmaDialogData>).apply {
+        //We use this to avoid fragment duplication due to internal fragment save state. It guarantees that on rotation
+        //the same fragment is updated and not generate a new one
+        fragmentManager.findFragmentByTag(tag)?.also {
+            dialog = (it as EmaDialog<*, EmaDialogData>).apply {
                 updateDialogData(this, dialogData)
             }
         } ?: also {
-            if (dialog == null) {
-                dialog = generateDialog(dialogData) as EmaDialog<*,EmaDialogData>
-            }
-            dialog?.let { dialog ->
-                updateDialogData(dialog, dialogData)
-                //Because fragment manager works asynchronously,
-                // check it to avoid that fragment has been added exception
-                fragmentManager.executePendingTransactions()
-                if (!dialog.isVisible && !dialog.isAdded) {
-                    dialog.show(fragmentManager, getTag())
+            val dialogToUpdate = dialog ?: let {
+                val newDialog = (generateDialog(dialogData) as EmaDialog<*, EmaDialogData>)
+                if (!newDialog.isVisible && !newDialog.isAdded) {
+                    newDialog.show(
+                        fragmentManager,
+                        tag
+                    )
                 }
-
+                newDialog
             }
+            updateDialogData(dialogToUpdate,dialogData)
+            dialog = dialogToUpdate
+    }
+}
+
+private fun updateDialogData(
+    dialog: EmaDialog<*, EmaDialogData>,
+    dialogData: EmaDialogData?
+) {
+    dialog.dialogListener = dialogListener
+    dialogData?.also {
+        dialog.updateData {
+            it
         }
     }
+}
 
-    private fun updateDialogData(
-        dialog: EmaDialog<*,EmaDialogData>,
-        dialogData: EmaDialogData?
-    ) {
-        dialog.dialogListener = dialogListener
-        dialogData?.also {
-            dialog.updateData {
-                it
-            }
+override fun hide() {
+    //It guarantees that fragment is totally destroyed when it is hidden. Otherwise, the fragment could be saved
+    //internally and create duplications on fragment recreations.
+    dialog?.let {
+        if (!it.isHidden) {
+            Log.d(tag, "Alternative dialog totally hidden")
+            it.dismissAllowingStateLoss()
         }
+        fragmentManager.beginTransaction().remove(it).commitNowAllowingStateLoss()
     }
 
-    override fun hide() {
-        dialog?.let {
-            if (!it.isHidden) {
-                Log.d(getTag(), "Alternative dialog totally hidden")
-                it.dismiss()
-            }
-            fragmentManager.beginTransaction().remove(it).commit()
-        }
+
+    dialog = null
+}
 
 
-        dialog = null
+override val isVisible: Boolean
+    get() = fragmentManager.findFragmentByTag(tag)?.isVisible ?: false
+
+override var dialogListener: EmaDialogListener? = null
+    set(value) {
+        field = value
+        dialog?.dialogListener = value
     }
 
-    override val isVisible: Boolean
-        get() = fragmentManager.findFragmentByTag(getTag())?.isVisible?:false
-
-    override var dialogListener: EmaDialogListener? = null
-        set(value) {
-            field = value
-            dialog?.dialogListener = value
-        }
-
-    /**
-     * We use dialog class if it is available to handle rotation changes if different dialogs
-     * are showing through the same provider
-     */
-    private fun getTag(): String {
-
-        return dialog?.let { it.javaClass.name.toString() } ?: javaClass.name.toString()
-    }
+private val tag by lazy {
+    dialogTag ?: javaClass.name.toString()
+}
 
 
 }

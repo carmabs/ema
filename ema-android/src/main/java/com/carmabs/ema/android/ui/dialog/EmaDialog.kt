@@ -39,7 +39,7 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
     var data: T by emaStateDelegate {
         createInitialState()
     }
-    private set
+        private set
 
     private var isDismissed: Boolean = false
 
@@ -57,12 +57,9 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
      */
     protected abstract fun B.setup(data: T)
 
+    @CallSuper
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog =  super.onCreateDialog(savedInstanceState)
-        val savedData = (savedInstanceState?.getSerializableCompat(KEY_DIALOG_DATA) as? java.io.Serializable) as? T
-        savedData?.also {
-            data = it
-        }
+        val dialog = super.onCreateDialog(savedInstanceState)
         dialog.setOnShowListener(this)
         dialog.setOnKeyListener { _, keyCode, event ->
             dialogListener?.let {
@@ -89,6 +86,7 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
         binding.setup(data)
     }
 
+    @CallSuper
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -102,6 +100,7 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
         return binding.root
     }
 
+    @CallSuper
     override fun onResume() {
         super.onResume()
         dialog?.window?.also { win ->
@@ -127,11 +126,13 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
 
     }
 
+    @CallSuper
     override fun onShow(p0: DialogInterface?) {
         if (isDismissed)
             dismissAllowingStateLoss()
     }
 
+    @CallSuper
     override fun show(manager: FragmentManager, tag: String?) {
         manager.apply {
             val oldFragment = findFragmentByTag(tag)
@@ -142,15 +143,19 @@ abstract class EmaDialog<B : ViewBinding, T : EmaDialogData> : DialogFragment(),
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(KEY_DIALOG_DATA, data)
-    }
-
     protected abstract fun createInitialState(): T
 
+    @CallSuper
     override fun onDestroyView() {
         _binding = null
-        dialogListener = null
         super.onDestroyView()
+    }
+
+
+    @CallSuper
+    override fun onDestroy() {
+        dialogListener?.onDestroyed()
+        dialogListener = null
+        super.onDestroy()
     }
 }

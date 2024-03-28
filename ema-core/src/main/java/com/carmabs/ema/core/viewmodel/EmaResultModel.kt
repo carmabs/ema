@@ -8,7 +8,7 @@ package com.carmabs.ema.core.viewmodel
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 internal data class EmaResultModel(
-    val code: String,
+    val key: String,
     val data: Any?,
     val ownerId: String
 )

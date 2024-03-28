@@ -1,6 +1,7 @@
 package com.carmabs.ema.core.extension
 
 import com.carmabs.ema.core.constants.STRING_EMPTY
+import com.carmabs.ema.core.model.EmaText
 
 /**
  * Created by Carlos Mateo Benito on 2019-11-24.

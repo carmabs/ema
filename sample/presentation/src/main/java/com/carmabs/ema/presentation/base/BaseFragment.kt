@@ -3,10 +3,9 @@ package com.carmabs.ema.presentation.base
 import androidx.viewbinding.ViewBinding
 import com.carmabs.ema.android.ui.EmaFragment
 import com.carmabs.ema.core.model.EmaText
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
-import com.carmabs.ema.core.state.EmaExtraDialogData
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 import com.carmabs.ema.presentation.dialog.AppDialogProvider
 import com.carmabs.ema.presentation.dialog.error.ErrorDialogData
@@ -27,13 +26,14 @@ import org.koin.core.parameter.parametersOf
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
 
-abstract class BaseFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> :
-    EmaFragment<B, S, VM, D>() {
+abstract class BaseFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, N>, N : EmaNavigationEvent> :
+    EmaFragment<B, S, VM, N>() {
 
 
     private val appDialogProvider: AppDialogProvider by inject {
         parametersOf(childFragmentManager)
     }
+
 
     final override fun B.onStateNormal(data: S) {
         hideLoading()
@@ -42,31 +42,7 @@ abstract class BaseFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel
         onNormal(data)
     }
 
-    final override fun B.onStateOverlapped(extra: EmaExtraData) {
-        when (extra.id) {
-            BaseViewModel.OVERLAPPED_LOADING -> {
-                showLoading(extra.data as? LoadingDialogData)
-            }
-            BaseViewModel.OVERLAPPED_ERROR -> {
-                val dialogData = extra.data as EmaExtraDialogData
-                val data = dialogData.data as ErrorDialogData
-                val listener = dialogData.listener as ErrorDialogListener
-                showError(data, listener)
-            }
-            BaseViewModel.OVERLAPPED_DIALOG -> {
-                val dialogData = extra.data as EmaExtraDialogData
-                val data = dialogData.data as SimpleDialogData
-                val listener = dialogData.listener as SimpleDialogListener
-                showDialog(data, listener)
-            }
-            else -> {
-                onOverlayed(extra)
-            }
-        }
-
-    }
-
-    protected fun showLoading(
+    private fun showLoading(
         data: LoadingDialogData? = null
     ) {
         val loadingData = data ?: LoadingDialogData(
@@ -76,23 +52,46 @@ abstract class BaseFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel
         appDialogProvider.show(loadingData)
     }
 
-    protected fun showDialog(dialogData: SimpleDialogData, listener: SimpleDialogListener) {
+    final override fun B.onStateOverlapped(extraData: EmaExtraData) {
+        when (extraData.id) {
+            BaseViewModel.OVERLAPPED_ERROR -> onOverlappedError(extraData)
+            BaseViewModel.OVERLAPPED_LOADING -> onOverlappedLoading(extraData)
+            BaseViewModel.OVERLAPPED_DIALOG -> onOverlappedDialog(extraData)
+            else -> onOverlapped(extraData = extraData)
+        }
+    }
+
+    protected fun showSimpleDialog(
+        dialogData: SimpleDialogData,
+        dialogListener: SimpleDialogListener
+    ) {
         appDialogProvider.show(dialogData)
-        appDialogProvider.dialogListener = listener
+        appDialogProvider.dialogListener = dialogListener
     }
 
-    protected fun showError(errorDialogData: ErrorDialogData, listener: ErrorDialogListener) {
+    protected fun showError(
+        errorDialogData: ErrorDialogData,
+        dialogListener: ErrorDialogListener
+    ) {
         appDialogProvider.show(errorDialogData)
-        appDialogProvider.dialogListener = listener
+        appDialogProvider.dialogListener = dialogListener
     }
 
-    final override fun B.onSingleEvent(extra: EmaExtraData) {
-        onSingle(extra)
+    final override fun B.onSingleEvent(extraData: EmaExtraData) {
+        onSingle(extraData)
     }
 
     abstract fun B.onNormal(data: S)
 
-    protected open fun B.onOverlayed(extra: EmaExtraData) {}
+    protected open fun B.onOverlapped(extraData: EmaExtraData) = Unit
+
+    protected open fun B.onOverlappedError(extraData: EmaExtraData) = Unit
+
+    protected open fun B.onOverlappedDialog(extraData: EmaExtraData) = Unit
+
+    protected open fun B.onOverlappedLoading(extraData: EmaExtraData){
+        showLoading()
+    }
 
     protected open fun B.onSingle(extra: EmaExtraData) {}
 

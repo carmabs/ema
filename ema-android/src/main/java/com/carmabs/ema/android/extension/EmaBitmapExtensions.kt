@@ -17,10 +17,10 @@ import kotlin.math.roundToInt
  * Created by Carlos Mateo Benito on 2020-07-13.
  *
  * <p>
- * Copyright (c) 2020 by atSistemas. All rights reserved.
+ * Copyright (c) 2020 by Carmabs. All rights reserved.
  * </p>
  *
- * @author <a href=“mailto:cmateo.benito@atsistemas.com”>Carlos Mateo Benito</a>
+ * @author <a href=“mailto:apps.carmabs@gmail.com.com”>Carlos Mateo Benito</a>
  */
 fun Bitmap.getRoundedCornerBitmap(
     pixels: Int = width / 2,
@@ -137,7 +137,7 @@ fun Bitmap.resizeFitInside(destWidth: Int, destHeight: Int): Bitmap {
     return background
 }
 
-fun Drawable.toBitmap(maxSize: Size? = null): Bitmap {
+fun Drawable.toBitmapWithMaxSize(maxSize: Size? = null): Bitmap {
     return if (this is BitmapDrawable && this.bitmap != null) {
         val bitmapDrawable = this
         if (maxSize == null) {

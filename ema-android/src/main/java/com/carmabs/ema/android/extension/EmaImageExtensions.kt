@@ -30,6 +30,7 @@ suspend fun EmaImage.bitmap(context: Context, overrideWeight:Int?=null,overrideH
     return when(this){
         is EmaImage.ByteArray -> bytes.toBitmap(fWidth,fHeight,fTint)
         is EmaImage.Id -> id.getBitmapFromResource(context,fWidth,fHeight,fTint)
+        is EmaImage.Uri -> uri.getBitmap(context,fWidth,fHeight)
     }
 }
 
@@ -37,5 +38,6 @@ suspend fun EmaImage.drawable(context: Context):Drawable{
     return when(this){
         is EmaImage.ByteArray -> BitmapDrawable(context.resources,bytes.toBitmap(width,height,colorTint))
         is EmaImage.Id -> id.getDrawable(context)
+        is EmaImage.Uri -> uri.requireDrawable(context)
     }
 }

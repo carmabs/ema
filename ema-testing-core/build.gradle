@@ -2,9 +2,9 @@ apply plugin: 'kotlin'
 
 dependencies {
     api project(":ema-core")
-    api emaTesting.junit
-    api emaTesting.junitKotlin
-    api emaTesting.rules
-    api emaTesting.mockito
-    api emaTesting.coroutines
+    api emaTestingDependencies.junit
+    api emaTestingDependencies.junitKotlin
+    api emaTestingDependencies.rules
+    api emaTestingDependencies.mockito
+    api emaTestingDependencies.coroutines
 }

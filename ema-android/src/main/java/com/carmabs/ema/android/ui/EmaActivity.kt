@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
 import com.carmabs.ema.android.base.EmaCoreActivity
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.viewmodel.EmaViewModel
@@ -17,7 +17,7 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
-abstract class EmaActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> :
+abstract class EmaActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> :
     EmaCoreActivity<S, VM, D>() {
 
     protected lateinit var binding: B
@@ -54,8 +54,8 @@ abstract class EmaActivity<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
         isFirstNormalExecution = false
     }
 
-    final override fun onEmaStateOverlapped(extra: EmaExtraData) {
-        binding.onStateOverlayed(extra)
+    final override fun onEmaStateOverlapped(extraData: EmaExtraData) {
+        binding.onStateOverlayed(extraData)
         isFirstOverlayedExecution = false
     }
 

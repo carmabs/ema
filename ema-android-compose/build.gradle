@@ -21,16 +21,17 @@ android {
         }
     }
 
+    def javaVersion= JavaVersion.VERSION_17
+
     compileOptions {
-        coreLibraryDesugaringEnabled = true
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-        //useIR = true
+        jvmTarget = javaVersion.toString()
     }
+
     packagingOptions {
         resources {
             pickFirsts += ['META-INF/kotlinx-io.kotlin_module', 'META-INF/ema-android_debug.kotlin_module']
@@ -48,15 +49,15 @@ dependencies {
 
     api platform(emaComposeDependencies.bom)
     api emaComposeDependencies.ui
+    api emaComposeDependencies.ripple
     api emaComposeDependencies.tooling
     api emaComposeDependencies.toolingPreview
     api emaComposeDependencies.activity
     api emaComposeDependencies.koin
+    api emaComposeDependencies.lifecycle
     api emaComposeDependencies.viewmodel
     api emaComposeDependencies.navigation
 
-    //Java Time API for SDK version < 26
-    coreLibraryDesugaring emaAndroidDependencies.desugaring
 }
 
 afterEvaluate {

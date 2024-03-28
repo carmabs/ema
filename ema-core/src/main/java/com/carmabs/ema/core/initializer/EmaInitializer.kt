@@ -1,6 +1,8 @@
 package com.carmabs.ema.core.initializer
 
-import java.io.Serializable
+import com.carmabs.ema.core.action.EmaAction
+import kotlinx.serialization.PolymorphicSerializer
+import kotlinx.serialization.Serializable
 
 /**
  * Created by Carlos Mateo Benito on 8/8/22.
@@ -11,8 +13,10 @@ import java.io.Serializable
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-interface EmaInitializer : Serializable {
+interface EmaInitializer : EmaAction.Initializer{
     companion object {
         const val KEY = "EmaInitializer"
     }
+    data object EMPTY : EmaInitializer
 }
+

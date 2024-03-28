@@ -11,6 +11,6 @@ interface EmaDialogListener {
     fun onOutsidePressed(){
         onBackPressed()
     }
-    
     fun onBackPressed()
+    fun onDestroyed() = Unit
 }

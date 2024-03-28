@@ -7,7 +7,8 @@ import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
 import com.carmabs.ema.android.base.EmaCoreFragment
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.android.initializer.bundle.strategy.BundleSerializerStrategy
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.state.EmaExtraData
 import com.carmabs.ema.core.viewmodel.EmaViewModel
@@ -19,9 +20,11 @@ import com.carmabs.ema.core.viewmodel.EmaViewModel
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo</a>
  */
-abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaDestination> :
-    EmaCoreFragment<S,VM,D>(){
+abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<S, D>, D : EmaNavigationEvent> :
+    EmaCoreFragment<S, VM, D>() {
 
+    override val initializerStrategy: BundleSerializerStrategy
+        get() = BundleSerializerStrategy.EMPTY
     protected var isFirstNormalExecution: Boolean = true
         private set
 
@@ -55,7 +58,6 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     }
 
 
-
     @CallSuper
     override fun onDestroyView() {
         _binding = null
@@ -78,7 +80,7 @@ abstract class EmaFragment<B : ViewBinding, S : EmaDataState, VM : EmaViewModel<
     }
 
     abstract fun B.onStateNormal(data: S)
-    protected open fun B.onStateOverlapped(extra: EmaExtraData) {}
-    protected open fun B.onSingleEvent(extra: EmaExtraData) {}
+    protected open fun B.onStateOverlapped(extraData: EmaExtraData) {}
+    protected open fun B.onSingleEvent(extraData: EmaExtraData) {}
 
 }

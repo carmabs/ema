@@ -22,7 +22,7 @@ import org.koin.core.component.KoinComponent
  * </p>
  *
  * Service to handle job intents
- * - It has implemented kodein to handle kodein instances of application module
+ * - It has implemented koin to handle koin instances of application module
  * - If you want to use a custom module you can provide it by inject module function
  * - It has static enqueue methods to execute work implicitily
  * - Use suspend execute work function to handle async operations in the service job thread

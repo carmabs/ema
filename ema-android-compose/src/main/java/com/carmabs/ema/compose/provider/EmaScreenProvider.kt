@@ -1,23 +1,25 @@
 package com.carmabs.ema.compose.provider
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.carmabs.ema.android.viewmodel.EmaAndroidViewModel
 import com.carmabs.ema.android.viewmodel.EmaViewModelFactory
-import com.carmabs.ema.compose.action.EmaComposableScreenActions
-import com.carmabs.ema.compose.action.EmaEmptyComposableScreenActions
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
+import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
 
-class EmaScreenProvider<VM:EmaViewModel<*,*>,A: EmaComposableScreenActions> {
+object EmaScreenProvider {
 
     @Composable
-    fun provide(androidViewModel:EmaAndroidViewModel):Pair<VM,A>{
-        val vm = viewModel(
-            androidViewModel::class.java,
-            factory = EmaViewModelFactory(androidViewModel)
-        ).emaViewModel as VM
-        val actions = (vm as? A)?: EmaEmptyComposableScreenActions as A
-
-        return  Pair(vm, actions)
+    fun <S : EmaDataState, N : EmaNavigationEvent> provideComposableViewModel(
+        viewModel: EmaViewModel<S, N>,
+        savedStateHandle: SavedStateHandle?
+    ): EmaAndroidViewModel<S, N> {
+        return viewModel(
+            modelClass = EmaAndroidViewModel::class.java,
+            key = viewModel.id,
+            factory = EmaViewModelFactory(viewModel, savedStateHandle)
+        ) as EmaAndroidViewModel<S, N>
     }
 }

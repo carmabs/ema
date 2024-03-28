@@ -1,17 +1,27 @@
-apply plugin: 'kotlin'
-apply plugin: 'maven-publish'
+plugins{
+    id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'maven-publish'
+    id 'kotlin'
+}
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 compileKotlin {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+    kotlinOptions.freeCompilerArgs = ["-Xcontext-receivers"]
+    kotlinOptions {
+        languageVersion = "1.9"
+    }
 }
+
 
 dependencies {
     api emaCoreDependencies.kotlin
     api emaCoreDependencies.coroutines
+    api emaCoreDependencies.serializationJson
     implementation emaCoreDependencies.reflect
+    implementation emaTestingDependencies.junit
 }
 
 

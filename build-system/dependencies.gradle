@@ -2,8 +2,9 @@ rootProject.ext {
 
     //Libraries
 
-    navigationVersion = "2.6.0-alpha04"
-    navigationComposeVersion = "2.5.3"
+    navigationVersion = "2.6.0-alpha06"
+
+    navigationComposeVersion = "2.7.1"
 
     lifecycleExtensionsVersion = "2.2.0"
 
@@ -11,7 +12,7 @@ rootProject.ext {
 
     constraintVersion = "2.1.4"
 
-    materialVersion = "1.7.0"
+    materialVersion = "1.11.0"
 
     coroutinesVersion = "1.6.4"
 
@@ -25,9 +26,11 @@ rootProject.ext {
 
     espressoVersion = "3.4.0"
 
-    kotlinVersion = '1.8.0'
+    kotlinVersion = '1.9.10'
 
     viewmodelVersion = "2.5.1"
+
+    gsonVersion = "2.10.1"
 
     kotlinCompilerExtensionVersion = '1.0.5'
 
@@ -35,16 +38,18 @@ rootProject.ext {
 
     lifecycleKtExtensionVersion = '2.5.1'
 
-    fragmentVersion = "1.5.4"
+    fragmentVersion = "1.5.5"
 
     reflectVersion = "1.8.0"
 
+    serializationJsonVersion = "1.6.0"
+
     emaVersioning = [
             minSdk           : 24,
-            compileSdk       : 33,
-            targetSdk        : 33,
-            versionCode      : 16,
-            versionName      : "5.1.0",
+            compileSdk       : 34,
+            targetSdk        : 34,
+            versionCode      : 17,
+            versionName      : "6.0.0",
             groupId          : 'com.github.carmabs',
             artifactCoreId   : 'ema-core',
             artifactAndroidId: 'ema-android',
@@ -52,12 +57,13 @@ rootProject.ext {
     ]
 
     emaCoreDependencies = [
-            kotlin    : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:" + project.kotlinVersion,
-            coroutines: 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + project.coroutinesVersion,
-            reflect   : 'org.jetbrains.kotlin:kotlin-reflect:' + project.reflectVersion
+            kotlin           : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:" + project.kotlinVersion,
+            coroutines       : 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + project.coroutinesVersion,
+            reflect          : 'org.jetbrains.kotlin:kotlin-reflect:' + project.reflectVersion,
+            serializationJson: 'org.jetbrains.kotlinx:kotlinx-serialization-json:' + project.serializationJsonVersion
     ]
 
-    emaTesting = [
+    emaTestingDependencies = [
             espresso   : "androidx.test.espresso:espresso-core:" + project.espressoVersion,
             core       : "androidx.test:core:" + project.coreVersion,
             coreKotlin : "androidx.test:core-ktx:" + project.coreVersion,
@@ -69,6 +75,7 @@ rootProject.ext {
     ]
 
     emaAndroidDependencies = [
+            gson                : "com.google.code.gson:gson:$gsonVersion",
             koin                : "io.insert-koin:koin-android:$koinVersion",
             reflection          : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
             fragment            : "androidx.fragment:fragment-ktx:$fragmentVersion",
@@ -85,9 +92,11 @@ rootProject.ext {
             bom           : 'androidx.compose:compose-bom:+',
             koin          : "io.insert-koin:koin-androidx-compose:$koinVersion",
             ui            : "androidx.compose.ui:ui",
+            ripple        : "androidx.compose.material:material-ripple-android",
             tooling       : "androidx.compose.ui:ui-tooling",
             toolingPreview: "androidx.compose.ui:ui-tooling-preview",
             activity      : "androidx.activity:activity-compose",
+            lifecycle     : "androidx.lifecycle:lifecycle-runtime-compose",
             viewmodel     : "androidx.lifecycle:lifecycle-viewmodel-compose",
             navigation    : "androidx.navigation:navigation-compose:$navigationComposeVersion",
     ]

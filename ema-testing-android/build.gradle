@@ -37,7 +37,7 @@ dependencies {
     implementation project(":ema-testing-core")
 
     //androidTest
-    implementation emaTesting.core
-    implementation emaTesting.coreKotlin
-    implementation emaTesting.espresso
+    implementation emaTestingDependencies.core
+    implementation emaTestingDependencies.coreKotlin
+    implementation emaTestingDependencies.espresso
 }

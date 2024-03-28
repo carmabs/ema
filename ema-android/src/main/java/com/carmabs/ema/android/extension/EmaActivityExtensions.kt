@@ -10,6 +10,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.BuildCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStateAtLeast
+import com.carmabs.ema.android.navigation.EmaNavigationBackHandler
+import com.carmabs.ema.core.model.EmaBackHandlerStrategy
+import kotlinx.coroutines.launch
 
 
 /**
@@ -24,36 +31,36 @@ import androidx.fragment.app.Fragment
  * back behaviour.
  */
 @SuppressLint("UnsafeOptInUsageError")
-fun ComponentActivity.addOnBackPressedListener(listener: () -> Boolean) {
-    if (BuildCompat.isAtLeastT()) {
-        val onBackInvokedCallback = object : OnBackInvokedCallback {
-            override fun onBackInvoked() {
-                val backDefaultLaunched = listener.invoke()
-                if (backDefaultLaunched) {
-                    onBackInvokedDispatcher.unregisterOnBackInvokedCallback(this)
-                    onBackPressedDispatcher.onBackPressed()
-                }
+fun ComponentActivity.addOnBackPressedListener(
+    lifecycleOwner: LifecycleOwner? = null,
+    listener: () -> EmaBackHandlerStrategy
+): EmaNavigationBackHandler {
+    //Added this due to bug https://issuetracker.google.com/issues/199631325
+    //This guarantees that listener are restored in same order
+    var added = false
+    val backHandler = EmaNavigationBackHandler(
+        activity = this,
+        lifecycleOwner = lifecycleOwner ?: this,
+        listener = listener
+    )
+    lifecycleOwner?.lifecycleScope?.launch {
+        lifecycleOwner.withStateAtLeast(Lifecycle.State.CREATED){
+            if(added) {
+                backHandler.remove()
+                added = false
             }
         }
-
-        onBackInvokedDispatcher
-            .registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT, onBackInvokedCallback
-            )
-
-    } else {
-        onBackPressedDispatcher.addCallback(
-            this, object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    val backDefaultLaunched = listener.invoke()
-                    isEnabled = !backDefaultLaunched
-                    if (backDefaultLaunched) {
-                        onBackPressedDispatcher.onBackPressed()
-                    }
-                }
-            }
-        )
     }
+    lifecycleOwner?.lifecycleScope?.launch {
+        lifecycleOwner.withStateAtLeast(Lifecycle.State.STARTED){
+            if(!added) {
+                backHandler.add()
+                added = true
+            }
+        }
+    }
+
+    return backHandler
 
 }
 
@@ -63,5 +70,14 @@ fun Context.findActivity(): Activity {
         if (context is Activity) return context
         context = context.baseContext
     }
-    throw IllegalStateException("This class is not contained in an activity")
+    throw IllegalStateException("This class is not contained in an Activity")
+}
+
+fun Context.findComponentActivity(): ComponentActivity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is ComponentActivity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("This class is not contained in a ComponentActivity")
 }

@@ -3,14 +3,14 @@ package com.carmabs.ema.android.extension
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
-import com.carmabs.ema.core.initializer.EmaInitializer
+import com.carmabs.ema.android.initializer.EmaInitializerBundle
 
 fun NavController.navigate(
     id: Int,
-    initializer:EmaInitializer?,
+    initializerBundle: EmaInitializerBundle?,
     navOptions: NavOptions? = null,
     navExtras: Navigator.Extras? = null
 ) {
-    navigate(id, initializer.toBundle(), navOptions, navExtras)
+    navigate(id, initializerBundle.toBundle(), navOptions, navExtras)
 }
 

@@ -26,17 +26,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carmabs.domain.model.User
+import com.carmabs.ema.core.action.EmaActionDispatcher
+import com.carmabs.ema.core.action.EmaActionDispatcherEmpty
 import com.carmabs.ema.presentation.base.compose.BaseScreenComposable
 import com.carmabs.ema.presentation.ui.compose.AppButton
 import com.carmabs.ema.sample.ema.R
 
 class ProfileOnBoardingScreenContent :
-    BaseScreenComposable<ProfileOnBoardingState, ProfileOnBoardingScreenActions>() {
+    BaseScreenComposable<ProfileOnBoardingState, ProfileOnBoardingActions>() {
 
     @Composable
     override fun onNormal(
         state: ProfileOnBoardingState,
-        actions: ProfileOnBoardingScreenActions
+        actions: EmaActionDispatcher<ProfileOnBoardingActions>
     ) {
         Surface(
             modifier = Modifier
@@ -76,14 +78,14 @@ class ProfileOnBoardingScreenContent :
                 AppButton(
                     text = stringResource(id = R.string.profile_user_admin)
                 ) {
-                    actions.onActionAdminClicked()
+                    actions.dispatch(ProfileOnBoardingActions.AdminClicked)
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
                 AppButton(
                     text = stringResource(id = R.string.profile_user_basic)
                 ) {
-                    actions.onActionUserClicked()
+                    actions.dispatch(ProfileOnBoardingActions.UserClicked)
                 }
             }
         }
@@ -93,7 +95,7 @@ class ProfileOnBoardingScreenContent :
 
     @Preview(device = Devices.NEXUS_5)
     @Composable
-    fun normalPreview() {
+    private fun NormalPreview() {
         onNormal(
             state = ProfileOnBoardingState(
                 User(
@@ -101,9 +103,7 @@ class ProfileOnBoardingScreenContent :
                     "Mateo"
                 )
             ),
-            object : ProfileOnBoardingScreenActions {
-                override fun onActionAdminClicked() = Unit
-                override fun onActionUserClicked() = Unit
-            })
+            actions = EmaActionDispatcherEmpty()
+        )
     }
 }

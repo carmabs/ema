@@ -19,7 +19,7 @@ interface UseCase<I, O> {
      * Executes a function inside a background thread by async way
      * @return the object with the return value
      */
-    suspend fun execute(input: I): O
+    suspend operator fun invoke(input: I): O
 
     /**
      * Executes a function inside blocking the thread until

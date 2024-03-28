@@ -1,13 +1,12 @@
 package com.carmabs.ema.android.viewmodel
 
 import androidx.annotation.CallSuper
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.carmabs.ema.core.navigator.EmaDestination
+import com.carmabs.ema.core.navigator.EmaNavigationEvent
 import com.carmabs.ema.core.state.EmaDataState
 import com.carmabs.ema.core.viewmodel.EmaViewModel
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.javaMethod
 
 /**
  * Created by Carlos Mateo Benito on 13/02/2021.
@@ -18,15 +17,17 @@ import kotlin.reflect.jvm.javaMethod
  *
  * @author <a href=“mailto:apps.carmabs@gmail.com”>Carlos Mateo Benito</a>
  */
-abstract class EmaAndroidViewModel(val emaViewModel:EmaViewModel<*,*>) :
-    ViewModel() {
+open class EmaAndroidViewModel<S:EmaDataState,N:EmaNavigationEvent>(
+    val emaViewModel:EmaViewModel<S,N>,
+    val savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
     init {
-        Class.forName(emaViewModel.javaClass.name).kotlin.functions.find { it.name == "setScope" }?.javaMethod?.invoke(emaViewModel,viewModelScope)
+        emaViewModel.setScope(viewModelScope)
     }
     @CallSuper
     override fun onCleared() {
-        Class.forName(emaViewModel.javaClass.name).kotlin.functions.find { it.name == "onCleared" }?.javaMethod?.invoke(emaViewModel)
+       emaViewModel.onCleared()
         super.onCleared()
     }
 }

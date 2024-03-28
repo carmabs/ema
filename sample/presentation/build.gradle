@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
 apply plugin: 'androidx.navigation.safeargs.kotlin'
@@ -12,15 +13,12 @@ android {
         minSdkVersion emaVersioning.minSdk
         compileSdkVersion emaVersioning.compileSdk
         targetSdkVersion emaVersioning.targetSdk
-        versionCode emaVersioning.versionCode
-        versionName emaVersioning.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     flavorDimensions 'default'
 
     buildTypes {
         debug {
-            debuggable true
             minifyEnabled false
         }
         release {
@@ -34,19 +32,20 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion "1.4.0"
-        kotlinCompilerVersion '1.8.0'
+        kotlinCompilerExtensionVersion "1.5.5"
+    }
+
+    def javaVersion= JavaVersion.VERSION_17
+
+    compileOptions {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-        //useIR = true
+        jvmTarget = javaVersion.toString()
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
     packagingOptions {
         resources {
             excludes += ['META-INF/LICENSE', 'META-INF/DEPENDENCIES']

@@ -5,6 +5,7 @@ import com.carmabs.ema.android.di.emaInjectionModule
 import com.carmabs.ema.core.concurrency.EmaScopeDispatcher
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import kotlin.reflect.full.functions
@@ -37,5 +38,5 @@ interface EmaApplicationAware {
      * The child classes implement this methods to return the module that provides the app scope objects
      * @return The Koin module which makes the injection
      */
-    fun injectAppModules(): List<Module>?
+    fun KoinApplication.injectAppModules(): List<Module>?
 }
