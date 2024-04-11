@@ -1,0 +1,2 @@
+[submodule "ema-core/src/main/java/com/carmabs/emax"]
+	url = git@github.com:carmabs/EmaX.git
